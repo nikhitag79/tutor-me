@@ -1,0 +1,16 @@
+{% extends 'main/base.html' %}
+
+{% block sidebar_block %}
+{% endblock %}
+
+{% block title_block %}
+    <h1>Register an Account</h1>
+{% endblock %}
+
+{% block body_block %}
+<form method="POST" class="from-group">
+    {% csrf_token %}
+    {{form}}
+    <button type="submit" class="btn-success">Create Account</button>
+</form>
+{% endblock %}
