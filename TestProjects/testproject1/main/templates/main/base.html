@@ -40,12 +40,14 @@
     </div>
 
     <div class="sidebar">
+        {% block link_block %}
         <a href="">Home</a>
         <a href="/student_home/">Student Home</a>
         <a href="/schedule">Schedule</a>
         <a href="/other/">Other</a>
         <a href="/account/">Account</a>
         <a href="/CS3240">CS3240</a>
+        {% endblock %}
     </div>
     <div class="main">
             {% block body_block %}
