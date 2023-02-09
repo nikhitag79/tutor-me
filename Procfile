@@ -1,1 +1,1 @@
-web: python manage.py migrate && python manage.py collectstatic && gunicorn locallibrary.wsgi
+web: gunicorn core.wsgi --log-file=-
