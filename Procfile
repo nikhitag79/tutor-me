@@ -1,1 +1,3 @@
-web: python manage.py migrate && python manage.py collectstatic && gunicorn locallibrary.wsgi
+
+release: python manage.py migrate
+web: gunicorn testproject1.wsgi
