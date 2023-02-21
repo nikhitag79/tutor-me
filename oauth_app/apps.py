@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 
 
-class RegistrationConfig(AppConfig):
+class OauthAppConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'registration'
+    name = 'oauth_app'
