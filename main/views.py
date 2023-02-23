@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
-from .models import ClassList, Item, ClassSelect, UserProfile
+from .models import ClassList, Item, ClassSelect
+ #   , UserProfile
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login
@@ -49,15 +50,23 @@ def other(response):
 @login_required
 def select_user(response):
     if response.method == "POST":
-        print("hello", response.POST.get('user_type'))
         user_type = response.POST.get('user_type')
-        response.user.user_type = user_type
-        response.user.has_selected_type = True
+        if(user_type=="Tutor"):
+            response.user.user_type = 1
+        if(user_type == "Student"):
+            response.user.user_type = 2
+
+        response.user.has_selected_role = True
         response.user.save()
 
-        if user_type == "tutor":
+        if user_type == "Tutor":
             return redirect('/home/')
-        elif user_type =="student":
+        elif user_type =="Student":
             return redirect('/student_home/')
+    # elif response.user.has_selected_role:
+    #     if response.user.user_type == "Tutor":
+    #         return redirect('/home/')
+    #     elif response.user.user_type == "Student":
+    #         return redirect('/student_home/')
     else:
         return render(response, 'main/select_user.html')

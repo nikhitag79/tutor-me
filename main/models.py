@@ -32,10 +32,10 @@ class ClassSelect(forms.Form):
     class_select = forms.MultipleChoiceField(choices=available_classes)
 
 
-class UserProfile(models.Model):
-    USER_TYPES = (
-        ('tutor', 'Tutor'),
-        ('student', 'Student'),
-    )
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    user_type = models.CharField(max_length=10, choices=USER_TYPES)
+# class UserProfile(models.Model):
+#     USER_TYPES = (
+#         ('tutor', 'Tutor'),
+#         ('student', 'Student'),
+#     )
+#     user = models.OneToOneField(User, on_delete=models.CASCADE)
+#     user_type = models.CharField(max_length=10, choices=USER_TYPES)

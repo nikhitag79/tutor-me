@@ -3,9 +3,14 @@
 <body>
 <h1>My Google OAuth Project </h1>
 {% if user.is_authenticated %}
-    {% if not user.has_selected_type %}
+    {% if not user.has_selected_role %}
         <a href="/select_user/">Continue to home</a>
+    {% elif user.user_type == 1%}
+        <a href="/home/"> Tutor Home </a>
+    {% elif user.user_type == 2%}
+        <a href="/student_home/"> Student Home </a>
     {% endif %}
+
   <p>Welcome, You are logged in as {{ user.username }}</p>
 {% else %}
   <a href="{% provider_login_url 'google' %}">Login With Google</a>
