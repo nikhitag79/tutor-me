@@ -1,0 +1,19 @@
+{% block content %}
+  <h1>Select your user type</h1>
+  <form method="post">
+    {% csrf_token %}
+    <div>
+      <label>
+        <input type="radio" name="user_type" value="tutor" required>
+        tutor
+      </label>
+    </div>
+    <div>
+      <label>
+        <input type="radio" name="user_type" value="student" required>
+        Student
+      </label>
+    </div>
+    <button type="submit">Submit</button>
+  </form>
+{% endblock %}

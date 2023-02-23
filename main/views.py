@@ -1,6 +1,9 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
-from .models import ClassList, Item, ClassSelect
+from .models import ClassList, Item, ClassSelect, UserProfile
+from django.contrib.auth import logout
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth import authenticate, login
 
 
 # Create your views here.
@@ -29,8 +32,10 @@ def schedule(response):
 
 
 def account(response):
-    return render(response, "main/home.html", {'name': 'Account'})
-
+    if response.method == "POST":
+        logout(response)
+        return redirect("/")
+    return render(response, "main/account.html", {'name': 'Account'})
 
 def classes(response, class_id):
     ls = ClassList.objects.get(class_id=class_id)
@@ -39,3 +44,20 @@ def classes(response, class_id):
 
 def other(response):
     return render(response, "main/home.html", {'name': 'Other'})
+
+
+@login_required
+def select_user(response):
+    if response.method == "POST":
+        print("hello", response.POST.get('user_type'))
+        user_type = response.POST.get('user_type')
+        response.user.user_type = user_type
+        response.user.has_selected_type = True
+        response.user.save()
+
+        if user_type == "tutor":
+            return redirect('/home/')
+        elif user_type =="student":
+            return redirect('/student_home/')
+    else:
+        return render(response, 'main/select_user.html')

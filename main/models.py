@@ -2,6 +2,7 @@ from django.db import models
 from django import forms
 from django.contrib.auth.models import User #Going to be used to attach users to Classes
 
+
 # Create your models here.
 
 # I have used a quick database set up for this. We can edit later, it just helps to show
@@ -29,3 +30,12 @@ class Item(models.Model):
 class ClassSelect(forms.Form):
     available_classes = (('CS3240', 'CS3240'), ('ECE2660', 'ECE2660'))
     class_select = forms.MultipleChoiceField(choices=available_classes)
+
+
+class UserProfile(models.Model):
+    USER_TYPES = (
+        ('tutor', 'Tutor'),
+        ('student', 'Student'),
+    )
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user_type = models.CharField(max_length=10, choices=USER_TYPES)
