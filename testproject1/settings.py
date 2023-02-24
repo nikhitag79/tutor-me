@@ -46,10 +46,14 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
+    'bootstrap5',
+    'crispy_forms',
+    'crispy_bootstrap5',
 
     # 'multiselectfield',             # allows for multiple selection of items such as classes, has not yet been used
 ]
-
+CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
+CRISPY_TEMPLATE_PACK = "bootstrap5"
 # Site ID
 SITE_ID = 6
 
