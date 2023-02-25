@@ -1,0 +1,17 @@
+{% extends 'main/base.html' %}
+
+{% block title_block %}
+    <h1>{{ ls.class_id }}</h1>
+{% endblock %}
+
+{% block body_block %}
+    {% if ls.item_set.all %}
+        <ul>
+        {% for item in ls.item_set.all %}
+            <li>{{ item.tutor_first_name }}{{' '}}{{ item.tutor_last_name }}</li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p>{{ 'There are currently no tutors available for this class!' }}</p>
+    {% endif %}
+{% endblock %}

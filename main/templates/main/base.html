@@ -1,0 +1,58 @@
+<html>
+
+<head>
+    {% block sidebar_block %}
+    <style>
+        .sidebar{
+            height:100%;
+            width:200px;
+            position: fixed;
+            z-index:1;
+            top:0;
+            left:0;
+            background-color:#2C2C2C;
+            overflow-x:hidden;
+            padding-top:15px;
+        }
+        .sidebar a{
+            padding:6px 8px 6px 16px;
+            text-decoration: none;
+            font-size:25px;
+            color: #818181;
+            display:block;
+        }
+        .sidebar a:hover{
+            color:#f1f1f1
+        }
+        .main{
+            margin-left:200px;
+            padding: 0px 10px;
+        }
+    </style>
+    {% endblock %}
+    <title>Tutor Website</title>
+</head>
+
+<body>
+    <div class="main">
+    {% block title_block %}
+    {% endblock %}
+    </div>
+
+    <div class="sidebar">
+        {% block link_block %}
+        <a href="">Home</a>
+        <a href="/student_home/">Student Home</a>
+        <a href="/schedule/">Schedule</a>
+        <a href="/other/">Other</a>
+        <a href="/account/">Account</a>
+        <a href="/CS3240">CS3240</a>
+        {% endblock %}
+    </div>
+    <div class="main">
+            {% block body_block %}
+            {% endblock %}
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,21 @@
+{% extends 'main/base.html' %}
+
+{% block sidebar_block %}
+{% endblock %}
+
+{% block title_block %}
+<h1>Login Here</h1>
+{% endblock %}
+
+
+{% block link_block %}
+{% endblock %}
+
+{% block body_block %}
+<form method="post" class="form-group">
+    {% csrf_token %}
+    {{form}}
+    <button type="submit" class="btn btn-success">Login</button>
+    <p>First Time User? Create an account <a href="/register/">here</a></p>
+</form>
+{% endblock %}
