@@ -25,7 +25,7 @@ def student_home(response):
 
 
 def tutor_home(response):
-    return render(response, "main/home.html", {'name': 'Tutor'})
+    return render(response, "main/home.html", {'name': 'Home'})
 
 
 def schedule(response):
