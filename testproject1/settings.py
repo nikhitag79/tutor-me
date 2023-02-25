@@ -28,7 +28,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-a((^5pr8j5mok=r^9n4pb
 
 DEBUG = os.environ.get('DJANGO_DEBUG', '') != 'False'
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '.boiling-harbor-24441.herokuapp.com']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '.boiling-harbor-24441.herokuapp.com', '.tutor-me-uva.herokuapp.com']
 
 # Application definition
 
