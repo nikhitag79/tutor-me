@@ -1,6 +1,20 @@
 from django.db import models
 from django import forms
 from django.contrib.auth.models import User #Going to be used to attach users to Classes
+import requests
+import json
+
+
+class View(models.Model):
+    def get_json_data(url):
+        response = requests.get(url)
+        if response.status_code == 200:
+            data = json.loads(response.content)
+            return data
+        else:
+            print('Error:', response.status_code)
+
+
 
 
 # Create your models here.

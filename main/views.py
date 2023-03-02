@@ -1,13 +1,22 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
-from .models import ClassList, Item, ClassSelect
- #   , UserProfile
+from .models import ClassList, Item, ClassSelect, View
+#   , UserProfile
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login
 
 
 # Create your views here.
+
+def my_view(request):
+    url = "https://sisuva.admin.virginia.edu/psc/ihprd/UVSS/SA/s/WEBLIB_HCX_CM.H_CLASS_SEARCH.FieldFormula.IScript_ClassSearchOptions?institution=UVA01&term=1228"
+    response = View.get_json_data(url)
+    context = {'data': response}
+    print(type(response))
+    print(type(context))
+    return render(request, 'main/student_home.html', {'context': response})
+
 
 def account_creation(response):
     return render(response, "")
@@ -38,6 +47,7 @@ def account(response):
         return redirect("/")
     return render(response, "main/account.html", {'name': 'Account'})
 
+
 def classes(response, class_id):
     ls = ClassList.objects.get(class_id=class_id)
     return render(response, "main/roster.html", {"ls": ls})
@@ -51,9 +61,9 @@ def other(response):
 def select_user(response):
     if response.method == "POST":
         user_type = response.POST.get('user_type')
-        if(user_type=="Tutor"):
+        if (user_type == "Tutor"):
             response.user.user_type = 1
-        if(user_type == "Student"):
+        if (user_type == "Student"):
             response.user.user_type = 2
 
         response.user.has_selected_role = True
@@ -61,7 +71,7 @@ def select_user(response):
 
         if user_type == "Tutor":
             return redirect('/home/')
-        elif user_type =="Student":
+        elif user_type == "Student":
             return redirect('/student_home/')
     # elif response.user.has_selected_role:
     #     if response.user.user_type == "Tutor":
