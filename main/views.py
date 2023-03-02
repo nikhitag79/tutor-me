@@ -13,6 +13,10 @@ def my_view(request):
     url = "https://sisuva.admin.virginia.edu/psc/ihprd/UVSS/SA/s/WEBLIB_HCX_CM.H_CLASS_SEARCH.FieldFormula.IScript_ClassSearchOptions?institution=UVA01&term=1228"
     response = View.get_json_data(url)
     context = {'data': response}
+
+    subjects = context["data"]["subjects"]
+    for i in subjects:
+        print("each", i["subject"])
     print(type(response))
     print(type(context))
     return render(request, 'main/student_home.html', {'context': response})
