@@ -29,10 +29,20 @@ def account_creation(response):
 def home(response):
     return render(response, "main/home.html", {'name': 'Home'})
 
+# def tutors_search_results(request):
+#     if request.method == 'POST':
+#         selected_field = request.POST['field']
+#         # Retrieve search results for selected field
+#         # ...
+#         return render(request, 'tutors/search_results.html', {'results': results})
 
 def student_home(response):
     selection = ClassSelect()
     if response.method == "POST":
+        print("HERE")
+        print(response)
+        print(response.POST['field'])
+
         return redirect('/CS3240')
     return render(response, "main/student_home.html", {'name': 'Student', 'selection': selection})
 
