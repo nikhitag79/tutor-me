@@ -29,7 +29,6 @@ class ClassList(models.Model):
     def __str__(self):
         return self.class_id
 
-
 # The items are the tutors
 class Item(models.Model):
     classlist = models.ForeignKey(ClassList, on_delete=models.CASCADE)

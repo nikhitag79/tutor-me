@@ -22,7 +22,6 @@ def my_view(request):
 
     return render(request, 'main/student_home.html', {'context': subject})
 
-
 def account_creation(response):
     return render(response, "")
 
