@@ -1,5 +1,10 @@
 {% load static %}
 {% load socialaccount %}
+<!--
+    NOTES:
+    Figure out static image stuff
+    figure out how to change the heigh of "welcome" + signin
+-->
 <!doctype html>
 <html>
 <head>
@@ -18,24 +23,25 @@
 <body>
     <style>
         #leftside{
-            background-color: #f6b76a;
+            background-color: rgba(246, 183, 106, 0.7);
             margin: 0px;
             width: 35%;
             height: 100vh;
         };
     </style>
     <!--f9e1f5-->
-    <div class = "container-fluid">
+    <div class = "container-fluid" style = "background-image:url('https://www.toptal.com/designers/subtlepatterns/uploads/y-so-serious-white.png'); background-repeat: repeat;">
         <div class = "row">
             <div class = "col-4" id = "leftside">
-                <img src = "{% static '/testproject1/images/lineart-book-nobg' %}"/>
+                <!--<img src = "{% static 'testproject1/lineart-book-nobg.png' %}"/>-->
+                <p>Put an image here</p>
             </div><!--'https://www.toptal.com/designers/subtlepatterns/uploads/y-so-serious-white.png'-->
-            <div class = "d-flex align-items-center justify-content-center col-6" id = "rightside" style = "background-image:url('https://www.toptal.com/designers/subtlepatterns/uploads/y-so-serious-white.png'); background-repeat: repeat; width: 65%;">
+            <div class = "d-flex align-items-center justify-content-center col-6" id = "rightside" style = " width: 65%;">
                 <div class = "flex-container">
-                <div class="row">
+                <div class="row" id = "row-top">
                     <h1 id = "welcome">Welcome :)</h1>
                 </div>
-                <div class="row">
+                <div class="row" id = "row-bot">
                 {% if user.is_authenticated %}
                     {% if not user.has_selected_role %}
                         <a href="/select_user/">Continue to home</a>

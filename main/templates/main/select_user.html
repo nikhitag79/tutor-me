@@ -1,19 +1,89 @@
-{% block content %}
-  <h1>Select your user type</h1>
-  <form method="post">
+{% load static %}
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>Select User</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+
+</head>
+
+<body style = "background-image:url('https://www.toptal.com/designers/subtlepatterns/uploads/y-so-serious-white.png');">
+  <style>
+    div.center-screen {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      min-height: 70vh;
+      border-style: solid;
+      border-radius: 75px;
+      margin-top: 5%;
+      margin-right: 37%;
+      margin-left: 37%;
+      margin-bottom: 0%;
+      background-color: rgba(246, 183, 106, 0.5);
+      border-color: #f6b76a;
+      color: white;
+    }
+    div.row {
+    /  padding-top: 1em;
+    /  padding-bottom: 5em;
+    }
+    form {
+      justify-content: left;
+      align-items: left;
+      text-align: left;
+    }
+    input {
+      appearance: none;
+    
+      border-radius: 50%;
+      width: 16px;
+      height: 16px;
+    
+      border: 2px solid #999;
+      transition: 0.2s all linear;
+      margin-right: 5px;
+    
+      position: relative;
+      top: 4px;
+    }
+    
+    input:checked {
+      border: 6px solid black;
+    }
+  </style>
+
+  {% block content %}
+  <div class = "center-screen">
+    <div class = "flex-container">
+      <div class = "row">
+        <h1>Select User Type</h1>
+      </div>
+    <div class = "row">
+    <form method="post">
     {% csrf_token %}
-    <div>
-      <label>
-        <input type="radio" name="user_type" value="Tutor" required>
+    <div class = "form-check">
+      <label class = "form-check-label">
+        <input class = "form-check-input" type="radio" name="user_type" value="Tutor" required>
         Tutor
       </label>
     </div>
-    <div>
-      <label>
-        <input type="radio" name="user_type" value="Student" required>
+    <div class = "form-check">
+      <label class = "form-check-label">
+        <input class = "form-check-input" type="radio" name="user_type" value="Student" required>
         Student
       </label>
     </div>
     <button type="submit">Submit</button>
   </form>
+</div>
+  </div>
+</div>
+</div>
+</body>
 {% endblock %}
