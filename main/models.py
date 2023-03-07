@@ -1,5 +1,6 @@
 from django.db import models
 from django import forms
+from django.forms import widgets
 from django.contrib.auth.models import User #Going to be used to attach users to Classes
 import requests
 import json
@@ -42,8 +43,18 @@ class Item(models.Model):
 # Should technically make a forms.py for this, but it behaves like a model, and I thought
 # for testing purposes it was fine.
 class ClassSelect(forms.Form):
-    available_classes = (('CS3240', 'CS3240'), ('ECE2660', 'ECE2660'))
-    class_select = forms.MultipleChoiceField(choices=available_classes)
+    # available_classes = (('CS3240', 'CS3240'), ('ECE2660', 'ECE2660'))
+    url = "https://sisuva.admin.virginia.edu/psc/ihprd/UVSS/SA/s/WEBLIB_HCX_CM.H_CLASS_SEARCH.FieldFormula.IScript_ClassSearchOptions?institution=UVA01&term=1228"
+    response = View.get_json_data(url)
+
+    context = {'data': response}
+    list = []
+    subjects = context["data"]["subjects"]
+    for i in subjects:
+        tuple = (i["subject"],i["subject"])
+        list.append(tuple)
+
+    class_select = forms.MultipleChoiceField(choices=list, widget=forms.widgets.SelectMultiple(attrs={'size': 100}))
 
 
 # class UserProfile(models.Model):
