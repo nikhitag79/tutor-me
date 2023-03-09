@@ -51,7 +51,10 @@ INSTALLED_APPS = [
 ]
 
 # Site ID
-SITE_ID = 5
+if 'DATABASE_URL' in os.environ:
+    SITE_ID = 10
+else:
+    SITE_ID = 8
 
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'

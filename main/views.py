@@ -1,7 +1,6 @@
 from django.shortcuts import render, redirect
-from django.http import HttpResponse
-from .models import ClassList, Item, ClassSelect, View
-#   , UserProfile
+from .models import ClassList, Item, View
+from .forms import ClassSelect
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login
@@ -23,6 +22,18 @@ def home(response):
 
 
 def student_home(response):
+    url = "https://sisuva.admin.virginia.edu/psc/ihprd/UVSS/SA/s/WEBLIB_HCX_CM.H_CLASS_SEARCH.FieldFormula.IScript_ClassSearchOptions?institution=UVA01&term=1228"
+    url_data = View.get_json_data(url)
+
+    context = {'data': url_data}
+    subjects = context["data"]["subjects"]
+    existing_list = []
+    existing_classes = ClassList.objects.all()
+    for i in existing_classes:
+        existing_list.append(str(i))
+    for i in subjects:
+        if not i["subject"] in existing_list:
+            class_instance = ClassList.objects.create(class_id = i["subject"], class_name="")
     selection = ClassSelect()
     if response.method == "POST":
         return redirect('/CS3240')
@@ -55,13 +66,16 @@ def other(response):
 
 @login_required
 def select_user(response):
-    url = "https://sisuva.admin.virginia.edu/psc/ihprd/UVSS/SA/s/WEBLIB_HCX_CM.H_CLASS_SEARCH.FieldFormula.IScript_ClassSearchOptions?institution=UVA01&term=1228"
-    url_data = View.get_json_data(url)
-
-    context = {'data': url_data}
-    subjects = context["data"]["subjects"]
-    for i in subjects:
-        class_instance = ClassList.objects.create(class_id = i["subject"], class_name="")
+    # url = "https://sisuva.admin.virginia.edu/psc/ihprd/UVSS/SA/s/WEBLIB_HCX_CM.H_CLASS_SEARCH.FieldFormula.IScript_ClassSearchOptions?institution=UVA01&term=1228"
+    # url_data = View.get_json_data(url)
+    #
+    # context = {'data': url_data}
+    # subjects = context["data"]["subjects"]
+    # existing_classes = ClassList.objects.all()
+    # for i in subjects:
+    #     if not i["subject"] in existing_classes:
+    #         print(i["subject"])
+    #         # class_instance = ClassList.objects.create(class_id = i["subject"], class_name="")
 
     if response.method == "POST":
         user_type = response.POST.get('user_type')
