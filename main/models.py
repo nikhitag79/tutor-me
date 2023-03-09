@@ -43,23 +43,21 @@ class Item(models.Model):
 # for testing purposes it was fine.
 class ClassSelect(forms.Form):
     # available_classes = (('CS3240', 'CS3240'), ('ECE2660', 'ECE2660'))
-    url = "https://sisuva.admin.virginia.edu/psc/ihprd/UVSS/SA/s/WEBLIB_HCX_CM.H_CLASS_SEARCH.FieldFormula.IScript_ClassSearchOptions?institution=UVA01&term=1228"
-    response = View.get_json_data(url)
-
-    context = {'data': response}
+    # url = "https://sisuva.admin.virginia.edu/psc/ihprd/UVSS/SA/s/WEBLIB_HCX_CM.H_CLASS_SEARCH.FieldFormula.IScript_ClassSearchOptions?institution=UVA01&term=1228"
+    # response = View.get_json_data(url)
+    #
+    # context = {'data': response}
+    context = ClassList
+    print(context.objects.all())
     list = []
-    subjects = context["data"]["subjects"]
+    subjects = context.objects.all()
     for i in subjects:
-        tuple = (i["subject"],i["subject"])
+        tuple = (str(i),str(i))
         list.append(tuple)
+        print(type(i))
+        print(i)
 
-    class_select = forms.MultipleChoiceField(choices=list, widget=forms.widgets.SelectMultiple(attrs={'size': 100}))
+    class_select = forms.ChoiceField(choices=list, widget=forms.widgets.SelectMultiple(attrs={'size': 100}))
 
 
-# class UserProfile(models.Model):
-#     USER_TYPES = (
-#         ('tutor', 'Tutor'),
-#         ('student', 'Student'),
-#     )
-#     user = models.OneToOneField(User, on_delete=models.CASCADE)
-#     user_type = models.CharField(max_length=10, choices=USER_TYPES)
+

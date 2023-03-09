@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/4.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.0/ref/settings/
 """
-# import dj_database_url
+import dj_database_url
 from pathlib import Path
 import os
 
@@ -91,7 +91,6 @@ WSGI_APPLICATION = 'testproject1.wsgi.application'
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
 if 'DATABASE_URL' in os.environ:
-    print(dj_database_url.parse(os.environ.get('DATABASE_URL')))
     DATABASES = {
         'default':  dj_database_url.parse(os.environ.get('DATABASE_URL'))
     }
@@ -177,7 +176,6 @@ LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/login/'
 
 # Update database configuration from $DATABASE_URL.
-import dj_database_url
 
 db_from_env = dj_database_url.config(conn_max_age=500)
 DATABASES['default'].update(db_from_env)

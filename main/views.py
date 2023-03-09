@@ -11,14 +11,6 @@ from django.contrib.auth import authenticate, login
 
 def my_view(request):
     subject = ClassSelect()
-    # url = "https://sisuva.admin.virginia.edu/psc/ihprd/UVSS/SA/s/WEBLIB_HCX_CM.H_CLASS_SEARCH.FieldFormula.IScript_ClassSearchOptions?institution=UVA01&term=1228"
-    # response = View.get_json_data(url)
-    #
-    # context = {'data': response}
-    # list = []
-    # subjects = context["data"]["subjects"]
-    # for i in subjects:
-    #     list.append(i["subject"])
 
     return render(request, 'main/student_home.html', {'context': subject})
 
@@ -29,20 +21,10 @@ def account_creation(response):
 def home(response):
     return render(response, "main/home.html", {'name': 'Home'})
 
-# def tutors_search_results(request):
-#     if request.method == 'POST':
-#         selected_field = request.POST['field']
-#         # Retrieve search results for selected field
-#         # ...
-#         return render(request, 'tutors/search_results.html', {'results': results})
 
 def student_home(response):
     selection = ClassSelect()
     if response.method == "POST":
-        print("HERE")
-        print(response)
-        print(response.POST['field'])
-
         return redirect('/CS3240')
     return render(response, "main/student_home.html", {'name': 'Student', 'selection': selection})
 
@@ -73,6 +55,14 @@ def other(response):
 
 @login_required
 def select_user(response):
+    url = "https://sisuva.admin.virginia.edu/psc/ihprd/UVSS/SA/s/WEBLIB_HCX_CM.H_CLASS_SEARCH.FieldFormula.IScript_ClassSearchOptions?institution=UVA01&term=1228"
+    url_data = View.get_json_data(url)
+
+    context = {'data': url_data}
+    subjects = context["data"]["subjects"]
+    for i in subjects:
+        class_instance = ClassList.objects.create(class_id = i["subject"], class_name="")
+
     if response.method == "POST":
         user_type = response.POST.get('user_type')
         if (user_type == "Tutor"):
@@ -87,10 +77,6 @@ def select_user(response):
             return redirect('/home/')
         elif user_type == "Student":
             return redirect('/student_home/')
-    # elif response.user.has_selected_role:
-    #     if response.user.user_type == "Tutor":
-    #         return redirect('/home/')
-    #     elif response.user.user_type == "Student":
-    #         return redirect('/student_home/')
+
     else:
         return render(response, 'main/select_user.html')
