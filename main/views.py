@@ -1,10 +1,10 @@
 from django.shortcuts import render, redirect
-from .models import ClassList, Item, View
+from .models import ClassList, Item, View, ClassDatabase
 from .forms import ClassSelect
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login
-
+from .filters import FilterCourses
 
 # Create your views here.
 
@@ -22,22 +22,47 @@ def home(response):
 
 
 def student_home(response):
+    #till 37 keep for testing
     url = "https://sisuva.admin.virginia.edu/psc/ihprd/UVSS/SA/s/WEBLIB_HCX_CM.H_CLASS_SEARCH.FieldFormula.IScript_ClassSearchOptions?institution=UVA01&term=1228"
     url_data = View.get_json_data(url)
 
     context = {'data': url_data}
     subjects = context["data"]["subjects"]
     existing_list = []
-    existing_classes = ClassList.objects.all()
+    existing_classes = ClassDatabase.objects.all()
     for i in existing_classes:
+        print("exisiting", str(i))
         existing_list.append(str(i))
-    for i in subjects:
-        if not i["subject"] in existing_list:
-            class_instance = ClassList.objects.create(class_id = i["subject"], class_name="")
-    selection = ClassSelect()
+    # for i in subjects:
+    #     if not i["subject"] in existing_list:
+    #         class_instance = ClassDatabase.objects.create(class_id = i["subject"], class_name="")
+
+    # for i in subjects:
+    url = "https://sisuva.admin.virginia.edu/psc/ihprd/UVSS/SA/s/WEBLIB_HCX_CM.H_CLASS_SEARCH.FieldFormula.IScript_ClassSearch?institution=UVA01&term=1228&subject=" + "CS" +"&page=1"
+    url_data = View.get_json_data(url)
+    context = {'data': url_data}
+    for j in range(len(context["data"])):
+        class_info = context['data'][j]['catalog_nbr']
+        # print(class_info)
+        instructor = context['data'][j]["instructors"][0]["name"]
+        name = context['data'][j]['descr']
+        # print(instructor)
+        # print(name)
+        all= "CS"+class_info +" " + name + " "+ instructor
+        if not all in existing_list:
+            print("full string", all)
+            existing_list.append(all)
+            class_instance = ClassDatabase.objects.create(class_id="CS" + class_info, class_name=name, professors=instructor)
+
+    # move later
+
+
+    selection = ClassDatabase.objects.all()
+    filters = FilterCourses(response.GET,queryset= selection)
+    context = {"filters": filters}
     if response.method == "POST":
         return redirect('/CS3240')
-    return render(response, "main/student_home.html", {'name': 'Student', 'selection': selection})
+    return render(response, "main/student_home.html", context)
 
 
 def tutor_home(response):
