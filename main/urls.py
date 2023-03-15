@@ -10,5 +10,7 @@ urlpatterns = [
     path("other/", views.other, name='other'),
     path("account/", views.account, name='account'),
     path("select_user/", views.select_user, name='select_user'),
+    path("test/",views.a,name='a'),
+    path("test/searchbar/",views.searchbar,name='searchbar'),
     path("<str:class_id>", views.classes, name='class'),
 ]

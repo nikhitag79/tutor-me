@@ -1,0 +1,21 @@
+{% extends 'main/base.html' %}
+
+{% block title_block %}
+    <h1>{{ name }} Page</h1>
+{% endblock %}
+
+{% block body_block %}
+    Find Tutors
+    <form action= "searchbar/" method="get">
+        find a: <input type="text" name="a">
+        <input type="submit" value="Submit" />
+    </form>
+
+<!--    <form method="Post" class="form-switcher">-->
+<!--        {% csrf_token %}-->
+<!--        {{ selection }}-->
+<!--        {{ context }}-->
+
+<!--        <button type="submit" name="GoTo">GoTo</button>-->
+<!--    </form>-->
+{% endblock %}
