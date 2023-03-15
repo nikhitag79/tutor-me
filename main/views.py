@@ -140,6 +140,7 @@ def searchbar(response):
     if response.method == 'GET':
         search = response.GET.get('a')
         url = "https://sisuva.admin.virginia.edu/psc/ihprd/UVSS/SA/s/WEBLIB_HCX_CM.H_CLASS_SEARCH.FieldFormula.IScript_ClassSearch?institution=UVA01&term=1228&subject=" + str(search) +"&page=1"
+        # To remove the other classes that we did not search just perform a if search in database is not 'a' we remove it.
         url_data = View.get_json_data(url)
         context = {'data': url_data}
         print(context)
