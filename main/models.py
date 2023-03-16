@@ -40,7 +40,7 @@ class Item(models.Model):
 
 class ClassDatabase(models.Model):
     class_id = models.CharField(max_length=10, default = 'no class id')
-    class_mnen = models.CharField(max_length=10, default = 'no class mnemonic')
+    class_mnen = models.CharField(max_length=100, default = 'no class mnemonic')
     class_name = models.CharField(max_length=100, default='no class name')
     professors = models.CharField(max_length=100, default = 'no professor')
     available_tutors = models.BooleanField(default=False)
