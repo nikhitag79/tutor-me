@@ -31,7 +31,6 @@ def student_home(response):
     existing_list = []
     existing_classes = ClassDatabase.objects.all()
     for i in existing_classes:
-        print("exisiting", str(i))
         existing_list.append(str(i))
     # for i in subjects:
     #     if not i["subject"] in existing_list:
@@ -43,14 +42,10 @@ def student_home(response):
         context = {'data': url_data}
         for j in range(len(context["data"])):
             class_info = context['data'][j]['catalog_nbr']
-            # print(class_info)
             instructor = context['data'][j]["instructors"][0]["name"]
             name = context['data'][j]['descr']
-            # print(instructor)
-            # print(name)
             all= "CS"+class_info +" " + name + " "+ instructor
             if not all in existing_list:
-                print("full string", all)
                 existing_list.append(all)
                 class_instance = ClassDatabase.objects.create(class_id="CS" + class_info, class_name=name, professors=instructor)
 
@@ -85,18 +80,17 @@ def classes(response, class_id):
     return render(response, "main/roster.html", {"ls": ls})
 
 
-def a(response):
-    url = "https://sisuva.admin.virginia.edu/psc/ihprd/UVSS/SA/s/WEBLIB_HCX_CM.H_CLASS_SEARCH.FieldFormula.IScript_ClassSearchOptions?institution=UVA01&term=1228"
-    url_data = View.get_json_data(url)
-
-    context = {'data': url_data}
-    subjects = context["data"]["subjects"]
-    existing_list = []
-    existing_classes = ClassDatabase.objects.all()
-    for i in existing_classes:
-        print("existing", str(i))
-        existing_list.append(str(i))
-    return render(response, "main/a.html",{"exlist":existing_list})
+def mnemonic(response):
+    # url = "https://sisuva.admin.virginia.edu/psc/ihprd/UVSS/SA/s/WEBLIB_HCX_CM.H_CLASS_SEARCH.FieldFormula.IScript_ClassSearchOptions?institution=UVA01&term=1228"
+    # url_data = View.get_json_data(url)
+    #
+    # context = {'data': url_data}
+    # subjects = context["data"]["subjects"]
+    # existing_list = []
+    # existing_classes = ClassDatabase.objects.all()
+    # for i in existing_classes:
+    #     existing_list.append(str(i))
+    return render(response, "main/mnemonic_page.html")
 
 
 
@@ -138,28 +132,44 @@ def select_user(response):
 
 def searchbar(response):
     if response.method == 'GET':
-        search = response.GET.get('a')
-        url = "https://sisuva.admin.virginia.edu/psc/ihprd/UVSS/SA/s/WEBLIB_HCX_CM.H_CLASS_SEARCH.FieldFormula.IScript_ClassSearch?institution=UVA01&term=1228&subject=" + str(search) +"&page=1"
-        # To remove the other classes that we did not search just perform a if search in database is not 'a' we remove it.
-        url_data = View.get_json_data(url)
-        context = {'data': url_data}
-        print(context)
-        for j in range(len(context["data"])):
-            class_info = context['data'][j]['catalog_nbr']
-            # print(class_info)
-            instructor = context['data'][j]["instructors"][0]["name"]
-            name = context['data'][j]['descr']
-            # print(instructor)
-            # print(name)
-            all= str(search) +class_info +" " + name + " "+ instructor
+        search = response.GET.get('mnemonic')
+        if not search is None:
+            print("here")
             existing_list = []
-            if not all in existing_list:
-                print("full string", all)
-                existing_list.append(all)
-                class_instance = ClassDatabase.objects.create(class_id= str(search) + class_info, class_name=name, professors=instructor)
-    selection = ClassDatabase.objects.all()
-    filters = FilterCourses(response.GET,queryset= selection)
-    context = {"filters": filters}
-    print(selection)
-            
+            existing_classes = ClassDatabase.objects.all()
+            for i in existing_classes:
+                existing_list.append(str(i))
+            pages = 100
+            for page_number in range(1, pages):
+                print("pages numbers", page_number)
+                url = "https://sisuva.admin.virginia.edu/psc/ihprd/UVSS/SA/s/WEBLIB_HCX_CM.H_CLASS_SEARCH.FieldFormula.IScript_ClassSearch?institution=UVA01&term=1228&subject=" + str(
+                    search) + "&page=" + str(page_number)
+                # To remove the other classes that we did not search just perform a if search in database is not 'a' we remove it.
+                url_data = View.get_json_data(url)
+                context = {'data': url_data}
+                if (context["data"] == []):
+                    print("breaking")
+                    break;
+                for j in range(len(context["data"])):
+                    class_info = context['data'][j]['catalog_nbr']
+                    instructor = context['data'][j]["instructors"][0]["name"]
+                    name = context['data'][j]['descr']
+                    all = str(search) + class_info + " " + name + " " + instructor
+                    if not all in existing_list:
+                        existing_list.append(all)
+                        class_instance = ClassDatabase.objects.create(class_id=str(search) + class_info,
+                                                                      class_name=name,
+                                                                      professors=instructor, class_mnen=str(search))
+
+            selection = ClassDatabase.objects.filter(class_mnen= str(search))
+            if not selection:
+                return render(response, "main/mnemonic_page.html", {"error_message": "Not an exisiting mnemonic"})
+            filters = FilterCourses(response.GET,queryset= selection)
+            context = {"filters": filters}
+        else:
+            print("else")
+            selection = ClassDatabase.objects.all()
+            filters = FilterCourses(response.GET, queryset=selection)
+            context = {"filters": filters}
+
     return render(response, "main/student_home.html", context)

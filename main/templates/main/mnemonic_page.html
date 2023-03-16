@@ -7,9 +7,10 @@
 {% block body_block %}
     Find Tutors
     <form action= "searchbar/" method="get">
-        find a: <input type="text" name="a">
+        find mnemonic: <input type="text" name="mnemonic">
         <input type="submit" value="Submit" />
     </form>
+    <br>{{ error_message }} </br>
 
 <!--    <form method="Post" class="form-switcher">-->
 <!--        {% csrf_token %}-->
