@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/4.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.0/ref/settings/
 """
-# import dj_database_url
+import dj_database_url
 from pathlib import Path
 import os
 
@@ -28,7 +28,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-a((^5pr8j5mok=r^9n4pb
 
 DEBUG = os.environ.get('DJANGO_DEBUG', '') != 'False'
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '.boiling-harbor-24441.herokuapp.com']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '.boiling-harbor-24441.herokuapp.com', '.tutor-me-uva.herokuapp.com']
 
 # Application definition
 
@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.sites',
     'oauth_app',
     'allauth',
+    'django_filters',
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
@@ -51,7 +52,10 @@ INSTALLED_APPS = [
 ]
 
 # Site ID
-SITE_ID = 6
+if 'DATABASE_URL' in os.environ:
+    SITE_ID = 10
+else:
+    SITE_ID = 7
 
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
@@ -90,8 +94,14 @@ WSGI_APPLICATION = 'testproject1.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
-DATABASES = {
-    'default': {
+if 'DATABASE_URL' in os.environ:
+    DATABASES = {
+        'default':  dj_database_url.parse(os.environ.get('DATABASE_URL'))
+    }
+else:
+    print("Postgres URL not found, using sqlite instead.")
+    DATABASES = {
+        'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
     }
@@ -170,7 +180,6 @@ LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/login/'
 
 # Update database configuration from $DATABASE_URL.
-import dj_database_url
 
 db_from_env = dj_database_url.config(conn_max_age=500)
 DATABASES['default'].update(db_from_env)

@@ -1,5 +1,10 @@
 {% extends 'main/base.html' %}
 
 {% block title_block %}
-<h1>Tutor {{ name }}</h1>
+{%if user.user_type == 1%}
+    <h1>Tutor {{ name }}</h1>
+{% endif %}
+{%if user.user_type == 2%}
+    <h1>{{ name }}</h1>
+{% endif %}
 {% endblock %}

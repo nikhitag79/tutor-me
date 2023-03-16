@@ -1,19 +1,30 @@
 from django.db import models
-from django import forms
-from django.contrib.auth.models import User #Going to be used to attach users to Classes
+from django.forms import widgets
+import requests
+import json
+
+
+class View(models.Model):
+    def get_json_data(url):
+        response = requests.get(url)
+        if response.status_code == 200:
+            data = json.loads(response.content)
+            return data
+        else:
+            print('Error:', response.status_code)
 
 
 # Create your models here.
 
 # I have used a quick database set up for this. We can edit later, it just helps to show
 class ClassList(models.Model):
-    class_id = models.CharField(max_length=10)
-    class_name = models.CharField(max_length=100, default='Some Class')
+    class_id = models.CharField(max_length=10, default = 'cl id')
+    class_name = models.CharField(max_length=100, default='cl name')
+    # professors = models.CharField(max_length=100, default = 'cl pr')
     available_tutors = models.BooleanField(default=False)
 
     def __str__(self):
         return self.class_id
-
 
 # The items are the tutors
 class Item(models.Model):
@@ -25,17 +36,16 @@ class Item(models.Model):
         return self.tutor_first_name + ' ' + self.tutor_last_name
 
 
-# Should technically make a forms.py for this, but it behaves like a model, and I thought
-# for testing purposes it was fine.
-class ClassSelect(forms.Form):
-    available_classes = (('CS3240', 'CS3240'), ('ECE2660', 'ECE2660'))
-    class_select = forms.MultipleChoiceField(choices=available_classes)
 
 
-# class UserProfile(models.Model):
-#     USER_TYPES = (
-#         ('tutor', 'Tutor'),
-#         ('student', 'Student'),
-#     )
-#     user = models.OneToOneField(User, on_delete=models.CASCADE)
-#     user_type = models.CharField(max_length=10, choices=USER_TYPES)
+class ClassDatabase(models.Model):
+    class_id = models.CharField(max_length=10, default = 'no class id')
+    class_mnen = models.CharField(max_length=10, default = 'no class mnemonic')
+    class_name = models.CharField(max_length=100, default='no class name')
+    professors = models.CharField(max_length=100, default = 'no professor')
+    available_tutors = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.class_id + ' ' + self.class_name + ' ' +  self.professors
+
+
