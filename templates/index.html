@@ -1,0 +1,21 @@
+{% load socialaccount %}
+<html>
+<body>
+<h1>Tutor Me App Login Page</h1>
+{% if user.is_authenticated %}
+    {% if not user.has_selected_role %}
+        <a href="/select_user/">Continue to home</a>
+    {% elif user.user_type == 1%}
+        <a href="/home/"> Tutor Home </a>
+    {% elif user.user_type == 2%}
+        <a href="/student_home/"> Student Home </a>
+    {% endif %}
+
+  <p>Welcome, You are logged in as {{ user.username }}</p>
+{% else %}
+    <a href="{% provider_login_url 'google' action='reauthenticate' %}">Sign in Google account</a>
+
+<!--  <a href="{% provider_login_url 'google' %}">Login With Google</a>-->
+{% endif %}
+</body>
+</html>
