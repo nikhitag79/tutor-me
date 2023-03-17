@@ -1,4 +1,5 @@
 from django.test import TestCase, Client
+from django.urls import reverse
 
 from main.models import ClassDatabase
 
@@ -27,6 +28,24 @@ class TestClass(TestCase):
         self.assertEqual(filtered_classes.count(), 1)
         self.assertEqual(filtered_classes.first().professors, "Horton")
 
+    def test_course_filter_same_mnen(self):
+        ClassDatabase.objects.create(class_id="CS3240", class_mnen="CS",
+                                     class_name="Software Dev", professors="Horton")
+        ClassDatabase.objects.create(class_id="CS1110", class_mnen="CS",
+                                     class_name="Intro", professors="Ryals")
+        filtered_classes = ClassDatabase.objects.filter(class_mnen="CS")
+        self.assertEqual(filtered_classes.count(), 2)
+
+    def test_student_home_template(self):
+        self.client = Client()
+        response = self.client.get(reverse('student_home'))
+        self.assertTemplateUsed(response, 'main/mnemonic_page.html')
+
+    def test_student_home_search_template(self):
+        self.client = Client()
+        response = self.client.get(reverse('searchbar'))
+        self.assertTemplateUsed(response, 'main/student_home.html')
+        self.assertContains(response, '<th> Class id </th>')
 
 
 # More tests on Friday 3/17
