@@ -4,17 +4,10 @@ from .models import ClassList, Item, View, ClassDatabase
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login
+from django.contrib import messages
 from .filters import FilterCourses
 
 # Create your views here.
-
-def my_view(request):
-    subject = ClassSelect()
-
-    return render(request, 'main/student_home.html', {'context': subject})
-
-def account_creation(response):
-    return render(response, "")
 
 
 def home(response):
@@ -22,42 +15,9 @@ def home(response):
 
 
 def student_home(response):
-    #till 37 keep for testing
-    url = "https://sisuva.admin.virginia.edu/psc/ihprd/UVSS/SA/s/WEBLIB_HCX_CM.H_CLASS_SEARCH.FieldFormula.IScript_ClassSearchOptions?institution=UVA01&term=1228"
-    url_data = View.get_json_data(url)
-
-    context = {'data': url_data}
-    subjects = context["data"]["subjects"]
-    existing_list = []
-    existing_classes = ClassDatabase.objects.all()
-    for i in existing_classes:
-        existing_list.append(str(i))
-    # for i in subjects:
-    #     if not i["subject"] in existing_list:
-    #         class_instance = ClassDatabase.objects.create(class_id = i["subject"], class_name="")
-
-    # for i in subjects:
-        url = "https://sisuva.admin.virginia.edu/psc/ihprd/UVSS/SA/s/WEBLIB_HCX_CM.H_CLASS_SEARCH.FieldFormula.IScript_ClassSearch?institution=UVA01&term=1228&subject=" + "CS" +"&page=1"
-        url_data = View.get_json_data(url)
-        context = {'data': url_data}
-        for j in range(len(context["data"])):
-            class_info = context['data'][j]['catalog_nbr']
-            instructor = context['data'][j]["instructors"][0]["name"]
-            name = context['data'][j]['descr']
-            all= "CS"+class_info +" " + name + " "+ instructor
-            if not all in existing_list:
-                existing_list.append(all)
-                class_instance = ClassDatabase.objects.create(class_id="CS" + class_info, class_name=name, professors=instructor)
-
-    # move later
-
-
-    selection = ClassDatabase.objects.all()
-    filters = FilterCourses(response.GET,queryset= selection)
-    context = {"filters": filters}
     if response.method == "POST":
         return redirect('/CS3240')
-    return render(response, "main/student_home.html", context)
+    return render(response, "main/student_home.html")
 
 
 def tutor_home(response):
@@ -81,15 +41,6 @@ def classes(response, class_id):
 
 
 def mnemonic(response):
-    # url = "https://sisuva.admin.virginia.edu/psc/ihprd/UVSS/SA/s/WEBLIB_HCX_CM.H_CLASS_SEARCH.FieldFormula.IScript_ClassSearchOptions?institution=UVA01&term=1228"
-    # url_data = View.get_json_data(url)
-    #
-    # context = {'data': url_data}
-    # subjects = context["data"]["subjects"]
-    # existing_list = []
-    # existing_classes = ClassDatabase.objects.all()
-    # for i in existing_classes:
-    #     existing_list.append(str(i))
     return render(response, "main/mnemonic_page.html")
 
 
@@ -163,7 +114,9 @@ def searchbar(response):
 
             selection = ClassDatabase.objects.filter(class_mnen= str(search))
             if not selection:
-                return render(response, "main/mnemonic_page.html", {"error_message": "Not an exisiting mnemonic"})
+                messages.error(response,"Not an exisiting mnemonic")
+                return redirect('/student_home/')
+                #return render(response, "main/mnemonic_page.html", {"error_message": "Not an exisiting mnemonic"})
             filters = FilterCourses(response.GET,queryset= selection)
             context = {"filters": filters}
         else:
@@ -172,4 +125,4 @@ def searchbar(response):
             filters = FilterCourses(response.GET, queryset=selection)
             context = {"filters": filters}
 
-    return render(response, "main/student_home.html", context)
+    return render(response, "main/class_finder.html", context)

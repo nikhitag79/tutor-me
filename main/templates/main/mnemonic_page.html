@@ -5,18 +5,20 @@
 {% endblock %}
 
 {% block body_block %}
+    {% if messages %} 
+        <ul style = "list-style-type: none;" class="messages">
+            {%for message in messages %}
+             <li {% if message.tags %} class = "{{message.tags}}" {% endif %}> {{message}} </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+    
     Find Tutors
     <form action= "searchbar/" method="get">
         find mnemonic: <input type="text" name="mnemonic">
         <input type="submit" value="Submit" />
     </form>
-    <br>{{ error_message }} </br>
+    
 
-<!--    <form method="Post" class="form-switcher">-->
-<!--        {% csrf_token %}-->
-<!--        {{ selection }}-->
-<!--        {{ context }}-->
 
-<!--        <button type="submit" name="GoTo">GoTo</button>-->
-<!--    </form>-->
 {% endblock %}
