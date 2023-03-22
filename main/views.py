@@ -8,7 +8,7 @@ from django.contrib import messages
 from .filters import FilterCourses
 
 # Create your views here.
-
+search_mnemonic = ""
 
 def home(response):
     return render(response, "main/home.html", {'name': 'Home'})
@@ -41,7 +41,7 @@ def classes(response, class_id):
 
 
 def mnemonic(response):
-    return render(response, "main/mnemonic_page.html")
+    return render(response, "main/mnemonic_page.html",{'name':'Home'})
 
 
 
@@ -51,17 +51,6 @@ def other(response):
 
 @login_required
 def select_user(response):
-    # url = "https://sisuva.admin.virginia.edu/psc/ihprd/UVSS/SA/s/WEBLIB_HCX_CM.H_CLASS_SEARCH.FieldFormula.IScript_ClassSearchOptions?institution=UVA01&term=1228"
-    # url_data = View.get_json_data(url)
-    #
-    # context = {'data': url_data}
-    # subjects = context["data"]["subjects"]
-    # existing_classes = ClassList.objects.all()
-    # for i in subjects:
-    #     if not i["subject"] in existing_classes:
-    #         print(i["subject"])
-    #         # class_instance = ClassList.objects.create(class_id = i["subject"], class_name="")
-
     if response.method == "POST":
         user_type = response.POST.get('user_type')
         if (user_type == "Tutor"):
@@ -85,6 +74,7 @@ def searchbar(response):
     if response.method == 'GET':
         search = response.GET.get('mnemonic')
         if not search is None:
+            search_mnemonic = str(search)
             print("here")
             existing_list = []
             existing_classes = ClassDatabase.objects.all()
@@ -115,14 +105,29 @@ def searchbar(response):
             selection = ClassDatabase.objects.filter(class_mnen= str(search))
             if not selection:
                 messages.error(response,"Not an exisiting mnemonic")
-                return redirect('/student_home/')
+                return redirect('/student_home/',{'name':'Home'})
                 #return render(response, "main/mnemonic_page.html", {"error_message": "Not an exisiting mnemonic"})
             filters = FilterCourses(response.GET,queryset= selection)
-            context = {"filters": filters}
+            context = {"filters": filters,'name':search_mnemonic}
         else:
             print("else")
             selection = ClassDatabase.objects.all()
             filters = FilterCourses(response.GET, queryset=selection)
-            context = {"filters": filters}
+            class_name = ""
+            for index, item in enumerate(filters.qs):
+                if index == 0 and len(filters.qs) == 1:
+                    class_name = item.class_name + " with " + item.professors
+                elif index == 0:
+                    class_name = item.class_name
+                elif class_name == item.class_name:
+                    continue
+                else:
+                    class_name = item.professors
+                    break
+
+                
+                
+            context = {"filters": filters,'name': class_name}
+
 
     return render(response, "main/class_finder.html", context)
