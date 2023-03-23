@@ -46,6 +46,19 @@ def classes(response, class_id, first_professors, last_professors):
     my_instance = ClassDatabase.objects.filter(class_id= class_id, professors = professors)
     print("my instance", len(my_instance))
     header = class_id + " " + professors
+    if response.method == "GET":
+        user = response.user
+        print("inside get")
+        print(class_id)
+        print(first_professors)
+        print(last_professors)
+        group = Group.objects.get(name=class_id + professors)
+        group.user_set.add(user)
+        group.save()
+        is_member = group.user_set.filter(username=user).exists()
+        print("here" , is_member)
+
+
     return render(response, "main/roster.html", {'header': header})
 
 
@@ -144,6 +157,8 @@ def searchbar_tutee(response):
 def searchbar_tutor(response):
     if response.method == 'GET':
         search = response.GET.get('mnemonic')
+        user = response.user
+        print("user", user)
         if not search is None:
             search_mnemonic = str(search).upper()
             print("here")
@@ -180,7 +195,7 @@ def searchbar_tutor(response):
                 return redirect('/student_home/', {'name': 'Home'})
                 # return render(response, "main/mnemonic_page.html", {"error_message": "Not an exisiting mnemonic"})
             filters = FilterCourses(response.GET, queryset=selection)
-            context = {"filters": filters, 'name': search_mnemonic}
+            context = {"filters": filters, 'name': search_mnemonic, 'user': user}
         else:
             print("else")
             selection = ClassDatabase.objects.all()

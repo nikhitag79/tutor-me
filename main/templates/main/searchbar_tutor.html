@@ -28,7 +28,12 @@
                     <td> {{item.class_id}}</td>
                     <td> {{item.class_name}}</td>
                     <td> {{item.professors}}</td>
-                   <td> <a href="/{{item.class_id}} {{item.professors}}/">Sign Up</a></td>
+
+                    {% if user in item.tutors.all %}
+                        <td> <a href="/{{item.class_id}} {{item.professors}}/">Change Sign Up</a></td>
+                    {% else %}
+                        <td> <a href="/{{item.class_id}} {{item.professors}}/">Sign Up</a></td>
+                    {% endif %}
                 </tr>
             {% endfor %}
         </table>

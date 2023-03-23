@@ -15,7 +15,8 @@
 
 <body>
     <h1>Time Availability</h1>
-    <form>
+    <form method="post">
+      {% csrf_token %}
       <fieldset>
         <legend>Monday</legend>
         <label>From:</label>
