@@ -39,13 +39,14 @@ def account(response):
     return render(response, "main/account.html", {'name': 'Account'})
 
 
-def classes(response, class_id):
-    # new_tutor = User.objects.get(username='guntu')
-    # my_instance = ClassDatabase.objects.all()
-    # for each in my_instance:
-    #     if class_id == each.class_id:
-    #
-    return render(response, "main/roster.html")
+def classes(response, class_id, first_professors, last_professors):
+    print("here",class_id)
+    print("type", type(class_id))
+    professors = first_professors + " "+ last_professors
+    my_instance = ClassDatabase.objects.filter(class_id= class_id, professors = professors)
+    print("my instance", len(my_instance))
+    header = class_id + " " + professors
+    return render(response, "main/roster.html", {'header': header})
 
 
 def mnemonic(response):
@@ -82,7 +83,7 @@ def searchbar_tutee(response):
     if response.method == 'GET':
         search = response.GET.get('mnemonic')
         if not search is None:
-            search_mnemonic = str(search)
+            search_mnemonic = str(search).upper()
             print("here")
             existing_list = []
             existing_classes = ClassDatabase.objects.all()
@@ -91,8 +92,7 @@ def searchbar_tutee(response):
             pages = 100
             for page_number in range(1, pages):
                 print("pages numbers", page_number)
-                url = "https://sisuva.admin.virginia.edu/psc/ihprd/UVSS/SA/s/WEBLIB_HCX_CM.H_CLASS_SEARCH.FieldFormula.IScript_ClassSearch?institution=UVA01&term=1228&subject=" + str(
-                    search) + "&page=" + str(page_number)
+                url = "https://sisuva.admin.virginia.edu/psc/ihprd/UVSS/SA/s/WEBLIB_HCX_CM.H_CLASS_SEARCH.FieldFormula.IScript_ClassSearch?institution=UVA01&term=1228&subject=" + search_mnemonic + "&page=" + str(page_number)
                 # To remove the other classes that we did not search just perform a if search in database is not 'a' we remove it.
                 url_data = View.get_json_data(url)
                 context = {'data': url_data}
@@ -103,14 +103,14 @@ def searchbar_tutee(response):
                     class_info = context['data'][j]['catalog_nbr']
                     instructor = context['data'][j]["instructors"][0]["name"]
                     name = context['data'][j]['descr']
-                    all = str(search) + class_info + " " + name + " " + instructor
+                    all = search_mnemonic + class_info + " " + name + " " + instructor
                     if not all in existing_list:
                         existing_list.append(all)
-                        class_instance = ClassDatabase.objects.create(class_id=str(search) + class_info,
+                        class_instance = ClassDatabase.objects.create(class_id=search_mnemonic + class_info,
                                                                       class_name=name,
                                                                       professors=instructor, class_mnen=str(search))
 
-            selection = ClassDatabase.objects.filter(class_mnen= str(search))
+            selection = ClassDatabase.objects.filter(class_mnen= search_mnemonic)
             if not selection:
                 messages.error(response,"Not an exisiting mnemonic")
                 return redirect('/student_home/',{'name':'Home'})
@@ -145,7 +145,7 @@ def searchbar_tutor(response):
     if response.method == 'GET':
         search = response.GET.get('mnemonic')
         if not search is None:
-            search_mnemonic = str(search)
+            search_mnemonic = str(search).upper()
             print("here")
             existing_list = []
             existing_classes = ClassDatabase.objects.all()
@@ -154,8 +154,7 @@ def searchbar_tutor(response):
             pages = 100
             for page_number in range(1, pages):
                 print("pages numbers", page_number)
-                url = "https://sisuva.admin.virginia.edu/psc/ihprd/UVSS/SA/s/WEBLIB_HCX_CM.H_CLASS_SEARCH.FieldFormula.IScript_ClassSearch?institution=UVA01&term=1228&subject=" + str(
-                    search) + "&page=" + str(page_number)
+                url = "https://sisuva.admin.virginia.edu/psc/ihprd/UVSS/SA/s/WEBLIB_HCX_CM.H_CLASS_SEARCH.FieldFormula.IScript_ClassSearch?institution=UVA01&term=1228&subject=" + search_mnemonic + "&page=" + str(page_number)
                 # To remove the other classes that we did not search just perform a if search in database is not 'a' we remove it.
                 url_data = View.get_json_data(url)
                 context = {'data': url_data}
@@ -166,16 +165,16 @@ def searchbar_tutor(response):
                     class_info = context['data'][j]['catalog_nbr']
                     instructor = context['data'][j]["instructors"][0]["name"]
                     name = context['data'][j]['descr']
-                    all = str(search) + class_info + " " + name + " " + instructor
+                    all = search_mnemonic + class_info + " " + name + " " + instructor
                     if not all in existing_list:
                         existing_list.append(all)
-                        group = Group.objects.create(name=str(search) + class_info + instructor)
+                        group = Group.objects.create(name=search_mnemonic + class_info + instructor)
                         group.save()
-                        class_instance = ClassDatabase.objects.create(class_id=str(search) + class_info,
+                        class_instance = ClassDatabase.objects.create(class_id=search_mnemonic + class_info,
                                                                       class_name=name,
-                                                                      professors=instructor, class_mnen=str(search), tutors=group)
+                                                                      professors=instructor, class_mnen=search_mnemonic, tutors=group)
 
-            selection = ClassDatabase.objects.filter(class_mnen=str(search))
+            selection = ClassDatabase.objects.filter(class_mnen=search_mnemonic)
             if not selection:
                 messages.error(response, "Not an exisiting mnemonic")
                 return redirect('/student_home/', {'name': 'Home'})
