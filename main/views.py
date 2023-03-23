@@ -6,6 +6,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login
 from django.contrib import messages
 from .filters import FilterCourses
+from oauth_app.models import User
+from django.contrib.auth.models import Group
 
 # Create your views here.
 search_mnemonic = ""
@@ -29,6 +31,8 @@ def schedule(response):
 
 
 def account(response):
+    # user_id = response.GET.get("username")
+    # print(user_id)
     if response.method == "POST":
         logout(response)
         return redirect("/")
@@ -36,8 +40,12 @@ def account(response):
 
 
 def classes(response, class_id):
-    ls = ClassList.objects.get(class_id=class_id)
-    return render(response, "main/roster.html", {"ls": ls})
+    # new_tutor = User.objects.get(username='guntu')
+    # my_instance = ClassDatabase.objects.all()
+    # for each in my_instance:
+    #     if class_id == each.class_id:
+    #
+    return render(response, "main/roster.html")
 
 
 def mnemonic(response):
@@ -70,7 +78,7 @@ def select_user(response):
         return render(response, 'main/select_user.html')
     
 
-def searchbar(response):
+def searchbar_tutee(response):
     if response.method == 'GET':
         search = response.GET.get('mnemonic')
         if not search is None:
@@ -131,3 +139,65 @@ def searchbar(response):
 
 
     return render(response, "main/class_finder.html", context)
+
+
+def searchbar_tutor(response):
+    if response.method == 'GET':
+        search = response.GET.get('mnemonic')
+        if not search is None:
+            search_mnemonic = str(search)
+            print("here")
+            existing_list = []
+            existing_classes = ClassDatabase.objects.all()
+            for i in existing_classes:
+                existing_list.append(str(i))
+            pages = 100
+            for page_number in range(1, pages):
+                print("pages numbers", page_number)
+                url = "https://sisuva.admin.virginia.edu/psc/ihprd/UVSS/SA/s/WEBLIB_HCX_CM.H_CLASS_SEARCH.FieldFormula.IScript_ClassSearch?institution=UVA01&term=1228&subject=" + str(
+                    search) + "&page=" + str(page_number)
+                # To remove the other classes that we did not search just perform a if search in database is not 'a' we remove it.
+                url_data = View.get_json_data(url)
+                context = {'data': url_data}
+                if (context["data"] == []):
+                    print("breaking")
+                    break;
+                for j in range(len(context["data"])):
+                    class_info = context['data'][j]['catalog_nbr']
+                    instructor = context['data'][j]["instructors"][0]["name"]
+                    name = context['data'][j]['descr']
+                    all = str(search) + class_info + " " + name + " " + instructor
+                    if not all in existing_list:
+                        existing_list.append(all)
+                        group = Group.objects.create(name=str(search) + class_info + instructor)
+                        group.save()
+                        class_instance = ClassDatabase.objects.create(class_id=str(search) + class_info,
+                                                                      class_name=name,
+                                                                      professors=instructor, class_mnen=str(search), tutors=group)
+
+            selection = ClassDatabase.objects.filter(class_mnen=str(search))
+            if not selection:
+                messages.error(response, "Not an exisiting mnemonic")
+                return redirect('/student_home/', {'name': 'Home'})
+                # return render(response, "main/mnemonic_page.html", {"error_message": "Not an exisiting mnemonic"})
+            filters = FilterCourses(response.GET, queryset=selection)
+            context = {"filters": filters, 'name': search_mnemonic}
+        else:
+            print("else")
+            selection = ClassDatabase.objects.all()
+            filters = FilterCourses(response.GET, queryset=selection)
+            class_name = ""
+            for index, item in enumerate(filters.qs):
+                if index == 0 and len(filters.qs) == 1:
+                    class_name = item.class_name + " with " + item.professors
+                elif index == 0:
+                    class_name = item.class_name
+                elif class_name == item.class_name:
+                    continue
+                else:
+                    class_name = item.professors
+                    break
+
+            context = {"filters": filters, 'name': class_name}
+
+    return render(response, "main/searchbar_tutor.html", context)
