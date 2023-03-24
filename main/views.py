@@ -55,6 +55,7 @@ def classes(response, class_id, first_professors, last_professors):
         group = Group.objects.get(name=class_id + professors)
         group.user_set.add(user)
         group.save()
+        print("type of group", type(group))
         is_member = group.user_set.filter(username=user).exists()
         print("here" , is_member)
 
@@ -146,19 +147,20 @@ def searchbar_tutee(response):
                     class_name = item.professors
                     break
 
-                
-                
             context = {"filters": filters,'name': class_name}
 
 
     return render(response, "main/class_finder.html", context)
 
 
-def searchbar_tutor(response):
-    if response.method == 'GET':
-        search = response.GET.get('mnemonic')
-        user = response.user
-        print("user", user)
+def searchbar_tutor(request):
+    user = request.user
+    results = Group.objects.filter(user=user)
+    print("results", results[0], len(results))
+    context = {"results": results}
+
+    if request.method == 'GET':
+        search = request.GET.get('mnemonic')
         if not search is None:
             search_mnemonic = str(search).upper()
             print("here")
@@ -172,14 +174,14 @@ def searchbar_tutor(response):
                 url = "https://sisuva.admin.virginia.edu/psc/ihprd/UVSS/SA/s/WEBLIB_HCX_CM.H_CLASS_SEARCH.FieldFormula.IScript_ClassSearch?institution=UVA01&term=1228&subject=" + search_mnemonic + "&page=" + str(page_number)
                 # To remove the other classes that we did not search just perform a if search in database is not 'a' we remove it.
                 url_data = View.get_json_data(url)
-                context = {'data': url_data}
-                if (context["data"] == []):
+                data = {'data': url_data}
+                if (data["data"] == []):
                     print("breaking")
                     break;
-                for j in range(len(context["data"])):
-                    class_info = context['data'][j]['catalog_nbr']
-                    instructor = context['data'][j]["instructors"][0]["name"]
-                    name = context['data'][j]['descr']
+                for j in range(len(data["data"])):
+                    class_info = data['data'][j]['catalog_nbr']
+                    instructor = data['data'][j]["instructors"][0]["name"]
+                    name = data['data'][j]['descr']
                     all = search_mnemonic + class_info + " " + name + " " + instructor
                     if not all in existing_list:
                         existing_list.append(all)
@@ -191,15 +193,15 @@ def searchbar_tutor(response):
 
             selection = ClassDatabase.objects.filter(class_mnen=search_mnemonic)
             if not selection:
-                messages.error(response, "Not an exisiting mnemonic")
-                return redirect('/student_home/', {'name': 'Home'})
+                messages.error(request, "Not an exisiting mnemonic")
+                return redirect('/student_home/', {'name': 'Home', "results": results})
                 # return render(response, "main/mnemonic_page.html", {"error_message": "Not an exisiting mnemonic"})
-            filters = FilterCourses(response.GET, queryset=selection)
-            context = {"filters": filters, 'name': search_mnemonic, 'user': user}
+            filters = FilterCourses(request.GET, queryset=selection)
+            context = {"filters": filters, 'name': search_mnemonic, 'user': user, 'results': results}
         else:
             print("else")
             selection = ClassDatabase.objects.all()
-            filters = FilterCourses(response.GET, queryset=selection)
+            filters = FilterCourses(request.GET, queryset=selection)
             class_name = ""
             for index, item in enumerate(filters.qs):
                 if index == 0 and len(filters.qs) == 1:
@@ -212,6 +214,6 @@ def searchbar_tutor(response):
                     class_name = item.professors
                     break
 
-            context = {"filters": filters, 'name': class_name}
-
-    return render(response, "main/searchbar_tutor.html", context)
+            context = {"filters": filters, 'name': class_name, "results": results}
+    print("context", context)
+    return render(request, "main/searchbar_tutor.html", context)

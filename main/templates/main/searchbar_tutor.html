@@ -20,22 +20,46 @@
             <tr>
                 <th> Class id </th>
                 <th> Class name </th>
-                <th> Professors </th>
-                <th> Sign Up </th>
+               <th> Professors </th>
+                <th> Status </th>
             </tr>
             {% for item in filters.qs %}
-                <tr>
-                    <td> {{item.class_id}}</td>
-                    <td> {{item.class_name}}</td>
-                    <td> {{item.professors}}</td>
+    <tr>
+        <td>{{ item.class_id }}</td>
+        <td>{{ item.class_name }}</td>
+        <td>{{ item.professors }}</td>
 
-                    {% if user in item.tutors.all %}
-                        <td> <a href="/{{item.class_id}} {{item.professors}}/">Change Sign Up</a></td>
-                    {% else %}
-                        <td> <a href="/{{item.class_id}} {{item.professors}}/">Sign Up</a></td>
+
+<!--        <td> {{ results|length}}</td>-->
+        {% if results|length < 1%}
+            <td><a href="/{{ item.class_id }} {{ item.professors }}/">Sign Up</a></td>
+        {%else%}
+         {% for result in results %}
+             <td>{{ result }}</td>
+             <td>{{ item.class_id }}{{ item.professors }}</td>
+            {% if  result  == '{{ item.class_id }}{{ item.professors }}' %}
+                <td><a href="/{{ item.class_id }} {{ item.professors }}/">Change Sign Up</a>
+            {% else %}
+                    <td><a href="/{{ item.class_id }} {{ item.professors }}/">Sign Up</a>
                     {% endif %}
-                </tr>
-            {% endfor %}
+        {% endfor %}
+
+        {% endif %}
+<!--        {% if not result %}-->
+<!--            <td><a href="/{{ item.class_id }} {{ item.professors }}/">Sign Up</a></td>-->
+<!--        {% else %}-->
+<!--            {% for result in results %}-->
+<!--                {% if result == item.class_id|add:item.professors %}-->
+<!--                    <td><a href="/{{ item.class_id }} {{ item.professors }}/">Sign Up</a></td>-->
+<!--                    {% if not forloop.last %}{% endif %}-->
+<!--                {% endif %}-->
+<!--            {% empty %}-->
+<!--                <td><a href="/{{ item.class_id }} {{ item.professors }}/">Sign Up</a></td>-->
+<!--            {% endfor %}-->
+<!--        {% endif %}-->
+    </tr>
+{% endfor %}
         </table>
     </form>
+
 {% endblock %}
