@@ -39,26 +39,24 @@ def account(response):
     return render(response, "main/account.html", {'name': 'Account'})
 
 
-def classes(response, class_id, first_professors, last_professors):
-    print("here",class_id)
-    print("type", type(class_id))
-    professors = first_professors + " "+ last_professors
+def classes(response, class_id, first_professors, middle ="", last_professors=""):
+    if (middle == ""):
+        print("single")
+        professors = first_professors + " " + last_professors
+    else:
+        print("double")
+        professors = first_professors + " " + middle + " " + last_professors
+    print("profesors", professors)
     my_instance = ClassDatabase.objects.filter(class_id= class_id, professors = professors)
-    print("my instance", len(my_instance))
     header = class_id + " " + professors
-    if response.method == "GET":
+    if response.method == "POST":
         user = response.user
-        print("inside get")
-        print(class_id)
-        print(first_professors)
-        print(last_professors)
         group = Group.objects.get(name=class_id + professors)
         group.user_set.add(user)
         group.save()
-        print("type of group", type(group))
         is_member = group.user_set.filter(username=user).exists()
-        print("here" , is_member)
-
+        letters_only = ''.join(filter(str.isalpha, class_id))
+        return redirect("/tutor_home/searchbar/?mnemonic=" + letters_only)
 
     return render(response, "main/roster.html", {'header': header})
 
@@ -156,8 +154,10 @@ def searchbar_tutee(response):
 def searchbar_tutor(request):
     user = request.user
     results = Group.objects.filter(user=user)
-    print("results", results[0], len(results))
-    context = {"results": results}
+    tutor_group={}
+    for each in results:
+        tutor_group[str(each)]= str(each)
+    context = {"results": tutor_group}
 
     if request.method == 'GET':
         search = request.GET.get('mnemonic')
@@ -194,10 +194,11 @@ def searchbar_tutor(request):
             selection = ClassDatabase.objects.filter(class_mnen=search_mnemonic)
             if not selection:
                 messages.error(request, "Not an exisiting mnemonic")
-                return redirect('/student_home/', {'name': 'Home', "results": results})
+                return redirect('/student_home/', {'name': 'Home', "results": tutor_group})
                 # return render(response, "main/mnemonic_page.html", {"error_message": "Not an exisiting mnemonic"})
             filters = FilterCourses(request.GET, queryset=selection)
-            context = {"filters": filters, 'name': search_mnemonic, 'user': user, 'results': results}
+
+            context = {"filters": filters, 'name': search_mnemonic, 'user': user, 'results': tutor_group}
         else:
             print("else")
             selection = ClassDatabase.objects.all()
@@ -214,6 +215,6 @@ def searchbar_tutor(request):
                     class_name = item.professors
                     break
 
-            context = {"filters": filters, 'name': class_name, "results": results}
+            context = {"filters": filters, 'name': class_name, "results": tutor_group}
     print("context", context)
     return render(request, "main/searchbar_tutor.html", context)

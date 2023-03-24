@@ -12,6 +12,7 @@ urlpatterns = [
     path("select_user/", views.select_user, name='select_user'),
     path("student_home/",views.mnemonic,name='student_home'),
     path("student_home/searchbar/",views.searchbar_tutee,name='searchbar'),
+    path("<str:class_id> <str:first_professors> <str:middle> <str:last_professors>/", views.classes, name='class'),
     path("<str:class_id> <str:first_professors> <str:last_professors>/", views.classes, name='class'),
 
 ]

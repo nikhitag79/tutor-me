@@ -24,39 +24,23 @@
                 <th> Status </th>
             </tr>
             {% for item in filters.qs %}
+
     <tr>
         <td>{{ item.class_id }}</td>
         <td>{{ item.class_name }}</td>
         <td>{{ item.professors }}</td>
 
-
-<!--        <td> {{ results|length}}</td>-->
-        {% if results|length < 1%}
+         {% if results|length < 1%}
             <td><a href="/{{ item.class_id }} {{ item.professors }}/">Sign Up</a></td>
         {%else%}
-         {% for result in results %}
-             <td>{{ result }}</td>
-             <td>{{ item.class_id }}{{ item.professors }}</td>
-            {% if  result  == '{{ item.class_id }}{{ item.professors }}' %}
-                <td><a href="/{{ item.class_id }} {{ item.professors }}/">Change Sign Up</a>
-            {% else %}
-                    <td><a href="/{{ item.class_id }} {{ item.professors }}/">Sign Up</a>
-                    {% endif %}
-        {% endfor %}
+                {% if item.class_id|add:item.professors in results %}
+                    <td><a href="/{{ item.class_id }} {{ item.professors }}/">Change Sign Up</a>
+                {% elif not item.class_id|add:item.professors in results %}
+                        <td><a href="/{{ item.class_id }} {{ item.professors }}/">Sign Up</a>
+                {% endif %}
 
         {% endif %}
-<!--        {% if not result %}-->
-<!--            <td><a href="/{{ item.class_id }} {{ item.professors }}/">Sign Up</a></td>-->
-<!--        {% else %}-->
-<!--            {% for result in results %}-->
-<!--                {% if result == item.class_id|add:item.professors %}-->
-<!--                    <td><a href="/{{ item.class_id }} {{ item.professors }}/">Sign Up</a></td>-->
-<!--                    {% if not forloop.last %}{% endif %}-->
-<!--                {% endif %}-->
-<!--            {% empty %}-->
-<!--                <td><a href="/{{ item.class_id }} {{ item.professors }}/">Sign Up</a></td>-->
-<!--            {% endfor %}-->
-<!--        {% endif %}-->
+
     </tr>
 {% endfor %}
         </table>
