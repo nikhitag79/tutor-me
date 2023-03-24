@@ -47,10 +47,14 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
+    'bootstrap5',
+    'crispy_forms',
+    'crispy_bootstrap5',
 
     # 'multiselectfield',             # allows for multiple selection of items such as classes, has not yet been used
 ]
-
+CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
+CRISPY_TEMPLATE_PACK = "bootstrap5"
 # Site ID
 if 'DATABASE_URL' in os.environ:
     SITE_ID = 11
@@ -163,7 +167,7 @@ USE_TZ = True
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')  # BASE_DIR / 'staticfiles'
 
 # The URL to use when referring to static files (where they will be served from)
-STATIC_URL = '/static/'
+STATIC_URL = 'static/'
 
 # Simplified static file serving.
 # https://pypi.org/project/whitenoise/

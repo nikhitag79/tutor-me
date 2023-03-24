@@ -1,0 +1,31 @@
+<body>
+
+  <style>
+    #leftside{
+      background-color: rgba(246, 183, 106, 0.7);
+      margin: 0px;
+      width: 35%;
+      height: 100vh;
+    }
+    body{
+      font-family: Georgia;
+      background-image:url('https://www.toptal.com/designers/subtlepatterns/uploads/y-so-serious-white.png');
+    }
+    div#rightside{
+      width: 65%;
+    }
+  </style>
+
+  <div class = "container-fluid">
+    <div class = "row">
+        <div class = "col-4" id = "leftside">
+            
+        </div>
+
+        <div class = "d-flex align-items-center justify-content-center col-6" id = "rightside" >
+          
+        </div>
+    </div>
+  </div>
+  
+</body>
