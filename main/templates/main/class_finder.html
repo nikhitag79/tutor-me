@@ -22,6 +22,7 @@
                 <th> Class name </th>
                 <th> Professors </th>
                 <th> Available Tutor </th>
+                <th> Find Tutors </th>
             </tr>
             {% for item in filters.qs %}
                 <tr>
@@ -29,6 +30,11 @@
                     <td> {{item.class_name}}</td>
                     <td> {{item.professors}}</td>
                     <td> {{item.available_tutors}}</td>
+                    {% if item.available_tutors }}
+                        <td><a href="/{{ item.class_id }} {{ item.professors }}/">Find Tutor</a>
+                    {% else %}
+                    <td> No Available Tutors </td>
+                    {% endif %}
                 </tr>
             {% endfor %}
         </table>

@@ -34,7 +34,7 @@
             <td><a href="/{{ item.class_id }} {{ item.professors }}/">Sign Up</a></td>
         {%else%}
                 {% if item.class_id|add:item.professors in results %}
-                    <td><a href="/{{ item.class_id }} {{ item.professors }}/">Change Sign Up</a>
+                    <td><a href="/{{ item.class_id }} {{ item.professors }}/">Adjust Schedule</a>
                 {% elif not item.class_id|add:item.professors in results %}
                         <td><a href="/{{ item.class_id }} {{ item.professors }}/">Sign Up</a>
                 {% endif %}
