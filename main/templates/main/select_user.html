@@ -11,79 +11,55 @@
 
 </head>
 
-<body style = "background-image:url('https://www.toptal.com/designers/subtlepatterns/uploads/y-so-serious-white.png');">
+<body>
+
   <style>
-    div.center-screen {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-      min-height: 70vh;
-      border-style: solid;
-      border-radius: 75px;
-      margin-top: 5%;
-      margin-right: 37%;
-      margin-left: 37%;
-      margin-bottom: 0%;
-      background-color: rgba(246, 183, 106, 0.5);
-      border-color: #f6b76a;
-      color: white;
+    #leftside{
+      background-color: rgba(246, 183, 106, 0.7);
+      margin: 0px;
+      width: 35%;
+      height: 100vh;
     }
-    div.row {
-    /  padding-top: 1em;
-    /  padding-bottom: 5em;
+    body{
+      font-family: Georgia;
+      background-image:url('https://www.toptal.com/designers/subtlepatterns/uploads/y-so-serious-white.png');
     }
-    form {
-      justify-content: left;
-      align-items: left;
-      text-align: left;
-    }
-    input {
-      appearance: none;
-    
-      border-radius: 50%;
-      width: 16px;
-      height: 16px;
-    
-      border: 2px solid #999;
-      transition: 0.2s all linear;
-      margin-right: 5px;
-    
-      position: relative;
-      top: 4px;
-    }
-    
-    input:checked {
-      border: 6px solid black;
+    div#rightside{
+      width: 65%;
     }
   </style>
 
-  {% block content %}
-  <div class = "center-screen">
-    <div class = "flex-container">
-      <div class = "row">
-        <h1>Select User Type</h1>
-      </div>
+  <div class = "container-fluid">
     <div class = "row">
-    <form method="post">
-    {% csrf_token %}
-    <div class = "form-check">
-      <label class = "form-check-label">
-        <input class = "form-check-input" type="radio" name="user_type" value="Tutor" required>
-        Tutor
-      </label>
+        <div class = "col-4" id = "leftside">
+            <!--<img src = "{% static 'testproject1/lineart-book-nobg.png' %}"/>-->
+            <p>Put an image here</p>
+        </div><!--'https://www.toptal.com/designers/subtlepatterns/uploads/y-so-serious-white.png'-->
+        <div class = "d-flex align-items-center justify-content-center col-6" id = "rightside" >
+          {% block content %}
+          <div class = "center-screen">
+            <div class = "flex-container">
+              <div class = "row">
+                <h1>Select User Type</h1>
+              </div>
+              <div class = "row">
+                <form method="post">
+                  {% csrf_token %}
+                  <div class = "form-check">
+                    <label class = "form-check-label">
+                    <input class = "form-check-input" type="radio" name="user_type" value="Tutor" required>Tutor</label>
+                  </div>
+                  <div class = "form-check">
+                    <label class = "form-check-label">
+                    <input class = "form-check-input" type="radio" name="user_type" value="Student" required>Student</label>
+                  </div>
+                  <button type="submit">Submit</button>
+                </form>
+              </div>
+            </div>
+          </div>
+          {% endblock %}
+        </div>
     </div>
-    <div class = "form-check">
-      <label class = "form-check-label">
-        <input class = "form-check-input" type="radio" name="user_type" value="Student" required>
-        Student
-      </label>
-    </div>
-    <button type="submit">Submit</button>
-  </form>
-</div>
   </div>
-</div>
-</div>
 </body>
-{% endblock %}
