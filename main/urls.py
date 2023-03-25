@@ -12,5 +12,5 @@ urlpatterns = [
     path("select_user/", views.select_user, name='select_user'),
     path("student_home/",views.mnemonic,name='student_home'),
     path("student_home/searchbar/",views.searchbar,name='searchbar'),
-    path("<str:class_id>", views.classes, name='class'),
+    path("<str:class_id>/", views.classes, name='class'),
 ]

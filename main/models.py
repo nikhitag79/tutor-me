@@ -2,7 +2,7 @@ from django.db import models
 from django.forms import widgets
 import requests
 import json
-
+from oauth_app.models import User
 
 class View(models.Model):
     def get_json_data(url):

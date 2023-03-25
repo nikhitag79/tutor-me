@@ -5,6 +5,7 @@ from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login
 from .filters import FilterCourses
+from django.contrib import messages
 
 # Create your views here.
 
@@ -163,7 +164,9 @@ def searchbar(response):
 
             selection = ClassDatabase.objects.filter(class_mnen= str(search))
             if not selection:
-                return render(response, "main/mnemonic_page.html", {"error_message": "Not an exisiting mnemonic"})
+                # return render(response, "main/mnemonic_page.html", {"error_message": "Not an exisiting mnemonic"})
+                messages.error(response, 'mnemonic does not exist')
+                return redirect('/student_home/')
             filters = FilterCourses(response.GET,queryset= selection)
             context = {"filters": filters}
         else:
