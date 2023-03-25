@@ -5,3 +5,6 @@ class FilterCourses(django_filters.FilterSet):
     class Meta:
         model =ClassDatabase
         fields = ["class_id", "class_name", "professors", "available_tutors"]
+
+        def __str__(self):
+            return self.class_id + ' ' + self.class_name + ' ' + self.professors + ' ' + available_tutors

@@ -1,17 +1,85 @@
 {% extends 'main/base.html' %}
 
 {% block title_block %}
-    <h1>{{ ls.class_id }}</h1>
+        <h1>{{ header }}</h1>
 {% endblock %}
 
+
+
 {% block body_block %}
-    {% if ls.item_set.all %}
-        <ul>
-        {% for item in ls.item_set.all %}
-            <li>{{ item.tutor_first_name }}{{' '}}{{ item.tutor_last_name }}</li>
-        {% endfor %}
-        </ul>
-    {% else %}
-        <p>{{ 'There are currently no tutors available for this class!' }}</p>
-    {% endif %}
+
+<body>
+  {% if user.user_type == 1 %}
+   <h1>Time Availability</h1>
+    <form method="post">
+      {% csrf_token %}
+      <fieldset>
+        <legend>Monday</legend>
+        <label>From:</label>
+        <input type="time" name="monday-from">
+        <label>To:</label>
+        <input type="time" name="monday-to">
+      </fieldset>
+      <fieldset>
+        <legend>Tuesday</legend>
+        <label>From:</label>
+        <input type="time" name="tuesday-from">
+        <label>To:</label>
+        <input type="time" name="tuesday-to">
+      </fieldset>
+      <fieldset>
+        <legend>Wednesday</legend>
+        <label>From:</label>
+        <input type="time" name="wednesday-from">
+        <label>To:</label>
+        <input type="time" name="wednesday-to">
+      </fieldset>
+      <fieldset>
+        <legend>Thursday</legend>
+        <label>From:</label>
+        <input type="time" name="thursday-from">
+        <label>To:</label>
+        <input type="time" name="thursday-to">
+      </fieldset>
+      <fieldset>
+        <legend>Friday</legend>
+        <label>From:</label>
+        <input type="time" name="friday-from">
+        <label>To:</label>
+        <input type="time" name="friday-to">
+      </fieldset>
+      <fieldset>
+        <legend>Saturday</legend>
+        <label>From:</label>
+        <input type="time" name="saturday-from">
+        <label>To:</label>
+        <input type="time" name="saturday-to">
+      </fieldset>
+      <fieldset>
+        <legend>Sunday</legend>
+        <label>From:</label>
+        <input type="time" name="sunday-from">
+        <label>To:</label>
+        <input type="time" name="sunday-to">
+      </fieldset>
+      <br>
+
+      <input type="submit" value="Add Availability">
+      <input type="submit" value="Remove This Time">
+      <br>
+      {% for person in group.user_set.all%}
+        {%if person == user%}
+          <button name = "remove" type="submit" value = "remove">Drop Tutoring</button>
+        {% endif %}
+      {% endfor %}
+    </form>
+
+  {% endif %}
+  {% if user.user_type == 2 %}
+
+
+  {% endif %}
+
+  </body>
+
 {% endblock %}
