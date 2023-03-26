@@ -70,6 +70,9 @@ def classes(response, class_id, first_professors, middle ="", last_professors=""
         if not group.user_set.filter(username=user).exists():
             group.user_set.add(user)
             group.save()
+            my_instance = ClassDatabase.objects.filter(class_id=class_id, professors=professors).first()
+            my_instance.available_tutors = True
+            my_instance.save()
             letters_only = ''.join(filter(str.isalpha, class_id))
             return redirect("/tutor_home/searchbar/?mnemonic=" + letters_only)
         else:
