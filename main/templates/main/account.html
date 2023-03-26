@@ -16,7 +16,7 @@
                        value="" data-type="currency" placeholder="$0.00" step=".01">
                 <button name="set_hourly" type="submit" value="set_hourly">Set Rate</button>
            </form>
-            <p>Current hourly rate: $0.00</p>
+            <p>Current hourly rate: {{user.tutor_rate}}</p>
         </fieldset>
 
             {% if hourly_rate %}

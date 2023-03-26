@@ -39,6 +39,11 @@ def account(response):
         if response.POST.get('logout'):
             logout(response)
             return redirect("/")
+        elif response.POST.get('set_hourly'):
+            hourly_rate = response.POST.get('hourly_rate')
+            response.user.tutor_rate = hourly_rate
+            response.user.save()
+            messages.success(response, 'Hourly rate updated successfully!')
     return render(response, "main/account.html", {'name': 'Account'})
 
 
