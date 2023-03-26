@@ -30,8 +30,8 @@
                     <td> {{item.class_name}}</td>
                     <td> {{item.professors}}</td>
                     <td> {{item.available_tutors}}</td>
-                    {% if item.available_tutors }}
-                        <td><a href="/{{ item.class_id }} {{ item.professors }}/">Find Tutor</a>
+                    {% if item.available_tutors }
+                    <td><a href="/{{ item.class_id }} {{ item.professors }}/">Find Tutor</a></td>
                     {% else %}
                     <td> No Available Tutors </td>
                     {% endif %}
