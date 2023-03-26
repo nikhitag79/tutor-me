@@ -43,7 +43,6 @@ def account(response):
             hourly_rate = response.POST.get('hourly_rate')
             response.user.tutor_rate = hourly_rate
             response.user.save()
-            messages.success(response, 'Hourly rate updated successfully!')
     return render(response, "main/account.html", {'name': 'Account'})
 
 
