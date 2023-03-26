@@ -78,6 +78,10 @@ def classes(response, class_id, first_professors, middle ="", last_professors=""
         else:
             if response.POST.get('remove'):
                 group.user_set.remove(user)
+                if group.user_set.all().count() == 0:
+                    my_instance = ClassDatabase.objects.filter(class_id=class_id, professors=professors).first()
+                    my_instance.available_tutors = False
+                    my_instance.save()
             letters_only = ''.join(filter(str.isalpha, class_id))
             return redirect("/tutor_home/searchbar/?mnemonic=" + letters_only)
 
