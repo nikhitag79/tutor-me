@@ -1,0 +1,57 @@
+#remember for what these things do 
+
+"""
+Method to get every mnemonic out of the database
+# url = "https://sisuva.admin.virginia.edu/psc/ihprd/UVSS/SA/s/WEBLIB_HCX_CM.H_CLASS_SEARCH.FieldFormula.IScript_ClassSearchOptions?institution=UVA01&term=1228"
+    # url_data = View.get_json_data(url)
+    #
+    # context = {'data': url_data}
+    # subjects = context["data"]["subjects"]
+    # existing_list = []
+    # existing_classes = ClassDatabase.objects.all()
+    # for i in existing_classes:
+    #     existing_list.append(str(i))
+
+"""
+
+"""
+Student_home before api changes
+    #till 37 keep for testing
+    url = "https://sisuva.admin.virginia.edu/psc/ihprd/UVSS/SA/s/WEBLIB_HCX_CM.H_CLASS_SEARCH.FieldFormula.IScript_ClassSearchOptions?institution=UVA01&term=1228"
+    url_data = View.get_json_data(url)
+
+    context = {'data': url_data}
+    subjects = context["data"]["subjects"]
+    existing_list = []
+    existing_classes = ClassDatabase.objects.all()
+    for i in existing_classes:
+        existing_list.append(str(i))
+    # for i in subjects:
+    #     if not i["subject"] in existing_list:
+    #         class_instance = ClassDatabase.objects.create(class_id = i["subject"], class_name="")
+
+    # for i in subjects:
+        url = "https://sisuva.admin.virginia.edu/psc/ihprd/UVSS/SA/s/WEBLIB_HCX_CM.H_CLASS_SEARCH.FieldFormula.IScript_ClassSearch?institution=UVA01&term=1228&subject=" + "CS" +"&page=1"
+        url_data = View.get_json_data(url)
+        context = {'data': url_data}
+        for j in range(len(context["data"])):
+            class_info = context['data'][j]['catalog_nbr']
+            instructor = context['data'][j]["instructors"][0]["name"]
+            name = context['data'][j]['descr']
+            all= "CS"+class_info +" " + name + " "+ instructor
+            if not all in existing_list:
+                existing_list.append(all)
+                class_instance = ClassDatabase.objects.create(class_id="CS" + class_info, class_name=name, professors=instructor)
+
+    # move later
+
+
+    selection = ClassDatabase.objects.all()
+    filters = FilterCourses(response.GET,queryset= selection)
+    context = {"filters": filters}
+    """
+
+    for groups absolute path 
+    {%for group in user.groups.all %}
+            <a href = "http://127.0.0.1:8000/{{group}}">{{group}}</a>
+        {% endfor %}

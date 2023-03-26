@@ -53,16 +53,15 @@ def classes(response, class_id, first_professors, middle ="", last_professors=""
     print("profesors", professors)
     my_instance = ClassDatabase.objects.filter(class_id= class_id, professors = professors)
     header = class_id + " " + professors
-    group_name = class_id+professors
     dict = {}
-    group_name = Group.objects.get(name=group_name)
+    group_name = Group.objects.get(name= header)
     users = group_name.user_set.all()
     print("users", type(users), users)
 
 
     if response.method == "POST":
         user = response.user
-        group = Group.objects.get(name=class_id + professors)
+        group = Group.objects.get(name=class_id +" "+ professors)
         if not group.user_set.filter(username=user).exists():
             group.user_set.add(user)
             group.save()
@@ -129,7 +128,7 @@ def searchbar_tutee(request):
                             database_object = search_mnemonic + class_info + " " + name + " " + instructor
                             if not database_object in existing_list:
                                 existing_list.append(database_object)
-                                group = Group.objects.create(name=search_mnemonic + class_info + instructor)
+                                group = Group.objects.create(name=search_mnemonic + class_info + " " + instructor)
                                 group.save()
                                 class_instance = ClassDatabase.objects.create(class_id=search_mnemonic + class_info,
                                                                               class_name=name,
@@ -189,7 +188,7 @@ def searchbar_tutor(request):
                             database_object = search_mnemonic + class_info + " " + name + " " + instructor
                             if not database_object in existing_list:
                                 existing_list.append(database_object)
-                                group = Group.objects.create(name=search_mnemonic + class_info + instructor)
+                                group = Group.objects.create(name=search_mnemonic + class_info + " " + instructor)
                                 group.save()
                                 class_instance = ClassDatabase.objects.create(class_id=search_mnemonic + class_info,
                                                                               class_name=name,
@@ -271,7 +270,7 @@ def database_setup(request):
                         print('database object', database_object)
                         if not database_object in existing_list:
                             existing_list.append(database_object)
-                            group = Group.objects.create(name= acronym + class_info + instructor)
+                            group = Group.objects.create(name= acronym + class_info + " " + instructor)
                             group.save()
                             class_instance = ClassDatabase.objects.create(class_id=acronym + class_info,
                                                                           class_name=name,
