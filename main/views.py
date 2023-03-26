@@ -36,8 +36,9 @@ def account(response):
     # user_id = response.GET.get("username")
     # print(user_id)
     if response.method == "POST":
-        logout(response)
-        return redirect("/")
+        if response.POST.get('logout'):
+            logout(response)
+            return redirect("/")
     return render(response, "main/account.html", {'name': 'Account'})
 
 
