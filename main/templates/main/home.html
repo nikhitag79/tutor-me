@@ -7,4 +7,7 @@
 {%if user.user_type == 2%}
     <h1>{{ name }}</h1>
 {% endif %}
+{%if user.user_type == 3%}
+    <h1>{{ name }}</h1>
+{% endif %}
 {% endblock %}

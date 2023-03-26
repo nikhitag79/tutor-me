@@ -8,9 +8,11 @@ from django.contrib import messages
 from .filters import FilterCourses
 from oauth_app.models import User
 from django.contrib.auth.models import Group
+import json
+import sys
+
 
 # Create your views here.
-search_mnemonic = ""
 
 def home(response):
     return render(response, "main/home.html", {'name': 'Home'})
@@ -106,49 +108,39 @@ def select_user(response):
     
 
 def searchbar_tutee(request):
+    sys.path.append('../')
     if request.method == 'GET':
         search = request.GET.get('mnemonic')
         if not search is None:
-            search_mnemonicst = str(search).upper()
+            search_mnemonic = str(search).upper()
             print("search mnemon", search_mnemonic)
             existing_list = []
-            existing_classes = ClassDatabase.objects.all()
+            existing_classes = ClassDatabase.objects.filter(class_mnen=search_mnemonic)
             for i in existing_classes:
                 existing_list.append(str(i))
-            pages = 100
-            for page_number in range(1, pages):
-                print("pages numbers", page_number)
-                url = "https://sisuva.admin.virginia.edu/psc/ihprd/UVSS/SA/s/WEBLIB_HCX_CM.H_CLASS_SEARCH.FieldFormula.IScript_ClassSearch?institution=UVA01&term=1228&subject=" + search_mnemonic + "&page=" + str(page_number)
-                # To remove the other classes that we did not search just perform a if search in database is not 'a' we remove it.
-                url_data = View.get_json_data(url)
-
-                data = {'data': url_data}
-                print("info", data["data"])
-                if (data["data"] == []):
-                    print("breaking")
-                    break
-                for j in range(len(data["data"])):
-                    class_info = data['data'][j]['catalog_nbr']
-                    instructor = data['data'][j]["instructors"][0]["name"]
-                    name = data['data'][j]['descr']
-                    all = search_mnemonic + class_info + " " + name + " " + instructor
-                    if not all in existing_list:
-                        existing_list.append(all)
-                        group = Group.objects.create(name=search_mnemonic + class_info + instructor)
-                        group.save()
-                        class_instance = ClassDatabase.objects.create(class_id=search_mnemonic + class_info,
-                                                                      class_name=name,
-                                                                      professors=instructor, class_mnen=search_mnemonic,tutors=group)
-
-            selection = ClassDatabase.objects.filter(class_mnen= search_mnemonic)
-            if not selection:
-                messages.error(request,"Not an exisiting mnemonic")
-                return redirect('/student_home/',{'name':'Home'})
-                #return render(request, "main/mnemonic_page.html", {"error_message": "Not an exisiting mnemonic"})
-            filters = FilterCourses(request.GET,queryset= selection)
+            if not existing_list:
+                with open("class_database.json") as database_json:
+                    database_file = json.load(database_json)
+                    if search_mnemonic in database_file:
+                        for item in database_file[search_mnemonic]:
+                            class_info = item[0]['class_info']
+                            instructor = item[1]['instructors'][0]['name']
+                            name = item[2]['descr']
+                            database_object = search_mnemonic + class_info + " " + name + " " + instructor
+                            if not database_object in existing_list:
+                                existing_list.append(database_object)
+                                group = Group.objects.create(name=search_mnemonic + class_info + instructor)
+                                group.save()
+                                class_instance = ClassDatabase.objects.create(class_id=search_mnemonic + class_info,
+                                                                              class_name=name,
+                                                                              professors=instructor,
+                                                                              class_mnen=search_mnemonic, tutors=group)
+                    else:
+                        messages.error(request, "Not an exisiting mnemonic")
+                        return redirect('/student_home/', {'name': 'Home'})
+            filters = FilterCourses(request.GET,queryset= existing_classes)
             context = {"filters": filters,'name':search_mnemonic}
         else:
-            print("else")
             selection = ClassDatabase.objects.all()
             filters = FilterCourses(request.GET, queryset=selection)
             class_name = ""
@@ -170,6 +162,7 @@ def searchbar_tutee(request):
 
 
 def searchbar_tutor(request):
+    sys.path.append('../')
     user = request.user
     results = Group.objects.filter(user=user)
     tutor_group={}
@@ -182,42 +175,33 @@ def searchbar_tutor(request):
         if not search is None:
             search_mnemonic = str(search).upper()
             existing_list = []
-            existing_classes = ClassDatabase.objects.all()
+            existing_classes = ClassDatabase.objects.filter(class_mnen=search_mnemonic)
             for i in existing_classes:
                 existing_list.append(str(i))
-            pages = 100
-            for page_number in range(1, pages):
-                print("pages numbers", page_number)
-                url = "https://sisuva.admin.virginia.edu/psc/ihprd/UVSS/SA/s/WEBLIB_HCX_CM.H_CLASS_SEARCH.FieldFormula.IScript_ClassSearch?institution=UVA01&term=1228&subject=" + search_mnemonic + "&page=" + str(page_number)
-                # To remove the other classes that we did not search just perform a if search in database is not 'a' we remove it.
-                url_data = View.get_json_data(url)
-                data = {'data': url_data}
-                if (data["data"] == []):
-                    print("breaking")
-                    break;
-                for j in range(len(data["data"])):
-                    class_info = data['data'][j]['catalog_nbr']
-                    instructor = data['data'][j]["instructors"][0]["name"]
-                    name = data['data'][j]['descr']
-                    all = search_mnemonic + class_info + " " + name + " " + instructor
-                    if not all in existing_list:
-                        existing_list.append(all)
-                        group = Group.objects.create(name=search_mnemonic + class_info + instructor)
-                        group.save()
-                        class_instance = ClassDatabase.objects.create(class_id=search_mnemonic + class_info,
-                                                                      class_name=name,
-                                                                      professors=instructor, class_mnen=search_mnemonic, tutors=group)
-
-            selection = ClassDatabase.objects.filter(class_mnen=search_mnemonic)
-            if not selection:
-                messages.error(request, "Not an exisiting mnemonic")
-                return redirect('/student_home/', {'name': 'Home', "results": tutor_group})
-                # return render(response, "main/mnemonic_page.html", {"error_message": "Not an exisiting mnemonic"})
-            filters = FilterCourses(request.GET, queryset=selection)
+            if not existing_list:
+                with open("class_database.json") as database_json:
+                    database_file = json.load(database_json)
+                    if search_mnemonic in database_file:
+                        for item in database_file[search_mnemonic]:
+                            class_info = item[0]['class_info']
+                            instructor = item[1]['instructors'][0]['name']
+                            name = item[2]['descr']
+                            database_object = search_mnemonic + class_info + " " + name + " " + instructor
+                            if not database_object in existing_list:
+                                existing_list.append(database_object)
+                                group = Group.objects.create(name=search_mnemonic + class_info + instructor)
+                                group.save()
+                                class_instance = ClassDatabase.objects.create(class_id=search_mnemonic + class_info,
+                                                                              class_name=name,
+                                                                              professors=instructor,
+                                                                              class_mnen=search_mnemonic, tutors=group)
+                    else:
+                        messages.error(request, "Not an exisiting mnemonic")
+                        return redirect('/tutor_home/', {'name': 'Home', "results": tutor_group})
+            filters = FilterCourses(request.GET, queryset=existing_classes)
 
             context = {"filters": filters, 'name': search_mnemonic, 'user': user, 'results': tutor_group}
         else:
-            print("else")
             selection = ClassDatabase.objects.all()
             filters = FilterCourses(request.GET, queryset=selection)
             class_name = ""
@@ -231,7 +215,67 @@ def searchbar_tutor(request):
                 else:
                     class_name = item.professors
                     break
-
             context = {"filters": filters, 'name': class_name, "results": tutor_group}
-    print("context", context)
     return render(request, "main/searchbar_tutor.html", context)
+
+def database_setup(request):
+    sys.path.append('../')
+    user = request.user
+    if request.method == "GET":
+        if request.GET.get("create_database_json"):
+            major_url = "https://sisuva.admin.virginia.edu/psc/ihprd/UVSS/SA/s/WEBLIB_HCX_CM.H_CLASS_SEARCH.FieldFormula.IScript_ClassSearchOptions?institution=UVA01&term=1228"
+            major_url_data = View.get_json_data(major_url)
+            major_data = {'data': major_url_data}
+            json_dict = {}
+            for j in range(len(major_data["data"]['subjects'])):
+                print('major_data', major_data['data']['subjects'][j]['subject'])
+                search_mnemonic_json = major_data['data']['subjects'][j]['subject']
+                class_list = []
+                pages = 100
+                for page_number in range(1, pages):
+                    print("pages numbers", page_number)
+                    url = "https://sisuva.admin.virginia.edu/psc/ihprd/UVSS/SA/s/WEBLIB_HCX_CM.H_CLASS_SEARCH.FieldFormula.IScript_ClassSearch?institution=UVA01&term=1228&subject=" + search_mnemonic_json + "&page=" + str(
+                        page_number)
+                    url_data = View.get_json_data(url)
+                    data = {'data': url_data}
+                    if (data["data"] == []):
+                        print("breaking")
+                        break
+                    for j in range(len(data["data"])):
+                        class_info = data['data'][j]['catalog_nbr']
+                        class_info_dict = {'class_info': class_info}
+                        instructor = data['data'][j]["instructors"][0]["name"]
+                        instructor_dict = {'instructors': [{'name': instructor}]}
+                        name = data['data'][j]['descr']
+                        name_dict = {'descr': name}
+                        class_list.append([class_info_dict, instructor_dict, name_dict])
+                json_dict[search_mnemonic_json] = class_list
+            json_object = json.dumps(json_dict, indent=4)
+            with open('class_database.json', 'w') as file:
+                file.write(json_object)
+            return redirect("/database/" , {'name': 'Database Setup', 'user': user})
+        if request.GET.get("create_database"):
+            with open("class_database.json") as database_json:
+                database_file = json.load(database_json)
+                existing_list = []
+                existing_classes = ClassDatabase.objects.all()
+                for i in existing_classes:
+                    existing_list.append(str(i))
+                for acronym in database_file:
+                    print('acronym', acronym)
+                    for item in database_file[acronym]:
+                        class_info = item[0]['class_info']
+                        instructor = item[1]['instructors'][0]['name']
+                        name = item[2]['descr']
+                        database_object = acronym + class_info + " " + name + " " + instructor
+                        print('database object', database_object)
+                        if not database_object in existing_list:
+                            existing_list.append(database_object)
+                            group = Group.objects.create(name= acronym + class_info + instructor)
+                            group.save()
+                            class_instance = ClassDatabase.objects.create(class_id=acronym + class_info,
+                                                                          class_name=name,
+                                                                          professors=instructor,
+                                                                          class_mnen=acronym, tutors=group)
+                            class_instance.save()
+    return render(request, "main/database.html", {'name': 'Database Setup', 'user': user})

@@ -47,6 +47,9 @@
         {% if user.user_type == 2 %}
             <a href="/student_home/">Student Home</a>
         {% endif %}
+        {% if user.user_type == 3 %}
+            <a href="/database/">Admin Home</a>
+        {% endif %}
         <a href="/schedule/">Schedule</a>
         <a href="/other/">Other</a>
         <a href="/account/">Account</a>
