@@ -1,0 +1,28 @@
+{% extends 'main/base.html' %}
+
+{% block title_block %}
+    <h1>{{ name }}</h1>
+{% endblock %}
+
+{% block body_block %}
+
+<h2 style="color:Tomato;"> WARNING If you are not completely comfortable with our databases contact another system admin WARNING</h2>
+    <form method="get">
+        <p>
+            Only press if setting up the json file not preparing the database.
+            If you are not sure what this is talking about contact a different system admin or
+            look at the ReadMe for further detail.
+        </p>
+        <input type="submit" name="create_database_json" value="Create Database Json File" />
+        <p>
+            Press this to set up the database from the existing json file. Make sure that your json file is
+            created and has been populated before pressing the following button.
+        </p>
+        <input type="submit" name="create_database" value="Create Database" />
+        <p>
+            The following button deletes all of the classes in the database.
+        </p>
+        <input type="submit" name="delete_database" value="Delete Database" />
+    </form>
+
+{% endblock %}
