@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
+    'djmoney',
 
     # 'multiselectfield',             # allows for multiple selection of items such as classes, has not yet been used
 ]

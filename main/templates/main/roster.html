@@ -75,9 +75,13 @@
     </form>
 
   {% endif %}
+
   {% if user.user_type == 2 %}
-
-
+  {% for person in group.user_set.all %}
+    {% if person.user_type ==  1 %}
+      {{person}}
+    {% endif %}
+  {% endfor %}
   {% endif %}
 
   </body>

@@ -2,12 +2,14 @@ from django.shortcuts import render, redirect
 from .models import ClassList, Item, View, ClassDatabase
 # from .forms import ClassSelect
 from django.contrib.auth import logout
+from django.http import JsonResponse 
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login
 from django.contrib import messages
 from .filters import FilterCourses
 from oauth_app.models import User
 from django.contrib.auth.models import Group
+from .models import Event
 import json
 import sys
 
@@ -29,15 +31,74 @@ def tutor_home(response):
 
 
 def schedule(response):
-    return render(response, "main/home.html", {'name': 'Schedule'})
+    all_events = Event.objects.filter(tutor = response.user)
+    print(all_events)
+    context = {
+        "events":all_events, "name": 'Schedule', "user":response.user
+    }
+    return render(response, "main/schedule.html", context)
 
+
+def add_event(request):
+    start = request.GET.get("start", None)
+    end = request.GET.get("end", None)
+    title = request.GET.get("title", None)
+    event = Event(name=str(title), start=start, end=end, tutor=request.user)
+    event.save()
+    data = {}
+    print(start)
+    print(end)
+    #print(tutor)
+    return JsonResponse(data)
+
+
+def all_events(request):                                                                                                 
+    all_events = Event.objects.all()                                                                                    
+    out = []                                                                                                             
+    for event in all_events:                                                                                             
+        out.append({                                                                                                     
+            'title': event.name,                                                                                         
+            'id': event.id,                                                                                              
+            'start': event.start.strftime("%m/%d/%Y, %H:%M:%S"),                                                         
+            'end': event.end.strftime("%m/%d/%Y, %H:%M:%S"),                                                             
+        })                                                                                                               
+    print(out)                                                                                                                  
+    return JsonResponse(out, safe=False) 
+
+
+def update(request):
+    start = request.GET.get("start", None)
+    end = request.GET.get("end", None)
+    title = request.GET.get("title", None)
+    id = request.GET.get("id", None)
+    event = Event.objects.get(id=id)
+    event.start = start
+    event.end = end
+    event.name = title
+    event.save()
+    data = {}
+    return JsonResponse(data)
+
+
+ 
+def remove(request):
+    id = request.GET.get("id", None)
+    event = Event.objects.get(id=id)
+    event.delete()
+    data = {}
+    return JsonResponse(data)
 
 def account(response):
     # user_id = response.GET.get("username")
     # print(user_id)
     if response.method == "POST":
-        logout(response)
-        return redirect("/")
+        if response.POST.get('logout'):
+            logout(response)
+            return redirect("/")
+        elif response.POST.get('set_hourly'):
+            hourly_rate = response.POST.get('hourly_rate')
+            response.user.tutor_rate = hourly_rate
+            response.user.save()
     return render(response, "main/account.html", {'name': 'Account'})
 
 
@@ -65,11 +126,18 @@ def classes(response, class_id, first_professors, middle ="", last_professors=""
         if not group.user_set.filter(username=user).exists():
             group.user_set.add(user)
             group.save()
+            my_instance = ClassDatabase.objects.filter(class_id=class_id, professors=professors).first()
+            my_instance.available_tutors = True
+            my_instance.save()
             letters_only = ''.join(filter(str.isalpha, class_id))
             return redirect("/tutor_home/searchbar/?mnemonic=" + letters_only)
         else:
             if response.POST.get('remove'):
                 group.user_set.remove(user)
+                if group.user_set.all().count() == 0:
+                    my_instance = ClassDatabase.objects.filter(class_id=class_id, professors=professors).first()
+                    my_instance.available_tutors = False
+                    my_instance.save()
             letters_only = ''.join(filter(str.isalpha, class_id))
             return redirect("/tutor_home/searchbar/?mnemonic=" + letters_only)
 
