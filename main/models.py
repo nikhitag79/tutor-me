@@ -5,7 +5,7 @@ from oauth_app.models import User
 from django.contrib.auth.models import Group
 import requests
 import json
-from oauth_app.models import User
+
 
 
 class View(models.Model):
@@ -52,3 +52,13 @@ class ClassDatabase(models.Model):
 
     def __str__(self):
         return self.class_id + ' ' + self.class_name + ' ' + self.professors
+
+
+class Event(models.Model):
+    id = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=255,null=True,blank=True)
+    start = models.DateTimeField(null=True,blank=True)
+    end = models.DateTimeField(null=True,blank=True)
+    isAval = models.BooleanField(default=True)
+    tutor = models.ForeignKey(User, on_delete=models.CASCADE,related_name='tutor_events',default=1)
+    student= models.ForeignKey(User, on_delete = models.SET_NULL,related_name ='student_events',null=True)
