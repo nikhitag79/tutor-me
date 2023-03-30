@@ -77,11 +77,17 @@
   {% endif %}
 
   {% if user.user_type == 2 %}
-  {% for person in group.user_set.all %}
-    {% if person.user_type ==  1 %}
-      {{person}}
-    {% endif %}
-  {% endfor %}
+  <form method="post">
+    {% csrf_token %}
+      <fieldset>
+        {% for person in group.user_set.all %}
+          {% if person.user_type ==  1 %}
+            <h3>{{person}}<h3/>
+                {% if event.tutor_set.all %}}
+                  <p>No List</p>
+                {% endif %}
+          {% endif %}
+        {% endfor %}
   {% endif %}
 
   </body>

@@ -62,3 +62,10 @@ class Event(models.Model):
     isAval = models.BooleanField(default=True)
     tutor = models.ForeignKey(User, on_delete=models.CASCADE,related_name='tutor_events',default=1)
     student= models.ForeignKey(User, on_delete = models.SET_NULL,related_name ='student_events',null=True)
+
+
+class Request(models.Model):
+    group_id = models.CharField(max_length=255, default='no class')
+    tutor = models.ForeignKey(User, on_delete=models.CASCADE,related_name='tutor_request',default=1)
+    student= models.ForeignKey(User, on_delete = models.CASCADE,related_name ='student_request',default=1)
+

@@ -1,16 +1,15 @@
 from django.shortcuts import render, redirect
-from .models import ClassList, Item, View, ClassDatabase
-# from .forms import ClassSelect
+
+from .models import ClassList, Item, View, ClassDatabase, Event
 from django.contrib.auth import logout
 from django.http import JsonResponse 
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth import authenticate, login
 from django.contrib import messages
 from .filters import FilterCourses
-from oauth_app.models import User
 from django.contrib.auth.models import Group
-from .models import Event
+from oauth_app.models import User
 import json
+import datetime
 import sys
 
 
@@ -42,27 +41,38 @@ def schedule(response):
 def add_event(request):
     start = request.GET.get("start", None)
     end = request.GET.get("end", None)
-    title = request.GET.get("title", None)
-    event = Event(name=str(title), start=start, end=end, tutor=request.user)
-    event.save()
-    data = {}
-    print(start)
     print(end)
-    #print(tutor)
+    title = request.GET.get("title", None)
+    data = {}
+    format = "%Y-%m-%d %H:%M:%S"
+    slot_time = 30
+    time = datetime.datetime.strptime(start,format)
+    end = datetime.datetime.strptime(end,format)
+    while time < end:
+        print('event start', time)
+        print('event end', time + datetime.timedelta(minutes=slot_time))
+        event = Event(name=str(title), start=time, end=time+datetime.timedelta(minutes=slot_time), tutor=request.user)
+        event.save()
+        time += datetime.timedelta(minutes=slot_time)
     return JsonResponse(data)
 
 
 def all_events(request):                                                                                                 
-    all_events = Event.objects.all()                                                                                    
-    out = []                                                                                                             
-    for event in all_events:                                                                                             
-        out.append({                                                                                                     
-            'title': event.name,                                                                                         
-            'id': event.id,                                                                                              
-            'start': event.start.strftime("%m/%d/%Y, %H:%M:%S"),                                                         
-            'end': event.end.strftime("%m/%d/%Y, %H:%M:%S"),                                                             
-        })                                                                                                               
-    print(out)                                                                                                                  
+    all_events = Event.objects.filter(tutor =  request.user)
+    out = []
+    now = datetime.datetime.now()
+    for event in all_events:
+        event_end = event.end
+        if now.timestamp()>event_end.timestamp():
+            print("should not be seen, needs to be deleted, may add notification model")
+            event.delete()
+        else:
+            out.append({
+                'title': event.name,
+                'id': event.id,
+                'start': event.start.strftime("%m/%d/%Y, %H:%M:%S"),
+                'end': event.end.strftime("%m/%d/%Y, %H:%M:%S"),
+            })
     return JsonResponse(out, safe=False) 
 
 
@@ -95,6 +105,16 @@ def account(response):
         if response.POST.get('logout'):
             logout(response)
             return redirect("/")
+        elif response.POST.get('set_username'):
+            new_username = response.POST.get('username')
+            if response.user.username == new_username or new_username == '':
+                return render(response, "main/account.html",
+                              {'name': 'Account', 'error': 'That is already your username!'})
+            if User.objects.filter(username=new_username).exists():
+                return render(response, "main/account.html", {'name': 'Account', 'error': 'That user name is already taken. Try again'})
+            else:
+                response.user.username = new_username
+                response.user.save()
         elif response.POST.get('set_hourly'):
             hourly_rate = response.POST.get('hourly_rate')
             response.user.tutor_rate = hourly_rate
@@ -116,6 +136,9 @@ def classes(response, class_id, first_professors, middle ="", last_professors=""
     header = class_id + " " + professors
     dict = {}
     group_name = Group.objects.get(name= header)
+    event_name = Event.objects.all()
+    # This is what we will use, using a different one for testing
+    # event_name = Event.objects.get(name= header)
     users = group_name.user_set.all()
     print("users", type(users), users)
 
@@ -141,7 +164,7 @@ def classes(response, class_id, first_professors, middle ="", last_professors=""
             letters_only = ''.join(filter(str.isalpha, class_id))
             return redirect("/tutor_home/searchbar/?mnemonic=" + letters_only)
 
-    return render(response, "main/roster.html", {'header': header, 'user': user, 'group': group_name})
+    return render(response, "main/roster.html", {'header': header, 'user': user, 'group': group_name, 'event':event_name})
 
 
 def mnemonic(response):
