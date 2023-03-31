@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from .models import ClassList, Item, View, ClassDatabase
+from .models import Item, View, ClassDatabase #ClassList, 
 # from .forms import ClassSelect
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
@@ -76,7 +76,7 @@ def account(response):
 
 
 def classes(response, class_id):
-    ls = ClassList.objects.get(class_id=class_id)
+    #ls = ClassList.objects.get(class_id=class_id)
     return render(response, "main/roster.html", {"ls": ls})
 
 
