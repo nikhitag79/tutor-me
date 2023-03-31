@@ -57,7 +57,7 @@ def add_event(request):
     return JsonResponse(data)
 
 
-def all_events(request):                                                                                                 
+def all_events(request,class_id="", first_professors="", middle ="", last_professors=""):
     all_events = Event.objects.filter(tutor =  request.user)
     out = []
     now = datetime.datetime.now()
@@ -142,7 +142,6 @@ def classes(response, class_id, first_professors, middle ="", last_professors=""
     users = group_name.user_set.all()
     print("users", type(users), users)
 
-
     if response.method == "POST":
         user = response.user
         group = Group.objects.get(name=class_id +" "+ professors)
@@ -153,7 +152,14 @@ def classes(response, class_id, first_professors, middle ="", last_professors=""
             my_instance.available_tutors = True
             my_instance.save()
             letters_only = ''.join(filter(str.isalpha, class_id))
-            return redirect("/tutor_home/searchbar/?mnemonic=" + letters_only)
+            # return redirect("/tutor_home/searchbar/?mnemonic=" + letters_only)
+
+
+            context = {
+                "events": event_name, "name": 'Schedule', "user": response.user
+            }
+
+            return redirect("/" + class_id + ' ' + professors, context)
         else:
             if response.POST.get('remove'):
                 group.user_set.remove(user)
@@ -164,8 +170,13 @@ def classes(response, class_id, first_professors, middle ="", last_professors=""
             letters_only = ''.join(filter(str.isalpha, class_id))
             return redirect("/tutor_home/searchbar/?mnemonic=" + letters_only)
 
-    return render(response, "main/roster.html", {'header': header, 'user': user, 'group': group_name, 'event':event_name})
+    user_in_group = 0
+    if user.groups.filter(name=header).exists():
+        user_in_group = 1
 
+    return render(response, "main/roster.html",
+                  {'header': header, 'user': user, 'group': group_name, 'event': event_name,
+                   'user_in_group': user_in_group, 'events':event_name})
 
 def mnemonic(response):
     return render(response, "main/mnemonic_page.html",{'name':'Home'})
