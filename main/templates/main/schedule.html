@@ -18,13 +18,32 @@
 <div class="container">
  <div class="row"> 
     {% block content %}
+    {% if user.user_type == 1 %}
+     <div class="dropdown">
+    <form name="formid">
+        <select name="ddlselect" onchange="get_groups()">
+            {% for group in groups %}
+                <option value ="{{group.name}}">{{group.name}}</option>
+            {% endfor %}
+        </select>
+    </form>
+         <label id="groupDropdown"></label>
+    </div>
+    {% endif %}
     <div class="col-md-12">    
         <div id='calendar'></div> 
     </div> 
     {% endblock content %}
  </div>
 </div>
+
+
 <script>
+    /* When the user clicks on the button,
+toggle between hiding and showing the dropdown content */
+function get_groups() {
+  document.getElementById("groupDropdown").classList.toggle("show");
+}
    $(document).ready(function () {
        var calendar = $('#calendar').fullCalendar({
            header: {
@@ -38,23 +57,26 @@
            editable: true,
            eventLimit: true,
            select: function (start, end, allDay) {
-               var title = prompt("Enter Event Title");
+               var title = formid.ddlselect[formid.ddlselect.selectedIndex].text
                if (title) {
-                   var start = $.fullCalendar.formatDate(start, "Y-MM-DD HH:mm:ss");
-                   var end = $.fullCalendar.formatDate(end, "Y-MM-DD HH:mm:ss");
-                   $.ajax({
-                       type: "GET",
-                       url: '/add_event',
-                       data: {'title': title, 'start': start, 'end': end},
-                       dataType: "json",
-                       success: function (data) {
-                           calendar.fullCalendar('refetchEvents');
-                           alert("Added Successfully");
-                       },
-                       error: function (data) {
-                           alert('There is a problem!!!');
-                       }
-                   });
+                   if (confirm("The event will be added to : " + formid.ddlselect[formid.ddlselect.selectedIndex].text)) {
+                       var start = $.fullCalendar.formatDate(start, "Y-MM-DD HH:mm:ss");
+                       var end = $.fullCalendar.formatDate(end, "Y-MM-DD HH:mm:ss");
+                       $.ajax({
+                           type: "GET",
+                           url: '/add_event',
+                           data: {'title': title, 'start': start, 'end': end},
+                           dataType: "json",
+                           success: function (data) {
+                               calendar.fullCalendar('refetchEvents');
+                               alert("Added Successfully");
+                           },
+                           error: function (data) {
+                               alert('There is a problem!!!');
+                           }
+
+                       });
+                   }
                }
            },
            eventResize: function (event) {

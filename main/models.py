@@ -5,6 +5,7 @@ from oauth_app.models import User
 from django.contrib.auth.models import Group
 import requests
 import json
+import datetime as dt
 
 
 
@@ -57,6 +58,11 @@ class ClassDatabase(models.Model):
 class Event(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=255,null=True,blank=True)
+    month = models.CharField(max_length=15,null=True,blank=True)
+    weekday = models.CharField(max_length=15,null=True,blank=True)
+    day = models.CharField(max_length=15,null=True,blank=True)
+    start_hour = models.CharField(max_length=15,null=True,blank=True)
+    end_hour = models.CharField(max_length=15,null=True,blank=True)
     start = models.DateTimeField(null=True,blank=True)
     end = models.DateTimeField(null=True,blank=True)
     isAval = models.BooleanField(default=True)
@@ -65,7 +71,19 @@ class Event(models.Model):
 
 
 class Request(models.Model):
+    event_id = models.CharField(max_length=255, default='no event')
+    event_start = models.CharField(max_length=255, default='no event')
+    event_stop = models.CharField(max_length=255, default='no event')
+    event_month = models.CharField(max_length=15,null=True,blank=True)
+    event_weekday = models.CharField(max_length=15, null=True, blank=True)
+    event_start_hour = models.CharField(max_length=15, null=True, blank=True)
+    event_end_hour = models.CharField(max_length=15, null=True, blank=True)
+    event_day =  models.CharField(max_length=15,null=True,blank=True)
     group_id = models.CharField(max_length=255, default='no class')
+    actual_event = models.ForeignKey(Event, on_delete=models.CASCADE, related_name='event_request', null=True)
     tutor = models.ForeignKey(User, on_delete=models.CASCADE,related_name='tutor_request',default=1)
     student= models.ForeignKey(User, on_delete = models.CASCADE,related_name ='student_request',default=1)
+    def __str__(self):
+        return self.student.username + ' wants to have make an appointment on ' + self.event_weekday + ' ' + self.event_month + ' ' + self.event_day + '\nFrom ' + self.event_start_hour + ' to ' + self.event_end_hour
+
 

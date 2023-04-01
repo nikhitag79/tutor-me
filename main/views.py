@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 
-from .models import ClassList, Item, View, ClassDatabase, Event
+from .models import View, ClassDatabase, Event, Request
 from django.contrib.auth import logout
 from django.http import JsonResponse 
 from django.contrib.auth.decorators import login_required
@@ -26,15 +26,25 @@ def student_home(response):
 
 
 def tutor_home(response):
-    return render(response, "main/home.html", {'name': 'Home'})
+    requests = Request.objects.filter(tutor = response.user)
+    print('requests', requests)
+    return render(response, "main/home.html", {'name': 'Home', 'requests': requests})
 
 
 def schedule(response):
-    all_events = Event.objects.filter(tutor = response.user)
-    print(all_events)
-    context = {
-        "events":all_events, "name": 'Schedule', "user":response.user
-    }
+    user = response.user
+    if user.user_type == 1:
+        all_events = Event.objects.filter(tutor = response.user)
+        all_groups = Group.objects.filter(user = response.user)
+        context = {
+            "events": all_events, "name": 'Schedule', "user": response.user, "groups": all_groups
+        }
+    elif user.user_type == 2:
+        all_events = Event.objects.filter(student = response.user)
+        print(all_events)
+        context = {
+            "events": all_events, "name": 'Schedule', "user": response.user
+        }
     return render(response, "main/schedule.html", context)
 
 
@@ -51,20 +61,25 @@ def add_event(request):
     while time < end:
         print('event start', time)
         print('event end', time + datetime.timedelta(minutes=slot_time))
-        event = Event(name=str(title), start=time, end=time+datetime.timedelta(minutes=slot_time), tutor=request.user)
+        if Event.objects.filter(name=str(title), start=time, end=time+datetime.timedelta(minutes=slot_time), tutor=request.user).exists():
+            return JsonResponse(data)
+        event = Event(name=str(title), start=time, end=time+datetime.timedelta(minutes=slot_time), tutor=request.user, month=time.strftime("%B"), weekday=time.strftime("%A"), day=time.strftime("%d"), start_hour=time.strftime("%H:%M"), end_hour=(time+datetime.timedelta(minutes=slot_time)).strftime("%H:%M"))
         event.save()
         time += datetime.timedelta(minutes=slot_time)
     return JsonResponse(data)
 
 
-def all_events(request):                                                                                                 
-    all_events = Event.objects.filter(tutor =  request.user)
+def all_events(request):
+    user=request.user
+    if user.user_type == 1:
+        all_events = Event.objects.filter(tutor = user)
+    elif user.user_type == 2:
+        all_events = Event.objects.filter(student=user)
     out = []
     now = datetime.datetime.now()
     for event in all_events:
         event_end = event.end
         if now.timestamp()>event_end.timestamp():
-            print("should not be seen, needs to be deleted, may add notification model")
             event.delete()
         else:
             out.append({
@@ -92,10 +107,16 @@ def update(request):
 
  
 def remove(request):
+    user = request.user
     id = request.GET.get("id", None)
     event = Event.objects.get(id=id)
-    event.delete()
     data = {}
+    if user.user_type == 1:
+        event.delete()
+    if user.user_type == 2:
+        event.student = None
+        event.isAval = True
+        event.save()
     return JsonResponse(data)
 
 def account(response):
@@ -131,44 +152,77 @@ def classes(response, class_id, first_professors, middle ="", last_professors=""
     else:
         print("double")
         professors = first_professors + " " + middle + " " + last_professors
-    print("profesors", professors)
+    print("professors", professors)
     my_instance = ClassDatabase.objects.filter(class_id= class_id, professors = professors)
     header = class_id + " " + professors
     dict = {}
     group_name = Group.objects.get(name= header)
+    now = datetime.datetime.now()
     event_name = Event.objects.all()
+    for event in event_name:
+        event_end = event.end
+        if now.timestamp()>event_end.timestamp():
+            print("should not be seen, needs to be deleted, may add notification model")
+            event.delete()
+    event_name = Event.objects.all()
+    print('event_name', event_name)
     # This is what we will use, using a different one for testing
     # event_name = Event.objects.get(name= header)
     users = group_name.user_set.all()
     print("users", type(users), users)
+    letters_only = ''.join(filter(str.isalpha, class_id))
 
 
     if response.method == "POST":
         user = response.user
         group = Group.objects.get(name=class_id +" "+ professors)
-        if not group.user_set.filter(username=user).exists():
-            group.user_set.add(user)
-            group.save()
-            my_instance = ClassDatabase.objects.filter(class_id=class_id, professors=professors).first()
-            my_instance.available_tutors = True
-            my_instance.save()
-            letters_only = ''.join(filter(str.isalpha, class_id))
-            return redirect("/tutor_home/searchbar/?mnemonic=" + letters_only)
-        else:
-            if response.POST.get('remove'):
-                group.user_set.remove(user)
-                if group.user_set.all().count() == 0:
-                    my_instance = ClassDatabase.objects.filter(class_id=class_id, professors=professors).first()
-                    my_instance.available_tutors = False
-                    my_instance.save()
-            letters_only = ''.join(filter(str.isalpha, class_id))
-            return redirect("/tutor_home/searchbar/?mnemonic=" + letters_only)
-
+        if user.user_type == 1:
+            if not group.user_set.filter(username=user).exists():
+                group.user_set.add(user)
+                group.save()
+                my_instance = ClassDatabase.objects.filter(class_id=class_id, professors=professors).first()
+                my_instance.available_tutors = True
+                my_instance.save()
+                return redirect("/tutor_home/searchbar/?mnemonic=" + letters_only)
+            else:
+                if response.POST.get('remove'):
+                    group.user_set.remove(user)
+                    if group.user_set.all().count() == 0:
+                        my_instance = ClassDatabase.objects.filter(class_id=class_id, professors=professors).first()
+                        my_instance.available_tutors = False
+                        my_instance.save()
+                letters_only = ''.join(filter(str.isalpha, class_id))
+                return redirect("/tutor_home/searchbar/?mnemonic=" + letters_only)
+        elif user.user_type == 2:
+            event_query = Event.objects.filter(id = response.POST.get('event_name'))
+            actual_event = []
+            for event in event_query:
+                actual_event.append(event)
+            this_event = actual_event[0]
+            if not Request.objects.filter(event_id = response.POST.get('event_name'), student = user).exists():
+                request = Request.objects.create(event_id = response.POST.get('event_name'), event_start = this_event.start, event_stop = this_event.end, tutor = this_event.tutor, student = user, actual_event=this_event, event_month = this_event.month, event_weekday = this_event.weekday, event_day = this_event.day, event_start_hour = this_event.start_hour, event_end_hour = this_event.end_hour)
+                request.save()
+                return redirect("/student_home/searchbar/?mnemonic=" + letters_only)
+            return redirect("/student_home/searchbar/?mnemonic=" + letters_only)
     return render(response, "main/roster.html", {'header': header, 'user': user, 'group': group_name, 'event':event_name})
 
 
 def mnemonic(response):
-    return render(response, "main/mnemonic_page.html",{'name':'Home'})
+    user = response.user
+    requests = Request.objects.filter(tutor=user)
+    if response.method == "POST":
+        if response.POST.get("Accept"):
+            request = Request.objects.get(id=response.POST.get("Accept"))
+            adjusted_event= Event.objects.get(id=request.event_id)
+            adjusted_event.student=request.student
+            adjusted_event.isAval=False
+            adjusted_event.save()
+            request.delete()
+        elif response.POST.get("Reject"):
+            request = Request.objects.get(id = response.POST.get("Reject"))
+            request.delete()
+
+    return render(response, "main/mnemonic_page.html",{'name':'Home', 'user': user, 'requests':requests})
 
 
 
@@ -226,7 +280,7 @@ def searchbar_tutee(request):
                                                                               professors=instructor,
                                                                               class_mnen=search_mnemonic, tutors=group)
                     else:
-                        messages.error(request, "Not an exisiting mnemonic")
+                        messages.error(request, "Not an existing mnemonic")
                         return redirect('/student_home/', {'name': 'Home'})
             filters = FilterCourses(request.GET,queryset= existing_classes)
             context = {"filters": filters,'name':search_mnemonic}
@@ -286,7 +340,7 @@ def searchbar_tutor(request):
                                                                               professors=instructor,
                                                                               class_mnen=search_mnemonic, tutors=group)
                     else:
-                        messages.error(request, "Not an exisiting mnemonic")
+                        messages.error(request, "Not an existing mnemonic")
                         return redirect('/tutor_home/', {'name': 'Home', "results": tutor_group})
             filters = FilterCourses(request.GET, queryset=existing_classes)
 

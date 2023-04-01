@@ -80,16 +80,28 @@
   <form method="post">
     {% csrf_token %}
       <fieldset>
+        {% if group %}
         {% for person in group.user_set.all %}
           {% if person.user_type ==  1 %}
-            <h3>{{person}}<h3/>
-                {% if event.tutor_set.all %}}
-                  <p>No List</p>
+              <h3>{{person}}</h3>
+                {% if event %}
+                  {% for each in event %}
+                    {% if each.isAval and each.name == group.name%}
+                    <button name = "event_name" type="submit" value = "{{each.id}}">Request {{each.start}}</button>
+                    <br>
+                    {% endif %}
+                  {% endfor %}
+                {% else %}
+                    <h3>{{person}} does not have any availability at this time</h3>
                 {% endif %}
           {% endif %}
         {% endfor %}
+        {% else %}
+          <h1>There are no existing tutors</h1>
+        {% endif %}
+      </fieldset>
   {% endif %}
-
+  </form>
   </body>
 
 {% endblock %}
