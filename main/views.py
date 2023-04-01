@@ -9,6 +9,7 @@ from .filters import FilterCourses
 from django.contrib.auth.models import Group
 from oauth_app.models import User
 import json
+from json import dumps
 import datetime
 import sys
 
@@ -215,9 +216,11 @@ def classes(response, class_id, first_professors, middle ="", last_professors=""
     user_in_group = 0
     if user.groups.filter(name=header).exists():
         user_in_group = 1
+    data_dict ={'group': header}
+    data_json = dumps(data_dict)
     return render(response, "main/roster.html",
                   {'header': header, 'user': user, 'group': group_name, 'event': event_name,
-                   'user_in_group': user_in_group, 'events':event_name})
+                   'user_in_group': user_in_group, 'events':event_name, 'data_json':data_json})
 
 def mnemonic(response):
     user = response.user

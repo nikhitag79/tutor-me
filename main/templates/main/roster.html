@@ -56,6 +56,7 @@
            editable: true,
            eventLimit: true,
            select: function (start, end, allDay) {
+
                var title = prompt("Enter Event Title");
                if (title) {
                    var start = $.fullCalendar.formatDate(start, "Y-MM-DD HH:mm:ss");
