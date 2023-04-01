@@ -69,7 +69,7 @@ def add_event(request):
     return JsonResponse(data)
 
 
-def all_events(request):
+def all_events(request,class_id="", first_professors="", middle ="", last_professors=""):
     user=request.user
     if user.user_type == 1:
         all_events = Event.objects.filter(tutor = user)
@@ -183,7 +183,11 @@ def classes(response, class_id, first_professors, middle ="", last_professors=""
                 my_instance = ClassDatabase.objects.filter(class_id=class_id, professors=professors).first()
                 my_instance.available_tutors = True
                 my_instance.save()
-                return redirect("/tutor_home/searchbar/?mnemonic=" + letters_only)
+                context = {
+                    "events": event_name, "name": 'Schedule', "user": response.user
+                }
+
+                return redirect("/" + class_id + ' ' + professors, context)
             else:
                 if response.POST.get('remove'):
                     group.user_set.remove(user)
@@ -191,21 +195,29 @@ def classes(response, class_id, first_professors, middle ="", last_professors=""
                         my_instance = ClassDatabase.objects.filter(class_id=class_id, professors=professors).first()
                         my_instance.available_tutors = False
                         my_instance.save()
-                letters_only = ''.join(filter(str.isalpha, class_id))
                 return redirect("/tutor_home/searchbar/?mnemonic=" + letters_only)
         elif user.user_type == 2:
-            event_query = Event.objects.filter(id = response.POST.get('event_name'))
+            event_query = Event.objects.filter(id=response.POST.get('event_name'))
             actual_event = []
             for event in event_query:
                 actual_event.append(event)
             this_event = actual_event[0]
-            if not Request.objects.filter(event_id = response.POST.get('event_name'), student = user).exists():
-                request = Request.objects.create(event_id = response.POST.get('event_name'), event_start = this_event.start, event_stop = this_event.end, tutor = this_event.tutor, student = user, actual_event=this_event, event_month = this_event.month, event_weekday = this_event.weekday, event_day = this_event.day, event_start_hour = this_event.start_hour, event_end_hour = this_event.end_hour)
+            if not Request.objects.filter(event_id=response.POST.get('event_name'), student=user).exists():
+                request = Request.objects.create(event_id=response.POST.get('event_name'), event_start=this_event.start,
+                                                 event_stop=this_event.end, tutor=this_event.tutor, student=user,
+                                                 actual_event=this_event, event_month=this_event.month,
+                                                 event_weekday=this_event.weekday, event_day=this_event.day,
+                                                 event_start_hour=this_event.start_hour, event_end_hour=this_event.end_hour)
                 request.save()
                 return redirect("/student_home/searchbar/?mnemonic=" + letters_only)
             return redirect("/student_home/searchbar/?mnemonic=" + letters_only)
-    return render(response, "main/roster.html", {'header': header, 'user': user, 'group': group_name, 'event':event_name})
 
+    user_in_group = 0
+    if user.groups.filter(name=header).exists():
+        user_in_group = 1
+    return render(response, "main/roster.html",
+                  {'header': header, 'user': user, 'group': group_name, 'event': event_name,
+                   'user_in_group': user_in_group, 'events':event_name})
 
 def mnemonic(response):
     user = response.user
