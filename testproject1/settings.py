@@ -56,7 +56,7 @@ INSTALLED_APPS = [
 if 'DATABASE_URL' in os.environ:
     SITE_ID = 11
 else:
-    SITE_ID = 8
+    SITE_ID = 6
 
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
@@ -160,8 +160,14 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
+
+
+
 # The absolute path to the directory where collectstatic will collect static files for deployment.
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')  # BASE_DIR / 'staticfiles'
+
+if not os.path.isdir(STATIC_ROOT):
+    os.makedirs(STATIC_ROOT, mode=0o755)
 
 # The URL to use when referring to static files (where they will be served from)
 STATIC_URL = '/static/'
