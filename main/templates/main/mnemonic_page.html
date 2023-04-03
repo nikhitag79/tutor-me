@@ -5,18 +5,73 @@
 {% endblock %}
 
 {% block body_block %}
+    {% if messages %} 
+        <ul style = "list-style-type: none;" class="messages">
+            {%for message in messages %}
+             <li {% if message.tags %} class = "{{message.tags}}" {% endif %}> {{message}} </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+    {% if user.user_type == 2 %}
     Find Tutors
+    {% elif user.user_type == 1%}
+
+        {% if requests %}
+        {% for request in requests %}
+            {% if request.event_month == 'January'%}
+                <fieldset>
+                    <legend>January</legend>
+                        <form>January Requests<h3/>
+                            {{request}}
+                        </form>
+                </fieldset>
+            {% endif %}
+        {% endfor %}
+        {% for request in requests %}
+            {% if request.event_month == 'February' %}
+                <fieldset>
+                    <legend>February</legend>
+                        <form>February Requests<h3/>
+                            {{request}}
+                        </form>
+                </fieldset>
+            {% endif %}
+        {% endfor %}
+        {% for request in requests %}
+            {% if requests.event_month == 'March' %}
+                <fieldset>
+                    <legend>March</legend>
+                        <form>March Requests<h3/>
+                            {{request}}
+                        </form>
+                </fieldset>
+            {% endif %}
+        {% endfor %}
+        <fieldset>
+            <legend>April Requests</legend>
+                {% for request in requests %}
+                    {% if request.event_month == 'April'%}
+                        <fieldset>
+                        <form method = "post">
+                            {% csrf_token %}
+                            <h3>{{request.event_weekday}} {{request.event_month}} {{request.event_day}} Request</h3>
+                            <h4>{{request}}</h4>
+                            <button name = "Accept" type="submit" value = "{{request.id}}">Accept</button>
+                            <button name = "Reject" type="submit" value = "{{request.id}}">Reject</button>
+                        </form>
+                        </fieldset>
+                    {% endif %}
+                {% endfor %}
+            </fieldset>
+        {% endif %}
+    <br>
+    Find Classes
+    {% endif %}
     <form action= "searchbar/" method="get">
         find mnemonic: <input type="text" name="mnemonic">
         <input type="submit" value="Submit" />
     </form>
-    <br>{{ error_message }} </br>
+    
 
-<!--    <form method="Post" class="form-switcher">-->
-<!--        {% csrf_token %}-->
-<!--        {{ selection }}-->
-<!--        {{ context }}-->
 
-<!--        <button type="submit" name="GoTo">GoTo</button>-->
-<!--    </form>-->
-{% endblock %}
+{% endblock body_block%}

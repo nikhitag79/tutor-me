@@ -1,10 +1,41 @@
 {% extends 'main/base.html' %}
 
 {% block title_block %}
+
+
+
+
+
 <h1>{{ name }} Page</h1>
+
+<h2> User name: {{user.username}} </h2>
+<h3> First name: {{user.first_name}}</h3>
+<h3> Last name: {{user.last_name}}</h3>
+<fieldset>
+    <legend>User Name</legend>
+        <form method="post">
+            {% csrf_token %}
+            <input type="text", name="username", id="username", value="", placeholder="{{user.username}}">
+            <button name="set_username" type="submit" value="set_username">Adjust Username</button>
+            <br>
+            {{error}}
+        </form>
+    {% if user.user_type == 1 %}
+        <legend>Hourly Rate</legend>
+            <form method="post">
+                {% csrf_token %}
+                <input type="number" name="hourly_rate" id="hourly_rate" pattern="^\$\d{1,3}(,\d{3})*(\.\d+)?$"
+                       value="" data-type="currency" placeholder={{user.tutor_rate}} step=".01">
+                <button name="set_hourly" type="submit" value="set_hourly">Set Rate</button>
+            </form>
+                <p>Current hourly rate: {{user.tutor_rate}}</p>
+    {% endif %}
+    </fieldset>
+
+
 <div style="margin-top:30px;">
     <form method = "POST">{% csrf_token %}
-        <button type="submit">Logout</button>
+        <button name = "logout" value="logout" type="submit">Logout</button>
     </form>
 </div>
 {% endblock %}

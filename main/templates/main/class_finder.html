@@ -1,0 +1,42 @@
+{% extends 'main/base.html' %}
+
+{% block title_block %}
+    <h1>{{name}}
+        
+    </h1>
+{% endblock %}
+
+{% block body_block %}
+    Find Tutors
+    <form method="get">
+        {{filters.form}}
+        <input type = "submit" value = "Search" name ="Find" >
+
+    </form>
+
+    <hr>
+    <form method="get">
+        <table border = "1">
+            <tr>
+                <th> Class id </th>
+                <th> Class name </th>
+                <th> Professors </th>
+                <th> Available Tutor </th>
+                <th> Find Tutors </th>
+            </tr>
+            {% for item in filters.qs %}
+    <tr>
+        <td> {{item.class_id}}</td>
+        <td> {{item.class_name}}</td>
+        <td> {{item.professors}}</td>
+        <td> {{item.available_tutors}}</td>
+        {% if item.available_tutors %}
+        <td><a href="/{{ item.class_id }} {{ item.professors }}/?class_id={{ item.id }}">Find Tutor</a></td>
+        {% else %}
+        <td> No Available Tutors </td>
+        {% endif %}
+    </tr>
+{% endfor %}
+        </table>
+    </form>
+{% endblock %}
