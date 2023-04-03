@@ -13,62 +13,136 @@
    <h1>Time Availability</h1>
     <form method="post">
       {% csrf_token %}
-      <fieldset>
-        <legend>Monday</legend>
-        <label>From:</label>
-        <input type="time" name="monday-from">
-        <label>To:</label>
-        <input type="time" name="monday-to">
-      </fieldset>
-      <fieldset>
-        <legend>Tuesday</legend>
-        <label>From:</label>
-        <input type="time" name="tuesday-from">
-        <label>To:</label>
-        <input type="time" name="tuesday-to">
-      </fieldset>
-      <fieldset>
-        <legend>Wednesday</legend>
-        <label>From:</label>
-        <input type="time" name="wednesday-from">
-        <label>To:</label>
-        <input type="time" name="wednesday-to">
-      </fieldset>
-      <fieldset>
-        <legend>Thursday</legend>
-        <label>From:</label>
-        <input type="time" name="thursday-from">
-        <label>To:</label>
-        <input type="time" name="thursday-to">
-      </fieldset>
-      <fieldset>
-        <legend>Friday</legend>
-        <label>From:</label>
-        <input type="time" name="friday-from">
-        <label>To:</label>
-        <input type="time" name="friday-to">
-      </fieldset>
-      <fieldset>
-        <legend>Saturday</legend>
-        <label>From:</label>
-        <input type="time" name="saturday-from">
-        <label>To:</label>
-        <input type="time" name="saturday-to">
-      </fieldset>
-      <fieldset>
-        <legend>Sunday</legend>
-        <label>From:</label>
-        <input type="time" name="sunday-from">
-        <label>To:</label>
-        <input type="time" name="sunday-to">
-      </fieldset>
       <br>
-
-      <input type="submit" value="Add Availability">
-      <input type="submit" value="Remove This Time">
+      {% if user_in_group == 0 %}
+         <button name = "tutor" type="submit" value = "tutor">Tutor for this Class</button>
+      {% endif %}
+<!--      <input type="submit" value="Add Availability">-->
       <br>
       {% for person in group.user_set.all%}
         {%if person == user%}
+          <!DOCTYPE html>
+<html>
+<head>
+    <title>Laravel 9 Ajax FullCalender CRUD (Create, Read, Update and Delete)</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.9.0/fullcalendar.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.9.0/fullcalendar.js"></script>
+</head>
+<body>
+<div class="container">
+ <div class="row">
+    {% block content %}
+    <div class="col-md-12">
+        <div id='calendar'></div>
+    </div>
+    {% endblock content %}
+ </div>
+</div>
+<script type="text/javascript">
+   $(document).ready(function () {
+       var calendar = $('#calendar').fullCalendar({
+           header: {
+               left: 'prev,next today',
+               center: 'title',
+               right: 'month,agendaWeek,agendaDay'
+           },
+           events: 'all_events',
+           selectable: true,
+           selectHelper: true,
+           editable: true,
+           eventLimit: true,
+           select: function (start, end, allDay) {
+               var title = "{{header}}";
+               if (title) {
+                 if (confirm("The event will be added to : " + title)) {
+                   var start = $.fullCalendar.formatDate(start, "Y-MM-DD HH:mm:ss");
+                   var end = $.fullCalendar.formatDate(end, "Y-MM-DD HH:mm:ss");
+                   $.ajax({
+                     type: "GET",
+                     url: '/add_event',
+                     data: {'title': title, 'start': start, 'end': end},
+                     dataType: "json",
+                     success: function (data) {
+                       calendar.fullCalendar('refetchEvents');
+                       alert("Added Successfully");
+                     },
+                     error: function (data) {
+                       alert('There is a problem!!!');
+                     }
+                   });
+                 }
+               }
+           },
+           eventResize: function (event) {
+               var start = $.fullCalendar.formatDate(event.start, "Y-MM-DD HH:mm:ss");
+               var end = $.fullCalendar.formatDate(event.end, "Y-MM-DD HH:mm:ss");
+               var title = event.title;
+               var id = event.id;
+               $.ajax({
+                   type: "GET",
+                   url: '/update',
+                   data: {'title': title, 'start': start, 'end': end, 'id': id},
+                   dataType: "json",
+                   success: function (data) {
+                       calendar.fullCalendar('refetchEvents');
+                       alert('Event Update');
+                   },
+                   error: function (data) {
+                       alert('There is a problem!!!');
+                   }
+               });
+           },
+
+           eventDrop: function (event) {
+               var start = $.fullCalendar.formatDate(event.start, "Y-MM-DD HH:mm:ss");
+               var end = $.fullCalendar.formatDate(event.end, "Y-MM-DD HH:mm:ss");
+               var title = event.title;
+               var id = event.id;
+               $.ajax({
+                   type: "GET",
+                   url: '/update',
+                   data: {'title': title, 'start': start, 'end': end, 'id': id},
+                   dataType: "json",
+                   success: function (data) {
+                       calendar.fullCalendar('refetchEvents');
+                       alert('Event Update');
+                   },
+                   error: function (data) {
+                       alert('There is a problem!!!');
+                   }
+               });
+           },
+
+           eventClick: function (event) {
+               if (confirm("Are you sure you want to remove it?")) {
+                   var id = event.id;
+                   $.ajax({
+                       type: "GET",
+                       url: '/remove',
+                       data: {'id': id},
+                       dataType: "json",
+                       success: function (data) {
+                           calendar.fullCalendar('refetchEvents');
+                           alert('Event Removed');
+                       },
+                       error: function (data) {
+                           alert('There is a problem!!!');
+                       }
+                   });
+               }
+           },
+
+       });
+   });
+
+</script>
+</body>
+</html>
+
           <button name = "remove" type="submit" value = "remove">Drop Tutoring</button>
         {% endif %}
       {% endfor %}
@@ -77,13 +151,31 @@
   {% endif %}
 
   {% if user.user_type == 2 %}
-  {% for person in group.user_set.all %}
-    {% if person.user_type ==  1 %}
-      {{person}}
-    {% endif %}
-  {% endfor %}
+  <form method="post">
+    {% csrf_token %}
+      <fieldset>
+        {% if group %}
+        {% for person in group.user_set.all %}
+          {% if person.user_type ==  1 %}
+              <h3>{{person}}</h3>
+                {% if event %}
+                  {% for each in event %}
+                    {% if each.isAval and each.name == group.name%}
+                    <button name = "event_name" type="submit" value = "{{each.id}}">Request {{each.start}}</button>
+                    <br>
+                    {% endif %}
+                  {% endfor %}
+                {% else %}
+                    <h3>{{person}} does not have any availability at this time</h3>
+                {% endif %}
+          {% endif %}
+        {% endfor %}
+        {% else %}
+          <h1>There are no existing tutors</h1>
+        {% endif %}
+      </fieldset>
   {% endif %}
-
+  </form>
   </body>
 
 {% endblock %}
