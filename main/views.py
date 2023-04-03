@@ -225,7 +225,9 @@ def classes(response, class_id, first_professors, middle ="", last_professors=""
 
 def mnemonic(response):
     user = response.user
-    requests = Request.objects.filter(tutor=user)
+    requests = ''
+    if user.id is not None:
+        requests = Request.objects.filter(tutor=user)
     if response.method == "POST":
         if response.POST.get("Accept"):
             request = Request.objects.get(id=response.POST.get("Accept"))
