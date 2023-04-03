@@ -189,7 +189,6 @@ def classes(response, class_id, first_professors, middle ="", last_professors=""
                 context = {
                     "events": event_name, "name": 'Schedule', "user": response.user
                 }
-
                 return redirect("/" + class_id + ' ' + professors, context)
             else:
                 if response.POST.get('remove'):
