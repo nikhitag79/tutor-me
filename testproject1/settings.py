@@ -54,7 +54,7 @@ INSTALLED_APPS = [
 
 # Site ID
 if 'DATABASE_URL' in os.environ:
-    SITE_ID = 11
+    SITE_ID = 12
 else:
     SITE_ID = 6
 
