@@ -42,7 +42,7 @@
     {% endblock content %}
  </div>
 </div>
-<script>
+<script type="text/javascript">
    $(document).ready(function () {
        var calendar = $('#calendar').fullCalendar({
            header: {
@@ -56,24 +56,25 @@
            editable: true,
            eventLimit: true,
            select: function (start, end, allDay) {
-
-               var title = prompt("Enter Event Title");
+               var title = "{{header}}";
                if (title) {
+                 if (confirm("The event will be added to : " + title)) {
                    var start = $.fullCalendar.formatDate(start, "Y-MM-DD HH:mm:ss");
                    var end = $.fullCalendar.formatDate(end, "Y-MM-DD HH:mm:ss");
                    $.ajax({
-                       type: "GET",
-                       url: '/add_event',
-                       data: {'title': title, 'start': start, 'end': end},
-                       dataType: "json",
-                       success: function (data) {
-                           calendar.fullCalendar('refetchEvents');
-                           alert("Added Successfully");
-                       },
-                       error: function (data) {
-                           alert('There is a problem!!!');
-                       }
+                     type: "GET",
+                     url: '/add_event',
+                     data: {'title': title, 'start': start, 'end': end},
+                     dataType: "json",
+                     success: function (data) {
+                       calendar.fullCalendar('refetchEvents');
+                       alert("Added Successfully");
+                     },
+                     error: function (data) {
+                       alert('There is a problem!!!');
+                     }
                    });
+                 }
                }
            },
            eventResize: function (event) {

@@ -50,11 +50,13 @@ def schedule(response):
 
 
 def add_event(request):
+    group = Group.objects.get(name=request.GET.get("title"))
+    print(group.name)
     start = request.GET.get("start", None)
     end = request.GET.get("end", None)
     print(end)
     title = request.GET.get("title", None)
-    data = {}
+    data = {"group": group.name}
     format = "%Y-%m-%d %H:%M:%S"
     slot_time = 30
     time = datetime.datetime.strptime(start,format)
