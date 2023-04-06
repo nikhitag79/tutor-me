@@ -1,7 +1,7 @@
 {% extends 'main/base.html' %}
 
 {% block title_block %}
-    <h1>{{ name}} Page
+    <h1>{{ name}} Student Home
         {{a}}
     </h1>
 {% endblock %}
@@ -15,24 +15,34 @@
     </form>
 
     <hr>
+        
     <form method="get">
-        <table border = "1">
-            <tr>
-                <th> Class id </th>
-                <th> Class name </th>
-                <th> Professors </th>
-                <th> Available Tutor </th>
-            </tr>
-            {% for item in filters.qs %}
+
+        {% block table_block %}
+        <table class="table table-striped">
+            <thead>
                 <tr>
-                    <td> {{item.class_id}}</td>
-                    <td> {{item.class_name}}</td>
-                    <td> {{item.professors}}</td>
-                    <td> {{item.available_tutors}}</td>
+                    <th> Class id </th>
+                    <th> Class name </th>
+                    <th> Professors </th>
+                    <th> Available Tutor </th>
                 </tr>
-            {% endfor %}
-        </table>
+            </thead>
+            <tbody>
+                {% for item in filters.qs %}
+                    <tr>
+                        <td> {{item.class_id}}</td>
+                        <td> {{item.class_name}}</td>
+                        <td> {{item.professors}}</td>
+                        <td> {{item.available_tutors}}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+          </table>
+
+          {%endblock%}
     </form>
+    
 
 {% endblock %}
 
