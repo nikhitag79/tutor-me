@@ -5,11 +5,18 @@ from main.models import ClassDatabase
 from oauth_app.models import User
 import djmoney
 from djmoney.money import Money
+from datetime import datetime, timedelta
+from django.contrib.auth.models import Group
 
 
 
 # Create your tests here.
 class TestClass(TestCase):
+
+    # def setUp(self):
+    #     self.tutor = User.objects.create(user_type=1)
+    #     self.student = User.objects.create(user_type=2)
+
     def test_studentHomePage(self):
         c= Client()
         response=c.get('/student_home/')
@@ -32,7 +39,34 @@ class TestClass(TestCase):
         self.tutor.tutor_rate = djmoney.money.Money('10.00', 'USD')
         self.assertEqual(self.tutor.tutor_rate, djmoney.money.Money('10.00', 'USD'))
 
+    def test_add_event(self):
+        self.group = Group.objects.create(name='Test Group', id=9)
+        self.tutor = User.objects.create(user_type=1, username="tutor_name", id=10)
+        self.student = User.objects.create(user_type=2, id=11)
+        self.group.user_set.add(self.tutor)
+        self.group.save()
 
+        start_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        end_time = (datetime.now() + timedelta(minutes=60)).strftime('%Y-%m-%d %H:%M:%S')
+        params = {'title': 'Test Group', 'start': start_time, 'end': end_time, 'group': 'Test Group', 'user': self.tutor}
+
+
+        # Log in as the test user
+        # self.client.login(username='testuser', password='testpass')
+
+        # Send the request to the view
+        url = reverse('add_event')
+        response = self.client.get(url, params)
+        # response.user = self.tutor
+
+        # Check that the response contains the expected data
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()['group'], 'Test Group')
+
+
+    # def test_user(self):
+    #     self.tutor = User.objects.create(user_type=1)
+    #     self.student = User.objects.create(user_type=2)
     # Tutor = 1
     # Student = 2
     # Administration = 3
