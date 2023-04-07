@@ -17,8 +17,7 @@
     <hr>
         
     <form method="get">
-
-        {% block table_block %}
+        {% comment %} {% block table_block %} {% endcomment %}
         <table class="table table-striped">
             <thead>
                 <tr>
@@ -40,7 +39,7 @@
             </tbody>
           </table>
 
-          {%endblock%}
+          {% comment %} {%endblock%} {% endcomment %}
     </form>
     
 
