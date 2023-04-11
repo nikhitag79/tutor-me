@@ -6,7 +6,7 @@
     {% if not user.has_selected_role %}
         <a href="/select_user/">Continue to home</a>
     {% elif user.user_type == 1%}
-        <a href="/home/"> Tutor Home </a>
+        <a href="/tutor_home/"> Tutor Home </a>
     {% elif user.user_type == 2%}
         <a href="/student_home/"> Student Home </a>
     {% endif %}

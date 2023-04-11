@@ -29,7 +29,7 @@ def student_home(response):
 def tutor_home(response):
     requests = Request.objects.filter(tutor = response.user)
     print('requests', requests)
-    return render(response, "main/home.html", {'name': 'Home', 'requests': requests})
+    return render(response, "main/tutor_home.html", {'name': 'Home', 'requests': requests})
 
 
 def schedule(response):
@@ -264,7 +264,7 @@ def select_user(response):
         response.user.save()
 
         if user_type == "Tutor":
-            return redirect('/home/')
+            return redirect('/tutor_home/')
         elif user_type == "Student":
             return redirect('/student_home/')
 
