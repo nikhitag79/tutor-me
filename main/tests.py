@@ -1,7 +1,7 @@
 from django.test import TestCase, Client
 from django.urls import reverse
 
-from main.models import ClassDatabase
+from main.models import ClassDatabase, Event
 from oauth_app.models import User
 import djmoney
 from djmoney.money import Money
@@ -102,6 +102,20 @@ class TestClass(TestCase):
         self.assertEqual(str(response.context['user']), 'tutor_name')
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'main/schedule.html')
+
+    def test_all_events(self):
+        self.group = Group.objects.create(name='Test Group', id=9)
+        self.tutor = User.objects.create_user(user_type=1, username="tutor_name", id=9, password='testpass')
+        self.group.user_set.add(self.tutor)
+        self.group.save()
+
+        self.assertTrue(self.client.login(username='tutor_name', password='testpass'))
+        # self.event = Event.objects.create(id=10, name="CS3240 Tutoring 1", month="May",
+        #                                   weekday="Wednesday", )
+        # just starting this, thinking we can test inputting a previous
+        # date and making sure it gets deleted & vice versa
+        #      not positive what the "day" field is in the model
+
 
     # def test_user(self):
     #     self.tutor = User.objects.create(user_type=1)
