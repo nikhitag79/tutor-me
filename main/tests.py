@@ -6,7 +6,7 @@ from oauth_app.models import User
 import djmoney
 from djmoney.money import Money
 from datetime import datetime, timedelta
-from django.contrib.auth.models import Group
+from django.contrib.auth.models import Group, UserManager
 
 
 
@@ -16,7 +16,7 @@ class TestClass(TestCase):
     # def setUp(self):
     #     self.tutor = User.objects.create(user_type=1)
     #     self.student = User.objects.create(user_type=2)
-
+    # teardown
     def test_studentHomePage(self):
         c= Client()
         response=c.get('/student_home/')
@@ -41,18 +41,20 @@ class TestClass(TestCase):
 
     def test_add_event(self):
         self.group = Group.objects.create(name='Test Group', id=9)
-        self.tutor = User.objects.create(user_type=1, username="tutor_name", id=10)
-        self.student = User.objects.create(user_type=2, id=11)
+        # self.tutor = User.objects.create(user_type=1, username="tutor_name", id=10, password='testpass')
+        self.tutor = User.objects.create_user(user_type=1, username="tutor_name", id=10, password='testpass')
+        # self.student = User.objects.create_user(user_type=2, username="student", id=11)
+        # self.student = User.objects.create(user_type=2, id=11)
         self.group.user_set.add(self.tutor)
         self.group.save()
 
         start_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         end_time = (datetime.now() + timedelta(minutes=60)).strftime('%Y-%m-%d %H:%M:%S')
-        params = {'title': 'Test Group', 'start': start_time, 'end': end_time, 'group': 'Test Group', 'user': self.tutor}
+        params = {'title': 'Test Group', 'start': start_time, 'end': end_time, 'group': 'Test Group', 'user': self.tutor.id}
 
 
         # Log in as the test user
-        # self.client.login(username='testuser', password='testpass')
+        self.assertTrue(self.client.login(username='tutor_name', password='testpass'))
 
         # Send the request to the view
         url = reverse('add_event')

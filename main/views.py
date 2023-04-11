@@ -67,7 +67,8 @@ def add_event(request):
         print('event start', time)
         print('event end', time + datetime.timedelta(minutes=slot_time))
         print("user", request.user)
-        if Event.objects.filter(name=str(title), start=time, end=time+datetime.timedelta(minutes=slot_time), tutor=request.user).exists():
+        if Event.objects.filter(name=str(title), start=time, end=time+datetime.timedelta(minutes=slot_time),
+                                tutor=request.user).exists():
             return JsonResponse(data)
         event = Event(name=str(title), start=time, end=time+datetime.timedelta(minutes=slot_time), tutor=request.user, month=time.strftime("%B"), weekday=time.strftime("%A"), day=time.strftime("%d"), start_hour=time.strftime("%H:%M"), end_hour=(time+datetime.timedelta(minutes=slot_time)).strftime("%H:%M"))
         event.save()
