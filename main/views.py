@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 
 from .models import View, ClassDatabase, Event, Request
 from django.contrib.auth import logout
-from django.http import JsonResponse 
+from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .filters import FilterCourses
@@ -27,7 +27,7 @@ def student_home(response):
 
 
 def tutor_home(response):
-    requests = Request.objects.filter(tutor = response.user)
+    requests = Request.objects.filter(tutor=response.user)
     print('requests', requests)
     return render(response, "main/tutor_home.html", {'name': 'Home', 'requests': requests})
 
@@ -35,14 +35,13 @@ def tutor_home(response):
 def schedule(response):
     user = response.user
     if user.user_type == 1:
-        all_events = Event.objects.filter(tutor = response.user)
-        all_groups = Group.objects.filter(user = response.user)
+        all_events = Event.objects.filter(tutor=response.user)
+        all_groups = Group.objects.filter(user=response.user)
         context = {
             "events": all_events, "name": 'Schedule', "user": response.user, "groups": all_groups
         }
     elif user.user_type == 2:
-        all_events = Event.objects.filter(student = response.user)
-        print(all_events)
+        all_events = Event.objects.filter(student=response.user)
         context = {
             "events": all_events, "name": 'Schedule', "user": response.user
         }
@@ -50,8 +49,6 @@ def schedule(response):
 
 
 def add_event(request):
-    title = request.GET.get("title")
-    print(title)
     group = Group.objects.get(name=request.GET.get("title"))
     print(group.name)
     start = request.GET.get("start", None)
@@ -61,32 +58,35 @@ def add_event(request):
     data = {"group": group.name}
     format = "%Y-%m-%d %H:%M:%S"
     slot_time = 30
-    time = datetime.datetime.strptime(start,format)
-    end = datetime.datetime.strptime(end,format)
+    time = datetime.datetime.strptime(start, format)
+    end = datetime.datetime.strptime(end, format)
     while time < end:
         print('event start', time)
         print('event end', time + datetime.timedelta(minutes=slot_time))
         print("user", request.user)
-        if Event.objects.filter(name=str(title), start=time, end=time+datetime.timedelta(minutes=slot_time),
+        if Event.objects.filter(name=str(title), start=time, end=time + datetime.timedelta(minutes=slot_time),
                                 tutor=request.user).exists():
             return JsonResponse(data)
-        event = Event(name=str(title), start=time, end=time+datetime.timedelta(minutes=slot_time), tutor=request.user, month=time.strftime("%B"), weekday=time.strftime("%A"), day=time.strftime("%d"), start_hour=time.strftime("%H:%M"), end_hour=(time+datetime.timedelta(minutes=slot_time)).strftime("%H:%M"))
+        event = Event(name=str(title), start=time, end=time + datetime.timedelta(minutes=slot_time), tutor=request.user,
+                      month=time.strftime("%B"), weekday=time.strftime("%A"), day=time.strftime("%d"),
+                      start_hour=time.strftime("%H:%M"),
+                      end_hour=(time + datetime.timedelta(minutes=slot_time)).strftime("%H:%M"))
         event.save()
         time += datetime.timedelta(minutes=slot_time)
     return JsonResponse(data)
 
 
-def all_events(request,class_id="", first_professors="", middle ="", last_professors=""):
-    user=request.user
+def all_events(request, class_id="", first_professors="", middle="", last_professors=""):
+    user = request.user
     if user.user_type == 1:
-        all_events = Event.objects.filter(tutor = user)
+        all_events = Event.objects.filter(tutor=user)
     elif user.user_type == 2:
         all_events = Event.objects.filter(student=user)
     out = []
     now = datetime.datetime.now()
     for event in all_events:
         event_end = event.end
-        if now.timestamp()>event_end.timestamp():
+        if now.timestamp() > event_end.timestamp():
             event.delete()
         else:
             out.append({
@@ -95,7 +95,7 @@ def all_events(request,class_id="", first_professors="", middle ="", last_profes
                 'start': event.start.strftime("%m/%d/%Y, %H:%M:%S"),
                 'end': event.end.strftime("%m/%d/%Y, %H:%M:%S"),
             })
-    return JsonResponse(out, safe=False) 
+    return JsonResponse(out, safe=False)
 
 
 def update(request):
@@ -112,7 +112,6 @@ def update(request):
     return JsonResponse(data)
 
 
- 
 def remove(request):
     user = request.user
     id = request.GET.get("id", None)
@@ -125,6 +124,7 @@ def remove(request):
         event.isAval = True
         event.save()
     return JsonResponse(data)
+
 
 def account(response):
     # user_id = response.GET.get("username")
@@ -139,7 +139,8 @@ def account(response):
                 return render(response, "main/account.html",
                               {'name': 'Account', 'error': 'That is already your username!'})
             if User.objects.filter(username=new_username).exists():
-                return render(response, "main/account.html", {'name': 'Account', 'error': 'That user name is already taken. Try again'})
+                return render(response, "main/account.html",
+                              {'name': 'Account', 'error': 'That user name is already taken. Try again'})
             else:
                 response.user.username = new_username
                 response.user.save()
@@ -150,7 +151,7 @@ def account(response):
     return render(response, "main/account.html", {'name': 'Account'})
 
 
-def classes(response, class_id, first_professors, middle ="", last_professors=""):
+def classes(response, class_id, first_professors, middle="", last_professors=""):
     user = response.user
     print(user.user_type)
     if (middle == ""):
@@ -160,15 +161,15 @@ def classes(response, class_id, first_professors, middle ="", last_professors=""
         print("double")
         professors = first_professors + " " + middle + " " + last_professors
     print("professors", professors)
-    my_instance = ClassDatabase.objects.filter(class_id= class_id, professors = professors)
+    my_instance = ClassDatabase.objects.filter(class_id=class_id, professors=professors)
     header = class_id + " " + professors
     dict = {}
-    group_name = Group.objects.get(name= header)
+    group_name = Group.objects.get(name=header)
     now = datetime.datetime.now()
     event_name = Event.objects.all()
     for event in event_name:
         event_end = event.end
-        if now.timestamp()>event_end.timestamp():
+        if now.timestamp() > event_end.timestamp():
             print("should not be seen, needs to be deleted, may add notification model")
             event.delete()
     event_name = Event.objects.all()
@@ -179,10 +180,9 @@ def classes(response, class_id, first_professors, middle ="", last_professors=""
     print("users", type(users), users)
     letters_only = ''.join(filter(str.isalpha, class_id))
 
-
     if response.method == "POST":
         user = response.user
-        group = Group.objects.get(name=class_id +" "+ professors)
+        group = Group.objects.get(name=class_id + " " + professors)
         if user.user_type == 1:
             if not group.user_set.filter(username=user).exists():
                 group.user_set.add(user)
@@ -213,7 +213,8 @@ def classes(response, class_id, first_professors, middle ="", last_professors=""
                                                  event_stop=this_event.end, tutor=this_event.tutor, student=user,
                                                  actual_event=this_event, event_month=this_event.month,
                                                  event_weekday=this_event.weekday, event_day=this_event.day,
-                                                 event_start_hour=this_event.start_hour, event_end_hour=this_event.end_hour)
+                                                 event_start_hour=this_event.start_hour,
+                                                 event_end_hour=this_event.end_hour)
                 request.save()
                 return redirect("/student_home/searchbar/?mnemonic=" + letters_only)
             return redirect("/student_home/searchbar/?mnemonic=" + letters_only)
@@ -221,11 +222,12 @@ def classes(response, class_id, first_professors, middle ="", last_professors=""
     user_in_group = 0
     if user.groups.filter(name=header).exists():
         user_in_group = 1
-    data_dict ={'group': header}
+    data_dict = {'group': header}
     data_json = dumps(data_dict)
     return render(response, "main/roster.html",
                   {'header': header, 'user': user, 'group': group_name, 'event': event_name,
-                   'user_in_group': user_in_group, 'events':event_name, 'data_json':data_json})
+                   'user_in_group': user_in_group, 'events': event_name, 'data_json': data_json})
+
 
 def mnemonic(response):
     user = response.user
@@ -235,17 +237,16 @@ def mnemonic(response):
     if response.method == "POST":
         if response.POST.get("Accept"):
             request = Request.objects.get(id=response.POST.get("Accept"))
-            adjusted_event= Event.objects.get(id=request.event_id)
-            adjusted_event.student=request.student
-            adjusted_event.isAval=False
+            adjusted_event = Event.objects.get(id=request.event_id)
+            adjusted_event.student = request.student
+            adjusted_event.isAval = False
             adjusted_event.save()
             request.delete()
         elif response.POST.get("Reject"):
-            request = Request.objects.get(id = response.POST.get("Reject"))
+            request = Request.objects.get(id=response.POST.get("Reject"))
             request.delete()
 
-    return render(response, "main/mnemonic_page.html",{'name':'Home', 'user': user, 'requests':requests})
-
+    return render(response, "main/mnemonic_page.html", {'name': 'Home', 'user': user, 'requests': requests})
 
 
 def other(response):
@@ -271,7 +272,7 @@ def select_user(response):
 
     else:
         return render(response, 'main/select_user.html')
-    
+
 
 def searchbar_tutee(request):
     sys.path.append('../')
@@ -304,8 +305,8 @@ def searchbar_tutee(request):
                     else:
                         messages.error(request, "Not an existing mnemonic")
                         return redirect('/student_home/', {'name': 'Home'})
-            filters = FilterCourses(request.GET,queryset= existing_classes)
-            context = {"filters": filters,'name':search_mnemonic}
+            filters = FilterCourses(request.GET, queryset=existing_classes)
+            context = {"filters": filters, 'name': search_mnemonic}
         else:
             selection = ClassDatabase.objects.all()
             filters = FilterCourses(request.GET, queryset=selection)
@@ -321,8 +322,7 @@ def searchbar_tutee(request):
                     class_name = item.professors
                     break
 
-            context = {"filters": filters,'name': class_name}
-
+            context = {"filters": filters, 'name': class_name}
 
     return render(request, "main/class_finder.html", context)
 
@@ -331,9 +331,9 @@ def searchbar_tutor(request):
     sys.path.append('../')
     user = request.user
     results = Group.objects.filter(user=user)
-    tutor_group={}
+    tutor_group = {}
     for each in results:
-        tutor_group[str(each)]= str(each)
+        tutor_group[str(each)] = str(each)
     context = {"results": tutor_group}
 
     if request.method == 'GET':
@@ -384,6 +384,7 @@ def searchbar_tutor(request):
             context = {"filters": filters, 'name': class_name, "results": tutor_group}
     return render(request, "main/searchbar_tutor.html", context)
 
+
 def database_setup(request):
     sys.path.append('../')
     user = request.user
@@ -419,7 +420,7 @@ def database_setup(request):
             json_object = json.dumps(json_dict, indent=4)
             with open('class_database.json', 'w') as file:
                 file.write(json_object)
-            return redirect("/database/" , {'name': 'Database Setup', 'user': user})
+            return redirect("/database/", {'name': 'Database Setup', 'user': user})
         if request.GET.get("create_database"):
             with open("class_database.json") as database_json:
                 database_file = json.load(database_json)
@@ -437,7 +438,7 @@ def database_setup(request):
                         print('database object', database_object)
                         if not database_object in existing_list:
                             existing_list.append(database_object)
-                            group = Group.objects.create(name= acronym + class_info + " " + instructor)
+                            group = Group.objects.create(name=acronym + class_info + " " + instructor)
                             group.save()
                             class_instance = ClassDatabase.objects.create(class_id=acronym + class_info,
                                                                           class_name=name,

@@ -9,7 +9,6 @@ from datetime import datetime, timedelta
 from django.contrib.auth.models import Group, UserManager
 
 
-
 # Create your tests here.
 class TestClass(TestCase):
 
@@ -18,8 +17,8 @@ class TestClass(TestCase):
     #     self.student = User.objects.create(user_type=2)
     # teardown
     def test_studentHomePage(self):
-        c= Client()
-        response=c.get('/student_home/')
+        c = Client()
+        response = c.get('/student_home/')
         self.assertEqual(response.status_code, 200)
 
     def test_defaultUserType(self):
@@ -50,8 +49,8 @@ class TestClass(TestCase):
 
         start_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         end_time = (datetime.now() + timedelta(minutes=60)).strftime('%Y-%m-%d %H:%M:%S')
-        params = {'title': 'Test Group', 'start': start_time, 'end': end_time, 'group': 'Test Group', 'user': self.tutor.id}
-
+        params = {'title': 'Test Group', 'start': start_time, 'end': end_time, 'group': 'Test Group',
+                  'user': self.tutor.id}
 
         # Log in as the test user
         self.assertTrue(self.client.login(username='tutor_name', password='testpass'))
@@ -65,6 +64,44 @@ class TestClass(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()['group'], 'Test Group')
 
+    def test_student_to_mnemonic_on_login(self):
+        self.group = Group.objects.create(name='Test Group', id=9)
+        self.student = User.objects.create_user(user_type=2, username="student_name", id=10, password='testpass')
+        self.group.user_set.add(self.student)
+        self.group.save()
+
+        self.assertTrue(self.client.login(username='student_name', password='testpass'))
+
+        response = self.client.get(reverse('student_home'))
+        self.assertEqual(str(response.context['user']), 'student_name')
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'main/mnemonic_page.html')
+
+    def test_tutor_to_mnemonic_on_login(self):
+        self.group = Group.objects.create(name='Test Group', id=9)
+        self.tutor = User.objects.create_user(user_type=1, username="tutor_name", id=9, password='testpass')
+        self.group.user_set.add(self.tutor)
+        self.group.save()
+
+        self.assertTrue(self.client.login(username='tutor_name', password='testpass'))
+
+        response = self.client.get(reverse('tutor_home'))
+        self.assertEqual(str(response.context['user']), 'tutor_name')
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'main/mnemonic_page.html')
+
+    def test_schedule_view(self):
+        self.group = Group.objects.create(name='Test Group', id=9)
+        self.tutor = User.objects.create_user(user_type=1, username="tutor_name", id=9, password='testpass')
+        self.group.user_set.add(self.tutor)
+        self.group.save()
+
+        self.assertTrue(self.client.login(username='tutor_name', password='testpass'))
+
+        response = self.client.get(reverse('schedule'))
+        self.assertEqual(str(response.context['user']), 'tutor_name')
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'main/schedule.html')
 
     # def test_user(self):
     #     self.tutor = User.objects.create(user_type=1)
