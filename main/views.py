@@ -17,16 +17,25 @@ import sys
 # Create your views here.
 
 def home(response):
+    if response.POST.get('logout'):
+        logout(response)
+        return redirect("/")
     return render(response, "main/home.html", {'name': 'Home'})
 
 
 def student_home(response):
     if response.method == "POST":
+        if response.POST.get('logout'):
+            logout(response)
+            return redirect("/")
         return redirect('/CS3240')
     return render(response, "main/student_home.html")
 
 
 def tutor_home(response):
+    if response.POST.get('logout'):
+        logout(response)
+        return redirect("/")
     requests = Request.objects.filter(tutor = response.user)
     print('requests', requests)
     return render(response, "main/home.html", {'name': 'Home', 'requests': requests})
@@ -227,11 +236,15 @@ def classes(response, class_id, first_professors, middle ="", last_professors=""
                    'user_in_group': user_in_group, 'events':event_name, 'data_json':data_json})
 
 def mnemonic(response):
+    
     user = response.user
     requests = ''
     if user.id is not None:
         requests = Request.objects.filter(tutor=user)
     if response.method == "POST":
+        if response.POST.get('logout'):
+            logout(response)
+            return redirect("/")
         if response.POST.get("Accept"):
             request = Request.objects.get(id=response.POST.get("Accept"))
             adjusted_event= Event.objects.get(id=request.event_id)
@@ -248,6 +261,9 @@ def mnemonic(response):
 
 
 def other(response):
+    if response.POST.get('logout'):
+        logout(response)
+        return redirect("/")
     return render(response, "main/home.html", {'name': 'Other'})
 
 
@@ -273,6 +289,9 @@ def select_user(response):
     
 
 def searchbar_tutee(request):
+    if request.POST.get('logout'):
+        logout(request)
+        return redirect("/")
     sys.path.append('../')
     if request.method == 'GET':
         search = request.GET.get('mnemonic')
@@ -327,6 +346,9 @@ def searchbar_tutee(request):
 
 
 def searchbar_tutor(request):
+    if request.POST.get('logout'):
+        logout(request)
+        return redirect("/")
     sys.path.append('../')
     user = request.user
     results = Group.objects.filter(user=user)
