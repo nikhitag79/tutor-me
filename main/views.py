@@ -33,6 +33,9 @@ def tutor_home(response):
 
 
 def schedule(response):
+    if response.POST.get('logout'):
+        logout(response)
+        return redirect("/")
     user = response.user
     if user.user_type == 1:
         all_events = Event.objects.filter(tutor = response.user)

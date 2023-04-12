@@ -66,6 +66,9 @@
                   <ul class="dropdown-menu dropdown-menu-end dropdown-menu-dark" aria-labelledby="navbarDarkDropdownMenuLink">
                     <li><a class="dropdown-item" href="/account/">View Profile</a></li>
                     <li><a class="dropdown-item" href="/account/">wanted to do a logout</a></li>
+                    <li><form method = "POST">{% csrf_token %}
+                      <button name = "logout" value="logout" type="submit">Logout</button>
+                    </form></li>
                   </ul>
                 </li>
               </ul>
