@@ -1,5 +1,6 @@
 from django.test import TestCase, Client
 from django.urls import reverse
+from django.utils import timezone
 
 from main.models import ClassDatabase, Event
 from oauth_app.models import User
@@ -7,6 +8,7 @@ import djmoney
 from djmoney.money import Money
 from datetime import datetime, timedelta
 from django.contrib.auth.models import Group, UserManager
+
 
 
 # Create your tests here.
@@ -103,15 +105,50 @@ class TestClass(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'main/schedule.html')
 
-    def test_all_events(self):
+    def test_all_events_future(self):
         self.group = Group.objects.create(name='Test Group', id=9)
         self.tutor = User.objects.create_user(user_type=1, username="tutor_name", id=9, password='testpass')
         self.group.user_set.add(self.tutor)
         self.group.save()
 
         self.assertTrue(self.client.login(username='tutor_name', password='testpass'))
-        # self.event = Event.objects.create(id=10, name="CS3240 Tutoring 1", month="May",
-        #                                   weekday="Wednesday", )
+    
+        s_time = timezone.now()
+        e_time= s_time + timezone.timedelta(hours=2)
+
+        start_time = s_time.strftime('%Y-%m-%d %H:%M:%S')
+        end_time = e_time.strftime('%Y-%m-%d %H:%M:%S')
+
+        self.event = Event.objects.create(id=9, name="CS3240 Tutoring 1",tutor = self.tutor, month="June",weekday="Tuesday", start_hour = '12:00', end_hour = '5:00', start='2023-06-13T10:00:00Z',end='2023-06-13T12:00:00Z',)
+        url = reverse('all_events')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        print(response.json())
+        self.assertEqual(response.json()[0]['title'], 'CS3240 Tutoring 1')
+
+
+    def test_all_events_past(self):
+        self.group = Group.objects.create(name='Test Group', id=9)
+        self.tutor = User.objects.create_user(user_type=1, username="tutor_name", id=9, password='testpass')
+        self.group.user_set.add(self.tutor)
+        self.group.save()
+
+        self.assertTrue(self.client.login(username='tutor_name', password='testpass'))
+    
+        s_time = timezone.now()
+        e_time= s_time + timezone.timedelta(hours=2)
+
+        start_time = s_time.strftime('%Y-%m-%d %H:%M:%S')
+        end_time = e_time.strftime('%Y-%m-%d %H:%M:%S')
+
+        self.event = Event.objects.create(id=9, name="CS3240 Tutoring 1",tutor = self.tutor, month="January",weekday="Friday", start_hour = '12:00', end_hour = '5:00', start='2023-01-13T10:00:00Z',end='2023-01-13T12:00:00Z',)
+        url = reverse('all_events')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        data= response.json()
+        print(response.json())
+        self.assertEqual(len(data), 0)
+        
         # just starting this, thinking we can test inputting a previous
         # date and making sure it gets deleted & vice versa
         #      not positive what the "day" field is in the model
