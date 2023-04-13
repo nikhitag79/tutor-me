@@ -1,6 +1,6 @@
 <body>
 
-  <style>
+
     #leftside{
       background-color: rgba(246, 183, 106, 0.7);
       margin: 0px;
