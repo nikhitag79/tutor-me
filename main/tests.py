@@ -1,9 +1,9 @@
 from django.test import TestCase, Client, RequestFactory
 from django.urls import reverse
 from django.utils import timezone
-
-from main.models import ClassDatabase, Event
-from main.views import update
+from django.contrib.sessions.middleware import SessionMiddleware
+from main.models import ClassDatabase, Event 
+from main.views import update ,remove , account 
 from oauth_app.models import User
 import djmoney
 from djmoney.money import Money
@@ -147,7 +147,7 @@ class TestClass(TestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         data= response.json()
-        print(response.json())
+       # print(response.json())
         self.assertEqual(len(data), 0)
     
 
@@ -169,17 +169,98 @@ class TestClass(TestCase):
                 'title': 'CS3240 New Title',
             }
         )
-         #request.user = self.tutor
-
-        # Call the update function
-         response = update(request)
-
-        # Check if the JsonResponse is returned
-         #self.assertIsInstance(response, JsonResponse)
-
-        # Check if the event data was updated correctly
+         update(request)
          updated_event = Event.objects.get(id=9)
          self.assertEqual(updated_event.name, 'CS3240 New Title')
+
+    def test_remove_tutor(self):
+        self.factory = RequestFactory()
+        self.group = Group.objects.create(name='Test Group', id=9)
+        self.tutor = User.objects.create_user(user_type=1, username="tutor_name", id=9, password='testpass')
+        self.group.user_set.add(self.tutor)
+        self.group.save()
+
+        self.assertTrue(self.client.login(username='tutor_name', password='testpass'))
+        self.event = Event.objects.create(id=9,name="CS3240 Tutoring 1",tutor=self.tutor,isAval=False)
+
+        request = self.factory.get('/remove/', {'id': 9})
+        request.user = self.tutor
+
+        remove(request)
+
+        #self.assertIsInstance(response, JsonResponse)
+        self.assertFalse(Event.objects.filter(id=9).exists())
+
+
+    def test_remove_student(self):
+        self.factory = RequestFactory()
+        self.group = Group.objects.create(name='Test Group', id=9)
+        self.tutor = User.objects.create_user(user_type=1, username="tutor_name", id=1, password='testpass')
+        self.group.user_set.add(self.tutor)
+        self.assertTrue(self.client.login(username='tutor_name', password='testpass'))
+
+        self.student = User.objects.create_user(user_type=2, username="student_name", id=9, password='testpass')
+        self.group.user_set.add(self.student)
+        self.group.save()
+
+        self.assertTrue(self.client.login(username='student_name', password='testpass'))
+        self.event = Event.objects.create(id=9,name="CS3240 Tutoring 1",student=self.student,isAval=False)
+
+        request = self.factory.get('/remove/', {'id': 9})
+        request.user = self.student
+
+        remove(request)
+
+        #self.assertIsInstance(response, JsonResponse)
+        self.assertTrue(Event.objects.filter(id=9).first().isAval)
+        self.assertEquals(Event.objects.filter(id=9).first().student, None)
+
+    def test_account_logout(self):
+        self.factory = RequestFactory()
+        self.group = Group.objects.create(name='Test Group', id=9)
+        self.tutor = User.objects.create_user(user_type=1, username="tutor_name", id=1, password='testpass')
+        self.group.user_set.add(self.tutor)
+        self.assertTrue(self.client.login(username='tutor_name', password='testpass'))
+        #request.user = self.tutor
+
+        request = self.factory.post('/account/', {'logout': 'Logout'})
+        request.user = self.tutor
+        middleware = SessionMiddleware()
+        middleware.process_request(request)
+        request.session.save()
+        account(request)
+        self.assertFalse(request.user.is_authenticated)
+
+
+    def test_account_changeuser(self):
+        self.factory = RequestFactory()
+        self.group = Group.objects.create(name='Test Group', id=9)
+        self.tutor = User.objects.create_user(user_type=1, username="tutor_name", id=1, password='testpass')
+        self.group.user_set.add(self.tutor)
+        self.assertTrue(self.client.login(username='tutor_name', password='testpass'))
+        #request.user = self.tutor
+
+        request = self.factory.post('/account/', {'set_username': 'Set Username', 'username': 'new_username'})
+        request.user = self.tutor
+        account(request)
+        self.tutor.refresh_from_db()
+        self.assertEqual(self.tutor.username, 'new_username')
+    
+    def test_change_rate(self):
+        self.factory = RequestFactory()
+        self.group = Group.objects.create(name='Test Group', id=9)
+        self.tutor = User.objects.create_user(user_type=1, username="tutor_name", id=1, password='testpass')
+        self.group.user_set.add(self.tutor)
+        self.assertTrue(self.client.login(username='tutor_name', password='testpass'))
+        
+        request = self.factory.post('/account/', {'set_hourly': 'Set Hourly Rate', 'hourly_rate': '20.00'})
+        request.user = self.tutor
+
+        account(request)
+        self.tutor.refresh_from_db()
+        self.assertEqual(self.tutor.tutor_rate, Money('20.00', 'USD'))
+
+
         
         # just starting this, thinking we can test inputting a previous
         # date and making sure it gets deleted & vice versa
