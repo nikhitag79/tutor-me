@@ -2,16 +2,14 @@ from django.test import TestCase, Client, RequestFactory
 from django.urls import reverse
 from django.utils import timezone
 from django.contrib.sessions.middleware import SessionMiddleware
-from main.models import ClassDatabase, Event 
-from main.views import update ,remove , account, classes
+from main.models import ClassDatabase, Event, Request
+from main.views import update, remove, account, classes, mnemonic
 from oauth_app.models import User
 import djmoney
 from djmoney.money import Money
 from datetime import datetime, timedelta
 from django.contrib.auth.models import Group, UserManager
 from django.core.handlers.base import BaseHandler
-
-
 
 
 # Create your tests here.
@@ -115,20 +113,20 @@ class TestClass(TestCase):
         self.group.save()
 
         self.assertTrue(self.client.login(username='tutor_name', password='testpass'))
-    
+
         s_time = timezone.now()
-        e_time= s_time + timezone.timedelta(hours=2)
+        e_time = s_time + timezone.timedelta(hours=2)
 
         start_time = s_time.strftime('%Y-%m-%d %H:%M:%S')
         end_time = e_time.strftime('%Y-%m-%d %H:%M:%S')
 
-        self.event = Event.objects.create(id=9, name="CS3240 Tutoring 1",tutor = self.tutor, month="June",weekday="Tuesday", start_hour = '12:00', end_hour = '5:00', start='2023-06-13T10:00:00Z',end='2023-06-13T12:00:00Z',)
+        self.event = Event.objects.create(id=9, name="CS3240 Tutoring 1", tutor=self.tutor, month="June",
+                                          weekday="Tuesday", start_hour='12:00', end_hour='5:00',
+                                          start='2023-06-13T10:00:00Z', end='2023-06-13T12:00:00Z', )
         url = reverse('all_events')
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        print(response.json())
         self.assertEqual(response.json()[0]['title'], 'CS3240 Tutoring 1')
-
 
     def test_all_events_past(self):
         self.group = Group.objects.create(name='Test Group', id=9)
@@ -137,43 +135,44 @@ class TestClass(TestCase):
         self.group.save()
 
         self.assertTrue(self.client.login(username='tutor_name', password='testpass'))
-    
+
         s_time = timezone.now()
-        e_time= s_time + timezone.timedelta(hours=2)
+        e_time = s_time + timezone.timedelta(hours=2)
 
         start_time = s_time.strftime('%Y-%m-%d %H:%M:%S')
         end_time = e_time.strftime('%Y-%m-%d %H:%M:%S')
 
-        self.event = Event.objects.create(id=9, name="CS3240 Tutoring 1",tutor = self.tutor, month="January",weekday="Friday", start_hour = '12:00', end_hour = '5:00', start='2023-01-13T10:00:00Z',end='2023-01-13T12:00:00Z',)
+        self.event = Event.objects.create(id=9, name="CS3240 Tutoring 1", tutor=self.tutor, month="January",
+                                          weekday="Friday", start_hour='12:00', end_hour='5:00',
+                                          start='2023-01-13T10:00:00Z', end='2023-01-13T12:00:00Z', )
         url = reverse('all_events')
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        data= response.json()
-       # print(response.json())
+        data = response.json()
         self.assertEqual(len(data), 0)
-    
 
     def test_update(self):
-         self.factory = RequestFactory()
-         self.group = Group.objects.create(name='Test Group', id=9)
-         self.tutor = User.objects.create_user(user_type=1, username="tutor_name", id=9, password='testpass')
-         self.group.user_set.add(self.tutor)
-         self.group.save()
+        self.factory = RequestFactory()
+        self.group = Group.objects.create(name='Test Group', id=9)
+        self.tutor = User.objects.create_user(user_type=1, username="tutor_name", id=9, password='testpass')
+        self.group.user_set.add(self.tutor)
+        self.group.save()
 
-         self.assertTrue(self.client.login(username='tutor_name', password='testpass'))
+        self.assertTrue(self.client.login(username='tutor_name', password='testpass'))
 
-         self.event = Event.objects.create(id=9,name="CS3240 Tutoring 1",tutor=self.tutor,start=timezone.now(),end=timezone.now() + timezone.timedelta(hours=2))
+        self.event = Event.objects.create(id=9, name="CS3240 Tutoring 1", tutor=self.tutor, start=timezone.now(),
+                                          end=timezone.now() + timezone.timedelta(hours=2))
 
-         request = self.factory.get(
+        request = self.factory.get(
             '/update/',
             {
                 'id': 9,
                 'title': 'CS3240 New Title',
             }
         )
-         update(request)
-         updated_event = Event.objects.get(id=9)
-         self.assertEqual(updated_event.name, 'CS3240 New Title')
+        update(request)
+        updated_event = Event.objects.get(id=9)
+        self.assertEqual(updated_event.name, 'CS3240 New Title')
 
     def test_remove_tutor(self):
         self.factory = RequestFactory()
@@ -183,16 +182,15 @@ class TestClass(TestCase):
         self.group.save()
 
         self.assertTrue(self.client.login(username='tutor_name', password='testpass'))
-        self.event = Event.objects.create(id=9,name="CS3240 Tutoring 1",tutor=self.tutor,isAval=False)
+        self.event = Event.objects.create(id=9, name="CS3240 Tutoring 1", tutor=self.tutor, isAval=False)
 
         request = self.factory.get('/remove/', {'id': 9})
         request.user = self.tutor
 
         remove(request)
 
-        #self.assertIsInstance(response, JsonResponse)
+        # self.assertIsInstance(response, JsonResponse)
         self.assertFalse(Event.objects.filter(id=9).exists())
-
 
     def test_remove_student(self):
         self.factory = RequestFactory()
@@ -206,14 +204,14 @@ class TestClass(TestCase):
         self.group.save()
 
         self.assertTrue(self.client.login(username='student_name', password='testpass'))
-        self.event = Event.objects.create(id=9,name="CS3240 Tutoring 1",student=self.student,isAval=False)
+        self.event = Event.objects.create(id=9, name="CS3240 Tutoring 1", student=self.student, isAval=False)
 
         request = self.factory.get('/remove/', {'id': 9})
         request.user = self.student
 
         remove(request)
 
-        #self.assertIsInstance(response, JsonResponse)
+        # self.assertIsInstance(response, JsonResponse)
         self.assertTrue(Event.objects.filter(id=9).first().isAval)
         self.assertEquals(Event.objects.filter(id=9).first().student, None)
 
@@ -223,7 +221,7 @@ class TestClass(TestCase):
         self.tutor = User.objects.create_user(user_type=1, username="tutor_name", id=1, password='testpass')
         self.group.user_set.add(self.tutor)
         self.assertTrue(self.client.login(username='tutor_name', password='testpass'))
-        #request.user = self.tutor
+        # request.user = self.tutor
 
         request = self.factory.post('/account/', {'logout': 'Logout'})
         request.user = self.tutor
@@ -233,6 +231,8 @@ class TestClass(TestCase):
         account(request)
         self.assertFalse(request.user.is_authenticated)
 
+    #     https://docs.djangoproject.com/en/3.2/topics/http/middleware/
+    # https://github.com/django/django/blob/main/django/core/handlers/base.py
 
     def test_account_changeuser(self):
         self.factory = RequestFactory()
@@ -240,21 +240,21 @@ class TestClass(TestCase):
         self.tutor = User.objects.create_user(user_type=1, username="tutor_name", id=1, password='testpass')
         self.group.user_set.add(self.tutor)
         self.assertTrue(self.client.login(username='tutor_name', password='testpass'))
-        #request.user = self.tutor
+        # request.user = self.tutor
 
         request = self.factory.post('/account/', {'set_username': 'Set Username', 'username': 'new_username'})
         request.user = self.tutor
         account(request)
         self.tutor.refresh_from_db()
         self.assertEqual(self.tutor.username, 'new_username')
-    
+
     def test_change_rate(self):
         self.factory = RequestFactory()
         self.group = Group.objects.create(name='Test Group', id=9)
         self.tutor = User.objects.create_user(user_type=1, username="tutor_name", id=1, password='testpass')
         self.group.user_set.add(self.tutor)
         self.assertTrue(self.client.login(username='tutor_name', password='testpass'))
-        
+
         request = self.factory.post('/account/', {'set_hourly': 'Set Hourly Rate', 'hourly_rate': '20.00'})
         request.user = self.tutor
 
@@ -264,21 +264,21 @@ class TestClass(TestCase):
 
     def test_class_tutor(self):
         self.factory = RequestFactory()
-       # self.group = Group.objects.create(name='Test Group', id=9)
+        # self.group = Group.objects.create(name='Test Group', id=9)
         self.tutor = User.objects.create_user(user_type=1, username="tutor_name", id=1, password='testpass')
-        
-        self.assertTrue(self.client.login(username='tutor_name', password='testpass'))
-        self.group = Group.objects.create(name="CS3240 John Doe",id=9)
-        self.class_db = ClassDatabase.objects.create(class_id="CS3240", professors="John Doe", available_tutors=True, tutors = self.group)
-        
-        self.group.user_set.add(self.tutor)
-       
 
-        #self.event = Event.objects.create(id=9, name="CS3240 Tutoring 1", tutor=self.tutor, isAval=False,)
+        self.assertTrue(self.client.login(username='tutor_name', password='testpass'))
+        self.group = Group.objects.create(name="CS3240 John Doe", id=9)
+        self.class_db = ClassDatabase.objects.create(class_id="CS3240", professors="John Doe", available_tutors=True,
+                                                     tutors=self.group)
+
+        self.group.user_set.add(self.tutor)
+
+        # self.event = Event.objects.create(id=9, name="CS3240 Tutoring 1", tutor=self.tutor, isAval=False,)
         request = self.factory.get('/classes/CS3240/John/Doe/')
         request.user = self.tutor
-        #request.header = 
-        classes(request, 'CS3240', 'John','','Doe')
+        # request.header =
+        classes(request, 'CS3240', 'John', '', 'Doe')
 
         # self.assertEqual(response.status_code, 200)
         # self.assertContains(response, "CS3240 John Doe")
@@ -286,17 +286,40 @@ class TestClass(TestCase):
         request = self.factory.post('/classes/CS3240/John/Doe/', {'remove': 'Remove'})
         request.user = self.tutor
 
-        classes(request, 'CS3240', 'John','', 'Doe')
+        classes(request, 'CS3240', 'John', '', 'Doe')
 
         # self.assertEqual(response.status_code, 302)
         self.assertNotIn(self.tutor, self.group.user_set.all())
-     
 
-        
-        # just starting this, thinking we can test inputting a previous
-        # date and making sure it gets deleted & vice versa
-        #      not positive what the "day" field is in the model
+    def test_mnemonic_accept(self):
+        self.factory = RequestFactory()
+        self.tutor = User.objects.create_user(user_type=1, username="tutor_name", id=1, password='testpass')
+        self.student = User.objects.create_user(user_type=2, username="student_name", id=10, password='testpass')
+        self.assertTrue(self.client.login(username='tutor_name', password='testpass'))
+        self.assertTrue(self.client.login(username='student_name', password='testpass'))
+        self.group = Group.objects.create(name="CS3240 John Doe", id=9)
+        self.class_db = ClassDatabase.objects.create(class_id="CS3240", professors="John Doe", available_tutors=True,
+                                                     tutors=self.group)
 
+        self.group.user_set.add(self.tutor)
+        self.group.user_set.add(self.student)
+        self.event = Event.objects.create(id=9, name="CS3240 Tutoring 1", tutor=self.tutor, month="June",
+                                          weekday="Tuesday", start_hour='12:00', end_hour='5:00',
+                                          start='2023-06-13T10:00:00Z', end='2023-06-13T12:00:00Z', )
+        self.requestModel = Request.objects.create(event_id=self.event.id, event_start=self.event.start,
+                                                   event_stop=self.event.end, event_month=self.event.month,
+                                                   event_weekday=self.event.weekday,
+                                                   event_start_hour=self.event.start_hour,
+                                                   event_end_hour=self.event.end_hour, event_day='13th',
+                                                   group_id='CS3240 John Doe', actual_event=self.event, tutor=self.tutor,
+                                                   student=self.student, id=11)
+
+        request = self.factory.post('/mnemonic/', {'Accept': 11})
+        request.user = self.tutor
+        mnemonic(request)
+        adjusted_event = Event.objects.get(id=self.event.id)
+        self.assertEqual(adjusted_event.student, self.student)
+        self.assertFalse(adjusted_event.isAval)
 
 
     # def test_user(self):
