@@ -321,6 +321,34 @@ class TestClass(TestCase):
         self.assertEqual(adjusted_event.student, self.student)
         self.assertFalse(adjusted_event.isAval)
 
+    def test_mnemonic_reject(self):
+        self.factory = RequestFactory()
+        self.tutor = User.objects.create_user(user_type=1, username="tutor_name", id=1, password='testpass')
+        self.student = User.objects.create_user(user_type=2, username="student_name", id=10, password='testpass')
+        self.assertTrue(self.client.login(username='tutor_name', password='testpass'))
+        self.assertTrue(self.client.login(username='student_name', password='testpass'))
+        self.group = Group.objects.create(name="CS3240 John Doe", id=9)
+        self.class_db = ClassDatabase.objects.create(class_id="CS3240", professors="John Doe", available_tutors=True,
+                                                     tutors=self.group)
+
+        self.group.user_set.add(self.tutor)
+        self.group.user_set.add(self.student)
+        self.event = Event.objects.create(id=9, name="CS3240 Tutoring 1", tutor=self.tutor, month="June",
+                                          weekday="Tuesday", start_hour='12:00', end_hour='5:00',
+                                          start='2023-06-13T10:00:00Z', end='2023-06-13T12:00:00Z', )
+        self.requestModel = Request.objects.create(event_id=self.event.id, event_start=self.event.start,
+                                                   event_stop=self.event.end, event_month=self.event.month,
+                                                   event_weekday=self.event.weekday,
+                                                   event_start_hour=self.event.start_hour,
+                                                   event_end_hour=self.event.end_hour, event_day='13th',
+                                                   group_id='CS3240 John Doe', actual_event=self.event,
+                                                   tutor=self.tutor,
+                                                   student=self.student, id=11)
+
+        request = self.factory.post('/mnemonic/', {'Reject': 11})
+        request.user = self.tutor
+        mnemonic(request)
+        self.assertFalse(Request.objects.filter(id=11).exists())
 
     # def test_user(self):
     #     self.tutor = User.objects.create(user_type=1)
