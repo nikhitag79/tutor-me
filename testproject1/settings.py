@@ -58,9 +58,9 @@ CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 CRISPY_TEMPLATE_PACK = "bootstrap5"
 # Site ID
 if 'DATABASE_URL' in os.environ:
-    SITE_ID = 11
+    SITE_ID = 12
 else:
-    SITE_ID = 6
+    SITE_ID = 8
 
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
@@ -100,6 +100,7 @@ WSGI_APPLICATION = 'testproject1.wsgi.application'
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
 if 'DATABASE_URL' in os.environ:
+    print(os.environ.get('DATABASE_URL'))
     DATABASES = {
         'default':  dj_database_url.parse(os.environ.get('DATABASE_URL'))
     }
