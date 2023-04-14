@@ -368,7 +368,7 @@ class TestClass(TestCase):
     def test_select_user_tutor(self):
         # https://docs.djangoproject.com/en/4.2/topics/testing/tools/
         self.group = Group.objects.create(name='Test Group', id=9)
-        self.tutor = User.objects.create_user(user_type=1, username="tutor_name", id=1, password='testpass')
+        self.tutor = User.objects.create_user(username="tutor_name", id=1, password='testpass')
         self.group.user_set.add(self.tutor)
         self.group.save()
 
@@ -377,9 +377,23 @@ class TestClass(TestCase):
 
         self.tutor.refresh_from_db()
         self.assertTrue(self.tutor.has_selected_role)
+        self.assertEqual(1, self.tutor.user_type)
         self.assertRedirects(response, '/tutor_home/')
 
+    def test_select_user_tutor(self):
+        # https://docs.djangoproject.com/en/4.2/topics/testing/tools/
+        self.group = Group.objects.create(name='Test Group', id=9)
+        self.student = User.objects.create_user(username="student_name", id=1, password='testpass')
+        self.group.user_set.add(self.student)
+        self.group.save()
 
+        self.assertTrue(self.client.login(username='student_name', password='testpass'))
+        response = self.client.post('/select_user/', {'user_type': 'Student'})
+
+        self.student.refresh_from_db()
+        self.assertTrue(self.student.has_selected_role)
+        self.assertEqual(2, self.student.user_type)
+        self.assertRedirects(response, '/student_home/')
 
     # def test_user(self):
     #     self.tutor = User.objects.create(user_type=1)
