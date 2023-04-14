@@ -3,7 +3,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django.contrib.sessions.middleware import SessionMiddleware
 from main.models import ClassDatabase, Event 
-from main.views import update ,remove , account 
+from main.views import update ,remove , account, classes
 from oauth_app.models import User
 import djmoney
 from djmoney.money import Money
@@ -260,6 +260,35 @@ class TestClass(TestCase):
         self.tutor.refresh_from_db()
         self.assertEqual(self.tutor.tutor_rate, Money('20.00', 'USD'))
 
+    def test_class_tutor(self):
+        self.factory = RequestFactory()
+       # self.group = Group.objects.create(name='Test Group', id=9)
+        self.tutor = User.objects.create_user(user_type=1, username="tutor_name", id=1, password='testpass')
+        
+        self.assertTrue(self.client.login(username='tutor_name', password='testpass'))
+        self.group = Group.objects.create(name="CS3240 John Doe",id=9)
+        self.class_db = ClassDatabase.objects.create(class_id="CS3240", professors="John Doe", available_tutors=True, tutors = self.group)
+        
+        self.group.user_set.add(self.tutor)
+       
+
+        #self.event = Event.objects.create(id=9, name="CS3240 Tutoring 1", tutor=self.tutor, isAval=False,)
+        request = self.factory.get('/classes/CS3240/John/Doe/')
+        request.user = self.tutor
+        #request.header = 
+        classes(request, 'CS3240', 'John','','Doe')
+
+        # self.assertEqual(response.status_code, 200)
+        # self.assertContains(response, "CS3240 John Doe")
+
+        request = self.factory.post('/classes/CS3240/John/Doe/', {'remove': 'Remove'})
+        request.user = self.tutor
+
+        classes(request, 'CS3240', 'John','', 'Doe')
+
+        # self.assertEqual(response.status_code, 302)
+        self.assertNotIn(self.tutor, self.group.user_set.all())
+     
 
         
         # just starting this, thinking we can test inputting a previous

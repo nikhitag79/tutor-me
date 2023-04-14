@@ -155,14 +155,17 @@ def classes(response, class_id, first_professors, middle="", last_professors="")
     user = response.user
     print(user.user_type)
     if (middle == ""):
-        print("single")
+        #print("single")
         professors = first_professors + " " + last_professors
     else:
-        print("double")
+       # print("double")
         professors = first_professors + " " + middle + " " + last_professors
     print("professors", professors)
     my_instance = ClassDatabase.objects.filter(class_id=class_id, professors=professors)
     header = class_id + " " + professors
+    print("header", header)
+    for group in Group.objects.all():
+        print("group.name",group.name)
     dict = {}
     group_name = Group.objects.get(name=header)
     now = datetime.datetime.now()
