@@ -417,6 +417,17 @@ class TestClass(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'ECE')
 
+    def test_class_database_model(self):
+        self.group = Group.objects.create(name='Test Group', id=9)
+        self.cd = ClassDatabase.objects.create(class_id="CS3240", class_mnen="CS",
+                                               class_name="Software Dev", professors="Horton", tutors=self.group)
+        self.assertEqual(self.cd.class_id, "CS3240")
+        self.assertEqual(self.cd.class_mnen, "CS")
+        self.assertEqual(self.cd.class_name, "Software Dev")
+        self.assertEqual(self.cd.professors, "Horton")
+        self.assertEqual(self.cd.tutors, self.group)
+        self.assertEqual("CS3240 Software Dev Horton", str(self.cd))
+
 
     # def test_searchbar_tutee_invalid_mnemonic(self):
     #     self.factory = RequestFactory()
@@ -449,13 +460,7 @@ class TestClass(TestCase):
     # user_type = models.PositiveIntegerField(choices=available_classes, default=2)
     # tutor_rate = MoneyField(max_digits=4, decimal_places=2, default_currency='USD', default=0.00)
 
-    # def test_my_class_db_values(self):
-    #     self.cd = ClassDatabase.objects.create(class_id="CS3240", class_mnen="CS",
-    #                                            class_name="Software Dev", professors="Horton")
-    #     self.assertEqual(self.cd.class_id, "CS3240")
-    #     self.assertEqual(self.cd.class_mnen, "CS")
-    #     self.assertEqual(self.cd.class_name, "Software Dev")
-    #     self.assertEqual(self.cd.professors, "Horton")
+
 
     #
     # def test_course_filter(self):
