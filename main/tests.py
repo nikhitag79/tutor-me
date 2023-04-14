@@ -3,7 +3,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django.contrib.sessions.middleware import SessionMiddleware
 from main.models import ClassDatabase, Event, Request
-from main.views import update, remove, account, classes, mnemonic, select_user, searchbar_tutee
+from main.views import update, remove, account, classes, mnemonic, select_user, searchbar_tutee, searchbar_tutor
 from oauth_app.models import User
 import djmoney
 from djmoney.money import Money
@@ -396,11 +396,39 @@ class TestClass(TestCase):
         self.assertEqual(2, self.student.user_type)
         self.assertRedirects(response, '/student_home/')
 
-    def test_searchbar_tutee_invalid_mnemonic(self):
-        # https://stackoverflow.com/questions/10277748/how-to-get-request-object-in-django-unit-testing
+    def test_searchbar_tutee_equivalence(self):
         self.factory = RequestFactory()
+        request = self.factory.get('student_home/searchbar/', {'mnemonic': 'ECE'})
+        response = searchbar_tutee(request)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'ECE')
 
-        request = self.factory.get('/searchbar_tutee/', {'mnemonic': 'XXXX'})
+    def test_searchbar_tutor(self):
+        self.factory = RequestFactory()
+        self.group = Group.objects.create(name='Test Group', id=9)
+        self.tutor = User.objects.create_user(user_type=1, username="tutor_name", id=1, password='testpass')
+        self.group.user_set.add(self.tutor)
+        self.assertTrue(self.client.login(username='tutor_name', password='testpass'))
+
+        request = self.factory.get('tutor_home/searchbar/', {'mnemonic': 'ECE'})
+        request.user = self.tutor
+        response = searchbar_tutor(request)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'ECE')
+
+
+    # def test_searchbar_tutee_invalid_mnemonic(self):
+    #     self.factory = RequestFactory()
+    #     request = self.factory.get('student_home/searchbar/', {'mnemonic': 'ABCD'})
+    #     response = searchbar_tutee(request)
+    #     self.assertEqual(response.status_code, 404)
+
+        # self.assertContains(response, 'ECE')
+        # https://stackoverflow.com/questions/10277748/how-to-get-request-object-in-django-unit-testing
+        # self.factory = RequestFactory()
+
+        # request = self.factory.get('/searchbar_tutee/', {'mnemonic': 'XXXX'})
         # response = searchbar_tutee(request)
         # self.assertEqual(404, response.status_code)
         # self.assertRedirects(response, '/student_home/')
@@ -409,13 +437,6 @@ class TestClass(TestCase):
         #
         # self.assertEqual(len(error_messages), 1)
         # self.assertEqual(str(error_messages[0]), 'Not an existing mnemonic')
-
-    def test_searchbar_tutee_equivalence(self):
-        self.factory = RequestFactory()
-        request = self.factory.get('student_home/searchbar/', {'mnemonic': 'ECE'})
-        response = searchbar_tutee(request)
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'ECE')
 
     # def test_user(self):
     #     self.tutor = User.objects.create(user_type=1)
