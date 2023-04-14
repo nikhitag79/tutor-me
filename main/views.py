@@ -155,17 +155,17 @@ def classes(response, class_id, first_professors, middle="", last_professors="")
     user = response.user
     print(user.user_type)
     if (middle == ""):
-        #print("single")
+        # print("single")
         professors = first_professors + " " + last_professors
     else:
-       # print("double")
+        # print("double")
         professors = first_professors + " " + middle + " " + last_professors
     print("professors", professors)
     my_instance = ClassDatabase.objects.filter(class_id=class_id, professors=professors)
     header = class_id + " " + professors
     print("header", header)
     for group in Group.objects.all():
-        print("group.name",group.name)
+        print("group.name", group.name)
     dict = {}
     group_name = Group.objects.get(name=header)
     now = datetime.datetime.now()
@@ -281,10 +281,12 @@ def searchbar_tutee(request):
     sys.path.append('../')
     if request.method == 'GET':
         search = request.GET.get('mnemonic')
+        print("SEARCH", mnemonic)
         if not search is None:
             search_mnemonic = str(search).upper()
-            print("search mnemon", search_mnemonic)
+            # print("search mnemon", search_mnemonic)
             existing_list = []
+
             existing_classes = ClassDatabase.objects.filter(class_mnen=search_mnemonic)
             for i in existing_classes:
                 existing_list.append(str(i))

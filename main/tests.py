@@ -3,13 +3,14 @@ from django.urls import reverse
 from django.utils import timezone
 from django.contrib.sessions.middleware import SessionMiddleware
 from main.models import ClassDatabase, Event, Request
-from main.views import update, remove, account, classes, mnemonic, select_user
+from main.views import update, remove, account, classes, mnemonic, select_user, searchbar_tutee
 from oauth_app.models import User
 import djmoney
 from djmoney.money import Money
 from datetime import datetime, timedelta
 from django.contrib.auth.models import Group, UserManager
 from django.core.handlers.base import BaseHandler
+from django.contrib.messages.api import get_messages
 
 
 # Create your tests here.
@@ -394,6 +395,20 @@ class TestClass(TestCase):
         self.assertTrue(self.student.has_selected_role)
         self.assertEqual(2, self.student.user_type)
         self.assertRedirects(response, '/student_home/')
+
+    def test_searchbar_tutee_invalid_mnemonic(self):
+        # https://stackoverflow.com/questions/10277748/how-to-get-request-object-in-django-unit-testing
+        self.factory = RequestFactory()
+
+        request = self.factory.get('/searchbar_tutee/', {'mnemonic': 'XXXX'})
+        # response = searchbar_tutee(request)
+        # self.assertEqual(404, response.status_code)
+        # self.assertRedirects(response, '/student_home/')
+
+        # error_messages = list(response.context.get('messages'))[0]
+        #
+        # self.assertEqual(len(error_messages), 1)
+        # self.assertEqual(str(error_messages[0]), 'Not an existing mnemonic')
 
     # def test_user(self):
     #     self.tutor = User.objects.create(user_type=1)
