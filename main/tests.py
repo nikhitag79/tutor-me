@@ -9,6 +9,8 @@ import djmoney
 from djmoney.money import Money
 from datetime import datetime, timedelta
 from django.contrib.auth.models import Group, UserManager
+from django.core.handlers.base import BaseHandler
+
 
 
 
@@ -225,7 +227,7 @@ class TestClass(TestCase):
 
         request = self.factory.post('/account/', {'logout': 'Logout'})
         request.user = self.tutor
-        middleware = SessionMiddleware()
+        middleware = SessionMiddleware(get_response=BaseHandler().get_response)
         middleware.process_request(request)
         request.session.save()
         account(request)
@@ -294,6 +296,7 @@ class TestClass(TestCase):
         # just starting this, thinking we can test inputting a previous
         # date and making sure it gets deleted & vice versa
         #      not positive what the "day" field is in the model
+
 
 
     # def test_user(self):
