@@ -68,6 +68,7 @@ class TestClass(TestCase):
         self.assertEqual(response.json()['group'], 'Test Group')
 
     def test_student_to_mnemonic_on_login(self):
+        # https://developer.mozilla.org/en-US/docs/Learn/Server-side/Django/Testing
         self.group = Group.objects.create(name='Test Group', id=9)
         self.student = User.objects.create_user(user_type=2, username="student_name", id=10, password='testpass')
         self.group.user_set.add(self.student)
@@ -311,7 +312,8 @@ class TestClass(TestCase):
                                                    event_weekday=self.event.weekday,
                                                    event_start_hour=self.event.start_hour,
                                                    event_end_hour=self.event.end_hour, event_day='13th',
-                                                   group_id='CS3240 John Doe', actual_event=self.event, tutor=self.tutor,
+                                                   group_id='CS3240 John Doe', actual_event=self.event,
+                                                   tutor=self.tutor,
                                                    student=self.student, id=11)
 
         request = self.factory.post('/mnemonic/', {'Accept': 11})
@@ -349,6 +351,19 @@ class TestClass(TestCase):
         request.user = self.tutor
         mnemonic(request)
         self.assertFalse(Request.objects.filter(id=11).exists())
+
+    def test_other_correct_template(self):
+        # https://developer.mozilla.org/en-US/docs/Learn/Server-side/Django/Testing
+        self.group = Group.objects.create(name='Test Group', id=9)
+        self.student = User.objects.create_user(user_type=2, username="student_name", id=10, password='testpass')
+        self.group.user_set.add(self.student)
+        self.group.save()
+
+        self.assertTrue(self.client.login(username='student_name', password='testpass'))
+
+        response = self.client.get(reverse('other'))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'main/home.html')
 
     # def test_user(self):
     #     self.tutor = User.objects.create(user_type=1)
