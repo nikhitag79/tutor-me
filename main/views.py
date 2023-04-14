@@ -281,7 +281,6 @@ def searchbar_tutee(request):
     sys.path.append('../')
     if request.method == 'GET':
         search = request.GET.get('mnemonic')
-        print("SEARCH", mnemonic)
         if not search is None:
             search_mnemonic = str(search).upper()
             # print("search mnemon", search_mnemonic)

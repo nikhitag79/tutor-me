@@ -410,6 +410,13 @@ class TestClass(TestCase):
         # self.assertEqual(len(error_messages), 1)
         # self.assertEqual(str(error_messages[0]), 'Not an existing mnemonic')
 
+    def test_searchbar_tutee_equivalence(self):
+        self.factory = RequestFactory()
+        request = self.factory.get('student_home/searchbar/', {'mnemonic': 'ECE'})
+        response = searchbar_tutee(request)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'ECE')
+
     # def test_user(self):
     #     self.tutor = User.objects.create(user_type=1)
     #     self.student = User.objects.create(user_type=2)
