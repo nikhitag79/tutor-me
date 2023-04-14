@@ -441,7 +441,7 @@ class TestClass(TestCase):
         self.assertTrue(self.client.login(username='student_name', password='testpass'))
         self.event = Event.objects.create(id=9, name="CS3240 Tutoring 1", tutor=self.tutor, month="June",
                                           weekday="Tuesday", start_hour='12:00', end_hour='5:00',
-                                          start='2023-06-13T10:00:00Z', end='2023-06-13T12:00:00Z', )
+                                          start='2023-06-13T10:00:00Z', end='2023-06-13T12:00:00Z')
         self.requestModel = Request.objects.create(event_id=self.event.id, event_start=self.event.start,
                                                    event_stop=self.event.end, event_month=self.event.month,
                                                    event_weekday=self.event.weekday,
@@ -453,6 +453,23 @@ class TestClass(TestCase):
 
         self.assertEqual("student_name wants to have make an appointment on Tuesday June 13th\nFrom 12:00 to 5:00", str(self.requestModel))
 
+    def test_event_model(self):
+        self.group = Group.objects.create(name='Test Group', id=9)
+        self.tutor = User.objects.create_user(user_type=1, username="tutor_name", id=1, password='testpass')
+        self.group.user_set.add(self.tutor)
+        self.assertTrue(self.client.login(username='tutor_name', password='testpass'))
+
+        self.student = User.objects.create_user(user_type=2, username="student_name", id=9, password='testpass')
+        self.group.user_set.add(self.student)
+        self.group.save()
+
+        self.assertTrue(self.client.login(username='student_name', password='testpass'))
+        self.event = Event.objects.create(id=9, name="CS3240 Tutoring 1", tutor=self.tutor, month="June",
+                                          weekday="Tuesday", start_hour='12:00', end_hour='5:00',
+                                          start='2023-06-13T10:00:00Z', end='2023-06-13T12:00:00Z')
+
+        self.assertTrue(self.event.isAval)
+        self.assertEqual(self.event.id, 9)
 
     # def test_searchbar_tutee_invalid_mnemonic(self):
     #     self.factory = RequestFactory()
