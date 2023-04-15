@@ -55,8 +55,8 @@
         <a href="/account/">Account</a>
         {%for group in user.groups.all %}
             <!-- "https://tutor-me-uva.herokuapp.com/{{group}}" #For Heroku-->
-            <!-- "http://127.0.0.1:8000/{{group}}" #For Heroku-->
-            <a href = "https://tutor-me-uva.herokuapp.com/{{group}}">{{group}}</a> <!--  HAVE TO CHANGE THIS HARD CODE-->
+            <!-- "http://127.0.0.1:8000/{{group}}" #For Local Host-->
+            <a href = "http://127.0.0.1:8000/{{group}}">{{group}}</a> <!--  HAVE TO CHANGE THIS HARD CODE-->
         {% endfor %}
         {% endblock %}
     </div>
