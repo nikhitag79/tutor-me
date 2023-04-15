@@ -1,6 +1,6 @@
 {% extends 'main/base.html' %}
 {% block title_block %}
-<h1>{{ name }}</h1>
+{% comment %} <h1>{{ name }}</h1> {% endcomment %}
 {% endblock title_block %}
 {% block body_block %}
 <!DOCTYPE html>
@@ -15,7 +15,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.9.0/fullcalendar.js"></script>
 </head>
 <body>
-<div class="container">
+<div class="container" style = "height: 70%; width: 70%">
  <div class="row"> 
     {% block content %}
     {% if user.user_type == 1 %}

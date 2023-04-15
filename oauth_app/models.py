@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from djmoney.models.fields import MoneyField
 
+
 # Create your models here.
 class User(AbstractUser):
     Tutor = 1

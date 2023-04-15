@@ -1,3 +1,4 @@
 This is where we are keeping our citations and we will properly cite them at the end!
 
 https://www.section.io/engineering-education/django-google-oauth/
+https://www.toptal.com/designers/subtlepatterns/y-so-serious-light-pattern/

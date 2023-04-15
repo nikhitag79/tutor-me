@@ -157,7 +157,7 @@
         {% if group %}
         {% for person in group.user_set.all %}
           {% if person.user_type ==  1 %}
-              <h3>{{person}}</h3>
+              <h3>Tutor: {{person.first_name}} {{person.last_name}}, Hourly Rate: {{person.tutor_rate}} </h3>
                 {% if event %}
                   {% for each in event %}
                     {% if each.isAval and each.name == group.name%}

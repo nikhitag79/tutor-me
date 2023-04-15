@@ -48,15 +48,19 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
     'djmoney',
+    'bootstrap5',
+    'crispy_forms',
+    'crispy_bootstrap5',
 
     # 'multiselectfield',             # allows for multiple selection of items such as classes, has not yet been used
 ]
-
+CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
+CRISPY_TEMPLATE_PACK = "bootstrap5"
 # Site ID
 if 'DATABASE_URL' in os.environ:
     SITE_ID = 12
 else:
-    SITE_ID = 8
+    SITE_ID = 9
 
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'

@@ -1,77 +1,95 @@
-{% extends 'main/base.html' %}
+ {% extends 'main/base.html' %}
 
 {% block title_block %}
-    <h1>{{ name }} Page</h1>
+   <h1 style="text-align:center">{{ name }} Search Class Mnemonic</h1>
 {% endblock %}
 
+
+
 {% block body_block %}
-    {% if messages %} 
-        <ul style = "list-style-type: none;" class="messages">
-            {%for message in messages %}
-             <li {% if message.tags %} class = "{{message.tags}}" {% endif %}> {{message}} </li>
-            {% endfor %}
-        </ul>
-    {% endif %}
-    {% if user.user_type == 2 %}
-    Find Tutors
-    {% elif user.user_type == 1%}
 
-        {% if requests %}
-        {% for request in requests %}
-            {% if request.event_month == 'January'%}
-                <fieldset>
-                    <legend>January</legend>
-                        <form>January Requests<h3/>
-                            {{request}}
-                        </form>
-                </fieldset>
-            {% endif %}
-        {% endfor %}
-        {% for request in requests %}
-            {% if request.event_month == 'February' %}
-                <fieldset>
-                    <legend>February</legend>
-                        <form>February Requests<h3/>
-                            {{request}}
-                        </form>
-                </fieldset>
-            {% endif %}
-        {% endfor %}
-        {% for request in requests %}
-            {% if requests.event_month == 'March' %}
-                <fieldset>
-                    <legend>March</legend>
-                        <form>March Requests<h3/>
-                            {{request}}
-                        </form>
-                </fieldset>
-            {% endif %}
-        {% endfor %}
-        <fieldset>
-            <legend>April Requests</legend>
-                {% for request in requests %}
-                    {% if request.event_month == 'April'%}
-                        <fieldset>
-                        <form method = "post">
-                            {% csrf_token %}
-                            <h3>{{request.event_weekday}} {{request.event_month}} {{request.event_day}} Request</h3>
-                            <h4>{{request}}</h4>
-                            <button name = "Accept" type="submit" value = "{{request.id}}">Accept</button>
-                            <button name = "Reject" type="submit" value = "{{request.id}}">Reject</button>
-                        </form>
-                        </fieldset>
-                    {% endif %}
+
+
+
+    <div style="text-align:center; margin-top:50px;">
+        {% if messages %}
+            <ul style="list-style-type:none; margin-bottom:30px;" class="messages">
+                {% for message in messages %}
+                    <li {% if message.tags %} class="{{ message.tags }}" {% endif %}>{{ message }}</li>
                 {% endfor %}
-            </fieldset>
+            </ul>
         {% endif %}
-    <br>
-    Find Classes
-    {% endif %}
-    <form action= "searchbar/" method="get">
-        find mnemonic: <input type="text" name="mnemonic">
-        <input type="submit" value="Submit" />
-    </form>
-    
 
+        {% if user.user_type == 2 %}
+            <h3 style="margin-top:20px;">Find Tutors</h3>
+        {% elif user.user_type == 1 %}
+            {% if requests %}
+                <fieldset style="margin-bottom:20px;">
+                    {% for request in requests %}
+                        {% if request.event_month == 'January' %}
+                            <legend style="font-weight:bold;">{{ request.event_month }}</legend>
+                            {{ request }}
+                        {% endif %}
+                    {% endfor %}
+                    {% for request in requests %}
+                        {% if request.event_month == 'February' %}
+                            <legend style="font-weight:bold;">{{ request.event_month }}</legend>
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                <form style="margin-right:10px;">February Requests</form>
+                                <h4 style="margin:0;">{{ request }}</h4>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                    {% for request in requests %}
+                        {% if request.event_month == 'March' %}
+                            <legend style="font-weight:bold;">{{ request.event_month }}</legend>
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                <form style="margin-right:10px;">March Requests</form>
+                                <div class="form-group">
+                                    <h4>{{ request }}</h4>
+                                </div>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                    {% for request in requests %}
+                        {% if request.event_month == 'April' %}
+                            <div style="text-align:center;">
+                                <table style="margin: 20px auto; border-collapse: collapse; text-align: center;">
+                                    <tr>
+                                        <th style="padding: 10px; border: 1px solid black;">Date</th>
+                                        <th style="padding: 10px; border: 1px solid black;">Request</th>
+                                        <th style="padding: 10px; border: 1px solid black;">Action</th>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 10px; border: 1px solid black;">{{ request.event_weekday }} {{ request.event_month }} {{ request.event_day }}</td>
+                                        <td style="padding: 10px; border: 1px solid black;">{{ request }}</td>
+                                        <td style="padding: 10px; border: 1px solid black;">
+                                            <form method="post">
+                                                {% csrf_token %}
+                                                <button class="btn btn-success" name="Accept" type="submit" value="{{ request.id }}">Accept</button>
+                                                <button class="btn btn-danger" name="Reject" type="submit" value="{{ request.id }}">Reject</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                </table>
 
-{% endblock body_block%}
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                </fieldset>
+            {% endif %}
+        {% endif %}
+
+        <br>
+        <h3 style="margin-top:50px;">Find Classes</h3>
+            <form action="searchbar/" method="get" style="display:flex; justify-content:center; align-items:center; margin-top:20px;">
+                <div class="input-group" style="max-width:500px;">
+                    <input type="text" class="form-control" name="mnemonic" placeholder="Search by mnemonic...">
+                    <div class="input-group-append">
+                        <button class="btn btn-primary" type="submit">Search</button>
+                    </div>
+                </div>
+            </form>
+    </div>
+
+{% endblock body_block %}
