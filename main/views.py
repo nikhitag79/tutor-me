@@ -249,7 +249,6 @@ def mnemonic(response):
     requests = ''
     if user.id is not None:
         requests = Request.objects.filter(tutor=user)
-        print(requests)
         if requests:
             messages.info(response, "You have unseen requests")
     if response.method == "POST":
