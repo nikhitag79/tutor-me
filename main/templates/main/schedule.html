@@ -22,9 +22,13 @@
      <div class="dropdown">
     <form name="formid">
         <select name="ddlselect" onchange="get_groups()">
+            {% if groups %}
             {% for group in groups %}
                 <option value ="{{group.name}}">{{group.name}}</option>
             {% endfor %}
+            {% else %}}
+                <option value ="None">No available classes</option>
+            {% endif %}
         </select>
     </form>
          <label id="groupDropdown"></label>
@@ -57,27 +61,95 @@ function get_groups() {
            editable: true,
            eventLimit: true,
            select: function (start, end, allDay) {
+               var now = new Date()
+               var hour = now.getHours()
+               var day = now.getDate()
+               var month = now.getMonth() + 1
+               var year = now.getFullYear()
                var title = formid.ddlselect[formid.ddlselect.selectedIndex].text
-               if (title) {
-                   if (confirm("The event will be added to : " + formid.ddlselect[formid.ddlselect.selectedIndex].text)) {
-                       var start = $.fullCalendar.formatDate(start, "Y-MM-DD HH:mm:ss");
-                       var end = $.fullCalendar.formatDate(end, "Y-MM-DD HH:mm:ss");
-                       $.ajax({
-                           type: "GET",
-                           url: '/add_event',
-                           data: {'title': title, 'start': start, 'end': end},
-                           dataType: "json",
-                           success: function (data) {
-                               calendar.fullCalendar('refetchEvents');
-                               alert("Added Successfully");
-                           },
-                           error: function (data) {
-                               alert('There is a problem!!!');
-                           }
-
-                       });
-                   }
-               }
+                    if (title != "No available classes") {
+                        if (end - start != 86400000) {
+                            if (confirm("The event will be added to : " + formid.ddlselect[formid.ddlselect.selectedIndex].text)) {
+                                var start_year = Number($.fullCalendar.formatDate(start, "Y"));
+                                var start_month = Number($.fullCalendar.formatDate(start, "MM"));
+                                var start_day = Number($.fullCalendar.formatDate(start, "DD"));
+                                var start_hour = Number($.fullCalendar.formatDate(start, "HH"));
+                                var start = $.fullCalendar.formatDate(start, "Y-MM-DD HH:mm:ss");
+                                var end = $.fullCalendar.formatDate(end, "Y-MM-DD HH:mm:ss");
+                                $.ajax({
+                                    type: "GET",
+                                    url: '/add_event',
+                                    data: {'title': title, 'start': start, 'end': end},
+                                    dataType: "json",
+                                    success: function (data) {
+                                        calendar.fullCalendar('refetchEvents');
+                                        if (year <= start_year && month <= start_month) {
+                                            if (day <= start_day) {
+                                                if (hour <= start_hour) {
+                                                    alert("Added Successfully");
+                                                }
+                                                else{
+                                                    alert("Events not created, because the date has already passed");
+                                                }
+                                            }
+                                            else{
+                                                alert("Events not created, because the date has already passed");
+                                            }
+                                        }
+                                        else{
+                                            alert("Events not created, because the date has already passed");
+                                        }
+                                    },
+                                    error: function (data) {
+                                        alert('There is a problem!!!');
+                                    }
+                                });
+                            }
+                        } else {
+                            if (confirm('Selecting here will add 48 events over the entire day.\n' +
+                                'If that is what you actually want click ok.\n' +
+                                'Otherwise click cancel, and add in the week or day time sections!')) {
+                                var start_year = Number($.fullCalendar.formatDate(start, "Y"));
+                                var start_month = Number($.fullCalendar.formatDate(start, "MM"));
+                                var start_day = Number($.fullCalendar.formatDate(start, "DD"));
+                                var start_hour = Number($.fullCalendar.formatDate(start, "HH"));
+                                var start = $.fullCalendar.formatDate(start, "Y-MM-DD HH:mm:ss");
+                                var end = $.fullCalendar.formatDate(end, "Y-MM-DD HH:mm:ss");
+                                $.ajax({
+                                    type: "GET",
+                                    url: '/add_event',
+                                    data: {'title': title, 'start': start, 'end': end},
+                                    dataType: "json",
+                                    success: function (data) {
+                                        calendar.fullCalendar('refetchEvents');
+                                        if (year <= start_year && month <= start_month) {
+                                            if (day <= start_day) {
+                                                if (hour <= start_hour) {
+                                                    alert("Added Successfully");
+                                                }
+                                                else{
+                                                    alert("Events not created, because the date has already passed");
+                                                }
+                                            }
+                                            else{
+                                                alert("Events not created, because the date has already passed");
+                                            }
+                                        }
+                                        else{
+                                            alert("Events not created, because the date has already passed");
+                                        }
+                                    },
+                                    error: function (data) {
+                                        alert('There is a problem!!!');
+                                    }
+                                });
+                            }
+                        }
+                    }
+                    else {
+                        alert("To add appointments to your schedule\n" +
+                            "you need to sign up to tutor a class!");
+                    }
            },
            eventResize: function (event) {
                var start = $.fullCalendar.formatDate(event.start, "Y-MM-DD HH:mm:ss");

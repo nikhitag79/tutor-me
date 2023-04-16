@@ -87,3 +87,12 @@ class Request(models.Model):
         return self.student.username + ' wants to have make an appointment on ' + self.event_weekday + ' ' + self.event_month + ' ' + self.event_day + '\nFrom ' + self.event_start_hour + ' to ' + self.event_end_hour
 
 
+class TextMessages(models.Model):
+    content = models.CharField(max_length=1024, null=True, blank=True)
+    subject = models.CharField(max_length=255,null=True,blank=True)
+    time_stamp = models.DateTimeField(null=True,blank=True)
+    viewed = models.BooleanField(default=True)
+    receiver = models.ForeignKey(User, on_delete=models.CASCADE, related_name='receiver',default=1)
+    sender = models.ForeignKey(User, on_delete = models.SET_NULL,related_name ='sender',null=True)
+    def __str__(self):
+        return self.subject

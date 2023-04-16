@@ -37,7 +37,6 @@ def tutor_home(response):
         logout(response)
         return redirect("/")
     requests = Request.objects.filter(tutor = response.user)
-    print('requests', requests)
     return render(response, "main/tutor_home.html", {'name': 'Home', 'requests': requests})
 
 
@@ -193,6 +192,9 @@ def classes(response, class_id, first_professors, middle="", last_professors="")
 
 
     if response.method == "POST":
+        if response.POST.get('logout'):
+            logout(response)
+            return redirect("/")
         user = response.user
         group = Group.objects.get(name=class_id + " " + professors)
         if user.user_type == 1:
@@ -247,30 +249,35 @@ def mnemonic(response):
     requests = ''
     if user.id is not None:
         requests = Request.objects.filter(tutor=user)
+        print(requests)
+        if requests:
+            messages.info(response, "You have unseen requests")
     if response.method == "POST":
         if response.POST.get('logout'):
             logout(response)
             return redirect("/")
-        if response.POST.get("Accept"):
-            request = Request.objects.get(id=response.POST.get("Accept"))
-            adjusted_event = Event.objects.get(id=request.event_id)
-            adjusted_event.student = request.student
-            adjusted_event.isAval = False
-            adjusted_event.save()
-            request.delete()
-        elif response.POST.get("Reject"):
-            request = Request.objects.get(id=response.POST.get("Reject"))
-            request.delete()
-
-    return render(response, "main/mnemonic_page.html", {'name': 'Home', 'user': user, 'requests': requests})
+    return render(response, "main/mnemonic_page.html", {'name': 'Home', 'user': user,})
 
 
 
-def other(response):
+def messages_and_requests(response):
+    user = response.user
+    if user.id is not None:
+        requests = Request.objects.filter(tutor = response.user)
     if response.POST.get('logout'):
         logout(response)
         return redirect("/")
-    return render(response, "main/home.html", {'name': 'Other'})
+    if response.POST.get("Accept"):
+        request = Request.objects.get(id=response.POST.get("Accept"))
+        adjusted_event = Event.objects.get(id=request.event_id)
+        adjusted_event.student = request.student
+        adjusted_event.isAval = False
+        adjusted_event.save()
+        request.delete()
+    elif response.POST.get("Reject"):
+        request = Request.objects.get(id=response.POST.get("Reject"))
+        request.delete()
+    return render(response, "main/message_request.html", {'name': 'Messages and Requests', 'user': user, 'requests': requests})
 
 
 @login_required
@@ -286,7 +293,7 @@ def select_user(response):
         response.user.save()
 
         if user_type == "Tutor":
-            return redirect('/home/')
+            return redirect('/tutor_home/')
         elif user_type == "Student":
             return redirect('/student_home/')
 

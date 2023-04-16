@@ -49,13 +49,15 @@
                 <a class="nav-link" href="/schedule/">Schedule</a>
               </li>
               <li class="nav-item">
-                <a class = "nav-link" href="/other/">Other</a>
+                <a class = "nav-link" href="/messages_and_requests/">Messages and Requests</a>
               </li>
             </ul>
             {%for group in user.groups.all %}
               <!-- "https://tutor-me-uva.herokuapp.com/" #For Heroku-->
               <!-- "http://127.0.0.1:8000/{{group}}" #For local host-->
-              <a href = "https://tutor-me-uva.herokuapp.com/{{group}}">{{group}}</a> <!--  HAVE TO CHANGE THIS HARD CODE-->
+               <li class="nav-item">
+                <a href = "https://tutor-me-uva.herokuapp.com/{{group}}">{{group}}</a> <!--  HAVE TO CHANGE THIS HARD CODE-->
+               </li>
             {% endfor %}
             <div class="collapse navbar-collapse justify-content-end" id="navbarNavDarkDropdown">
               <ul class="navbar-nav">
