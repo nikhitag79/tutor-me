@@ -353,7 +353,7 @@ class TestClass(TestCase):
         mnemonic(request)
         self.assertFalse(Request.objects.filter(id=11).exists())
 
-    def test_other_correct_template(self):
+    def test_message_request_correct_template(self):
         # https://developer.mozilla.org/en-US/docs/Learn/Server-side/Django/Testing
         self.group = Group.objects.create(name='Test Group', id=9)
         self.student = User.objects.create_user(user_type=2, username="student_name", id=10, password='testpass')
@@ -362,9 +362,9 @@ class TestClass(TestCase):
 
         self.assertTrue(self.client.login(username='student_name', password='testpass'))
 
-        response = self.client.get(reverse('other'))
+        response = self.client.get(reverse('message_request'))
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'main/home.html')
+        self.assertTemplateUsed(response, 'main/message_request.html')
 
     def test_select_user_tutor(self):
         # https://docs.djangoproject.com/en/4.2/topics/testing/tools/
