@@ -212,6 +212,10 @@ def classes(response, class_id, first_professors, middle="", last_professors="")
                 if response.POST.get('remove'):
                     group.user_set.remove(user)
                     if group.user_set.all().count() == 0:
+                        cleaned_events = Event.objects.filter(tutor=user, name = header)
+                        for event in cleaned_events:
+                            print(event)
+                            event.delete()
                         my_instance = ClassDatabase.objects.filter(class_id=class_id, professors=professors).first()
                         my_instance.available_tutors = False
                         my_instance.save()
