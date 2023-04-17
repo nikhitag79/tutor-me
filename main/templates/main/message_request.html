@@ -21,60 +21,70 @@
         {% endif %}
 
         {% if user.user_type == 2 %}
-            <h3 style="margin-top:20px;">Need to Create</h3>
+            {% if received_texts %}
+                {% for text in received_texts %}
+                    <fieldset style="text-align:center;">
+                                <div style="text-align:center;">
+                                    <table style="margin: 20px auto; border-collapse: collapse; text-align: center;">
+                                        <tr>
+                                            <th style="...">Subject</th>
+                                            <th style="padding: 10px; border: 1px solid black;">Content</th>
+                                            <th style="padding: 10px; border: 1px solid black;">Date</th>
+                                            <th style="padding: 10px; border: 1px solid black;">Action</th>
+                                        </tr>
+                                        <tr>
+                                            <td style="padding: 10px; border: 1px solid black;">{{ text }}</td>
+                                            <td style="padding: 10px; border: 1px solid black;">{{ text.content }}</td>
+                                            <td style="padding: 10px; border: 1px solid black;">{{ text.time_stamp }}</td>
+                                            <td style="padding: 10px; border: 1px solid black;">
+                                            <form method="post">
+                                                {% csrf_token %}
+                                                <button class="btn btn-success" name="Mark as Read" type="submit" value="{{ text.id }}">Mark as Read</button>
+                                                <button class="btn btn-danger" name="Delete" type="submit" value="{{ text.id }}">Delete</button>
+                                                {% if text.sender %}
+                                                <button class="btn btn-warning" name="Reply" type="submit" value="{{ text.id }}">Reply</button>
+                                                {% endif %}
+                                            </form>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                </fieldset>
+                {% endfor %}
+            {% else %}
+                    <h3 style="margin-top:20px;">You have no messages</h3>
+            {% endif %}
         {% elif user.user_type == 1 %}
             {% if requests %}
                 <fieldset style="margin-bottom:20px;">
-                    {% for request in requests %}
-                        {% if request.event_month == 'January' %}
-                            <legend style="font-weight:bold;">{{ request.event_month }}</legend>
-                            {{ request }}
-                        {% endif %}
-                    {% endfor %}
-                    {% for request in requests %}
-                        {% if request.event_month == 'February' %}
-                            <legend style="font-weight:bold;">{{ request.event_month }}</legend>
-                            <div style="display:flex; justify-content:space-between; align-items:center;">
-                                <form style="margin-right:10px;">February Requests</form>
-                                <h4 style="margin:0;">{{ request }}</h4>
-                            </div>
-                        {% endif %}
-                    {% endfor %}
-                    {% for request in requests %}
-                        {% if request.event_month == 'March' %}
-                            <legend style="font-weight:bold;">{{ request.event_month }}</legend>
-                            <div style="display:flex; justify-content:space-between; align-items:center;">
-                                <form style="margin-right:10px;">March Requests</form>
-                                <div class="form-group">
-                                    <h4>{{ request }}</h4>
-                                </div>
-                            </div>
-                        {% endif %}
-                    {% endfor %}
-                    {% for request in requests %}
-                        {% if request.event_month == 'April' %}
-                            <div style="text-align:center;">
-                                <table style="margin: 20px auto; border-collapse: collapse; text-align: center;">
-                                    <tr>
-                                        <th style="padding: 10px; border: 1px solid black;">Date</th>
-                                        <th style="padding: 10px; border: 1px solid black;">Request</th>
-                                        <th style="padding: 10px; border: 1px solid black;">Action</th>
-                                    </tr>
-                                    <tr>
-                                        <td style="padding: 10px; border: 1px solid black;">{{ request.event_weekday }} {{ request.event_month }} {{ request.event_day }}</td>
-                                        <td style="padding: 10px; border: 1px solid black;">{{ request }}</td>
-                                        <td style="padding: 10px; border: 1px solid black;">
+                    {% for month in sorted_calendar %}
+                        <legend>{{month}} Requests</legend>
+                            {% for request in requests %}
+                                {% if month == request.event_month %}
+                                <fieldset style="text-align:center;">
+                                <div style="text-align:center;">
+                                    <table style="margin: 20px auto; border-collapse: collapse; text-align: center;">
+                                        <tr>
+                                            <th style="padding: 10px; border: 1px solid black;">Date</th>
+                                            <th style="padding: 10px; border: 1px solid black;">Request</th>
+                                            <th style="padding: 10px; border: 1px solid black;">Action</th>
+                                        </tr>
+                                        <tr>
+                                            <td style="padding: 10px; border: 1px solid black;">{{ request.event_weekday }} {{ request.event_month }} {{ request.event_day }}</td>
+                                            <td style="padding: 10px; border: 1px solid black;">{{ request }}</td>
+                                            <td style="padding: 10px; border: 1px solid black;">
                                             <form method="post">
                                                 {% csrf_token %}
                                                 <button class="btn btn-success" name="Accept" type="submit" value="{{ request.id }}">Accept</button>
                                                 <button class="btn btn-danger" name="Reject" type="submit" value="{{ request.id }}">Reject</button>
                                             </form>
-                                        </td>
-                                    </tr>
-                                </table>
-
-                            </div>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                </fieldset>
                         {% endif %}
+                    {% endfor %}
                     {% endfor %}
                 </fieldset>
             {% endif %}

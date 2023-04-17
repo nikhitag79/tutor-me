@@ -91,7 +91,7 @@ class TextMessages(models.Model):
     content = models.CharField(max_length=1024, null=True, blank=True)
     subject = models.CharField(max_length=255,null=True,blank=True)
     time_stamp = models.DateTimeField(null=True,blank=True)
-    viewed = models.BooleanField(default=True)
+    viewed = models.BooleanField(default=False)
     receiver = models.ForeignKey(User, on_delete=models.CASCADE, related_name='receiver',default=1)
     sender = models.ForeignKey(User, on_delete = models.SET_NULL,related_name ='sender',null=True)
     def __str__(self):

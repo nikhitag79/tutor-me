@@ -79,18 +79,13 @@
                                success: function (data) {
                                    calendar.fullCalendar('refetchEvents');
                                    if (year <= start_year && month <= start_month) {
-                                       if (day <= start_day) {
-                                           if (hour <= start_hour) {
-                                               alert("Added Successfully");
-                                           }
-                                           else{
-                                               alert("Events not created, because the date has already passed");
-                                           }
-                                       }
-                                       else{
-                                           alert("Events not created, because the date has already passed");
-                                       }
-                                   }
+                                            if (day < start_day ||  (day == start_day && hour <= start_hour)) {
+                                                    alert("Added Successfully");
+                                            }
+                                            else{
+                                                alert("Events not created, because the date has already passed");
+                                            }
+                                        }
                                    else{
                                        alert("Events not created, because the date has already passed");
                                    }
@@ -119,13 +114,8 @@
                                     success: function (data) {
                                         calendar.fullCalendar('refetchEvents');
                                         if (year <= start_year && month <= start_month) {
-                                            if (day <= start_day) {
-                                                if (hour <= start_hour) {
+                                            if (day < start_day ||  (day == start_day && hour <= start_hour)) {
                                                     alert("Added Successfully");
-                                                }
-                                                else{
-                                                    alert("Events not created, because the date has already passed");
-                                                }
                                             }
                                             else{
                                                 alert("Events not created, because the date has already passed");

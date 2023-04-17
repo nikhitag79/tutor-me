@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 
-from .models import View, ClassDatabase, Event, Request
+from .models import View, ClassDatabase, Event, Request, TextMessages
 from django.contrib.auth import logout
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
@@ -263,6 +263,20 @@ def messages_and_requests(response):
     user = response.user
     if user.id is not None:
         requests = Request.objects.filter(tutor = response.user)
+        cal = {}
+        sorted_cal = {}
+        month = {'January': 1, "February": 2, " March": 3, "April": 4, "May": 5, "June": 6, "July": 7, "August": 8,
+                 " September": 9, "October": 10, "November": 11, "December": 12}
+        for request in requests:
+            if request.event_month not in cal:
+                cal[month[request.event_month]] = request.event_month
+        scal = sorted(cal)
+        for m in scal:
+            sorted_cal[cal[m]] = cal[m]
+
+        received_texts = TextMessages.objects.filter(receiver = response.user)
+        print(received_texts)
+
     if response.POST.get('logout'):
         logout(response)
         return redirect("/")
@@ -273,10 +287,25 @@ def messages_and_requests(response):
         adjusted_event.isAval = False
         adjusted_event.save()
         request.delete()
+        new_text = TextMessages.objects.create(subject="Appointment Accepted",
+                                               content=request.tutor.username + " has accepted an appointment with you on " + request.event_weekday + ", " + request.event_month + ", " + request.event_day + "\nSee you there, and message me if you need too!",
+                                               time_stamp=datetime.datetime.now(),
+                                               viewed=False,
+                                               receiver=request.student,
+                                               sender=request.tutor,
+                                               )
+        requests = Request.objects.filter(tutor=response.user)
     elif response.POST.get("Reject"):
         request = Request.objects.get(id=response.POST.get("Reject"))
+        new_text = TextMessages.objects.create(subject="Appointment Rejection",
+                                           content = "Unfortunately, " + request.tutor.username + " was unable to meet with you on " + request.event_weekday + ", " + request.event_month + ", " + request.event_day + "\nPlease try finding another time or available tutor!",
+                                           time_stamp = datetime.datetime.now(),
+                                           viewed = False,
+                                           receiver = request.student
+                                           )                                                        ,
         request.delete()
-    return render(response, "main/message_request.html", {'name': 'Messages and Requests', 'user': user, 'requests': requests})
+        requests = Request.objects.filter(tutor=response.user)
+    return render(response, "main/message_request.html", {'name': 'Messages and Requests', 'user': user, 'requests': requests, 'sorted_calendar': sorted_cal, 'received_texts': received_texts})
 
 
 @login_required
