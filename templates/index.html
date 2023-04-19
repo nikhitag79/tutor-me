@@ -32,7 +32,7 @@
             font-family: Georgia;
         }
     </style>
-    <!--f9e1f5-->
+    <!--f9e1f5  url('{% static 'bgd.png' %}')     url('/static/testproject1/bgd.png')  -->
     <div class = "container-fluid" style = "background-image:url('https://www.toptal.com/designers/subtlepatterns/uploads/y-so-serious-white.png'); background-repeat: repeat;">
         <div class = "row">
             <div class = "col-4" id = "leftside">
@@ -70,7 +70,7 @@
                     </div>
                     <div class="row" id = "row-bot">
                         <a class="btn btn-outline-dark" href="{% provider_login_url 'google' action='reauthenticate' %}" role="button" style="text-transform:none;">
-                        <img width="20px" style="margin-bottom:3px; margin-right:5px" alt="Google sign-in" src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Google_%22G%22_Logo.svg/512px-Google_%22G%22_Logo.svg.png" />Register with Google</a>
+                        <img width="20px" style="margin-bottom:3px; margin-right:5px" alt="Google sign-in" src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Google_%22G%22_Logo.svg/512px-Google_%22G%22_Logo.svg.png" />Sign in with Google</a>
                         <!--<a href="{% provider_login_url 'google' action='reauthenticate' %}">Sign in Google account</a>
                         <a href="{% provider_login_url 'google' %}">Login With Google</a>-->
                     </div>
