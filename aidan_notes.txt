@@ -1,0 +1,6 @@
+make background extended to full content (calendar not long enough, some mnemonics too long)
+dropdown for classes formatting
+page for requests
+static files
+logout button formatting
+login page editing
