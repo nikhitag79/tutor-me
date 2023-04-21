@@ -59,9 +59,9 @@
                 </a>
                 <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="navbarDarkDropdownMenuLink">
                   {%for group in user.groups.all %}
-                    <!-- "https://tutor-me-uva.herokuapp.com/" #For Heroku-->
+                    <!-- "https://tutor-me-uva.herokuapp.com/{{group}}" #For Heroku-->
                     <!-- "http://127.0.0.1:8000/{{group}}" #For Heroku-->
-                    <li><a href = "http://127.0.0.1:8000/{{group}}">{{group}}</a></li> <!--  HAVE TO CHANGE THIS HARD CODE-->
+                    <li><a href = "https://tutor-me-uva.herokuapp.com/{{group}}">{{group}}</a></li> <!--  HAVE TO CHANGE THIS HARD CODE-->
                   {% endfor %}
                 </ul>
               </li>
