@@ -51,6 +51,7 @@
                 <a class = "nav-link" href="/messages_and_requests/">Messages and Requests</a>
               </li>
             </ul>
+            {% if user.user_type == 1 %}
             <ul class="navbar-nav">
               <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" href="#" id="navbarDarkDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -60,11 +61,12 @@
                   {%for group in user.groups.all %}
                     <!-- "https://tutor-me-uva.herokuapp.com/" #For Heroku-->
                     <!-- "http://127.0.0.1:8000/{{group}}" #For Heroku-->
-                    <li><a href = "https://tutor-me-uva.herokuapp.com/">{{group}}</a></li> <!--  HAVE TO CHANGE THIS HARD CODE-->
+                    <li><a href = "http://127.0.0.1:8000/{{group}}">{{group}}</a></li> <!--  HAVE TO CHANGE THIS HARD CODE-->
                   {% endfor %}
                 </ul>
               </li>
             </ul>
+            {% endif %}
             <div class="collapse navbar-collapse justify-content-end" id="navbarNavDarkDropdown">
               <ul class="navbar-nav">
                 <li class="nav-item dropdown">
