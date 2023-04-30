@@ -556,7 +556,7 @@ def database_setup(request):
     user = request.user
     if request.method == "GET":
         if request.GET.get("create_database_json"):
-            major_url = "https://sisuva.admin.virginia.edu/psc/ihprd/UVSS/SA/s/WEBLIB_HCX_CM.H_CLASS_SEARCH.FieldFormula.IScript_ClassSearchOptions?institution=UVA01&term=1228"
+            major_url = "https://sisuva.admin.virginia.edu/psc/ihprd/UVSS/SA/s/WEBLIB_HCX_CM.H_CLASS_SEARCH.FieldFormula.IScript_ClassSearchOptions?institution=UVA01&term=1232"
             major_url_data = View.get_json_data(major_url)
             major_data = {'data': major_url_data}
             json_dict = {}
@@ -567,7 +567,7 @@ def database_setup(request):
                 pages = 100
                 for page_number in range(1, pages):
                     print("pages numbers", page_number)
-                    url = "https://sisuva.admin.virginia.edu/psc/ihprd/UVSS/SA/s/WEBLIB_HCX_CM.H_CLASS_SEARCH.FieldFormula.IScript_ClassSearch?institution=UVA01&term=1228&subject=" + search_mnemonic_json + "&page=" + str(
+                    url = "https://sisuva.admin.virginia.edu/psc/ihprd/UVSS/SA/s/WEBLIB_HCX_CM.H_CLASS_SEARCH.FieldFormula.IScript_ClassSearch?institution=UVA01&term=1232&subject=" + search_mnemonic_json + "&page=" + str(
                         page_number)
                     url_data = View.get_json_data(url)
                     data = {'data': url_data}
