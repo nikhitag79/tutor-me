@@ -81,7 +81,7 @@
                                success: function (data) {
                                    calendar.fullCalendar('refetchEvents');
                                    if (year <= start_year && month <= start_month) {
-                                            if (day < start_day ||  (day == start_day && hour <= start_hour)) {
+                                            if (day < start_day ||  (day == start_day && hour <= start_hour) || (start_month>month && start_year>=year)) {
                                                     alert("Added Successfully");
                                             }
                                             else{
@@ -89,7 +89,7 @@
                                             }
                                         }
                                    else{
-                                       alert("Events not created, because the date has already passed");
+                                       alert("Events not created, because the date has already passed.");
                                    }
                                },
                                error: function (data) {
@@ -116,7 +116,7 @@
                                     success: function (data) {
                                         calendar.fullCalendar('refetchEvents');
                                         if (year <= start_year && month <= start_month) {
-                                            if (day < start_day ||  (day == start_day && hour <= start_hour)) {
+                                            if ((day < start_day ||  (day == start_day && hour <= start_hour)) || (start_month>month && start_year>=year)) {
                                                     alert("Added Successfully");
                                             }
                                             else{
@@ -124,7 +124,7 @@
                                             }
                                         }
                                         else{
-                                            alert("Events not created, because the date has already passed");
+                                            alert("Events not created, because the date has already passed.");
                                         }
                                     },
                                     error: function (data) {
@@ -216,16 +216,38 @@
         {% for person in group.user_set.all %}
           {% if person.user_type ==  1 %}
               <h3>Tutor: {{person.first_name}} {{person.last_name}}, Hourly Rate: {{person.tutor_rate}} </h3>
-                {% if event %}
-                  {% for each in event %}
-                    {% if each.isAval and each.name == group.name%}
-                    <button name = "event_name" type="submit" value = "{{each.id}}">Request {{each.start}}</button>
-                    <br>
-                    {% endif %}
-                  {% endfor %}
-                {% else %}
-                    <h3>{{person}} does not have any availability at this time</h3>
-                {% endif %}
+{% if event %}
+<table style="margin: auto; width: 90%; border-collapse: collapse;">
+  <thead>
+    <tr style="background-color: #f2f2f2;">
+      <th style="padding: 12px 15px; text-align: left;">Date</th>
+      <th style="padding: 12px 15px; text-align: left;">Time</th>
+      <th style="padding: 12px 15px;"></th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for each in event %}
+      {% if each.isAval and each.name == group.name %}
+        <tr>
+          <td style="padding: 12px 15px; text-align: center; border: 1px solid #ddd;">{{ each.start|date:"F d, Y" }}</td>
+          <td style="padding: 12px 15px; text-align: center; border: 1px solid #ddd;">{{ each.start|time:"g:i A" }} - {{ each.end|time:"g:i A" }}</td>
+          <td style="padding: 12px 15px; text-align: center; border: 1px solid #ddd;">
+            <button name="event_name" type="submit" value="{{ each.id }}" style="background-color: #007bff; color: white; padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer;">
+              Request {{ each.start|time:"g:i A" }}
+            </button>
+          </td>
+        </tr>
+      {% endif %}
+    {% endfor %}
+  </tbody>
+</table>
+
+
+{% else %}
+  <h3 style="text-align: center;">{{ person }} does not have any availability at this time</h3>
+{% endif %}
+
+
           {% endif %}
         {% endfor %}
         {% else %}

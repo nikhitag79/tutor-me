@@ -16,33 +16,33 @@
 
     <hr>
     <form method="get">
-        <table border = "1">
-            <tr>
-                <th> Class id </th>
-                <th> Class name </th>
-               <th> Professors </th>
-                <th> Status </th>
-            </tr>
-            {% for item in filters.qs %}
-
-    <tr>
-        <td>{{ item.class_id }}</td>
-        <td>{{ item.class_name }}</td>
-        <td>{{ item.professors }}</td>
-
-         {% if results|length < 1%}
-            <td><a href="/{{ item.class_id }} {{ item.professors }}/">Sign Up</a></td>
-        {%else%}
-                {% if item.class_id|add:" "|add:item.professors in results %}
-                    <td><a href="/{{ item.class_id }} {{ item.professors }}/">Adjust Schedule</a>
-                {% elif not item.class_id|add:" "|add:item.professors in results %}
-                        <td><a href="/{{ item.class_id }} {{ item.professors }}/">Sign Up</a>
-                {% endif %}
-
-        {% endif %}
-
-    </tr>
-{% endfor %}
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th> Class id </th>
+                    <th> Class name </th>
+                    <th> Professors </th>
+                    <th> Status </th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in filters.qs %}
+                    <tr>
+                        <td>{{ item.class_id }}</td>
+                        <td>{{ item.class_name }}</td>
+                        <td>{{ item.professors }}</td>
+                        {% if results|length < 1%}
+                            <td><a href="/{{ item.class_id }} {{ item.professors }}/">Sign Up</a></td>
+                        {%else%}
+                            {% if item.class_id|add:" "|add:item.professors in results %}
+                                <td><a href="/{{ item.class_id }} {{ item.professors }}/">Adjust Schedule</a>
+                            {% elif not item.class_id|add:" "|add:item.professors in results %}
+                                <td><a href="/{{ item.class_id }} {{ item.professors }}/">Sign Up</a>
+                            {% endif %}
+                        {% endif %}
+                    </tr>
+                {% endfor %}
+            </tbody>
         </table>
     </form>
 
