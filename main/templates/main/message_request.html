@@ -19,10 +19,34 @@
                 {% endfor %}
             </ul>
         {% endif %}
-
-        {% if user.user_type == 2 %}
-            {% if received_texts %}
-                {% for text in received_texts %}
+        <form method="get">
+            {% csrf_token %}
+        <div class="col-md-3">
+            <label>Options</label>
+            <select name="message_option" class="form-control">
+                {% if user.user_type == 2 %}
+                    <option value = "Unread" selected>Unread Messages</option>
+                    <option value = "Read">Read Messages</option>
+                    <option value = "Sent">Sent Messages</option>
+                    <option value = "Upcoming">Upcoming Appointments</option>
+                {% elif user.user_type == 1 %}
+                    <option value = "Unread">Unread Messages</option>
+                    <option value = "Read">Read Messages</option>
+                    <option value = "Sent">Sent Messages</option>
+                    <option value = "Upcoming">Booked Appointments</option>
+                    <option value = "Unaccepted">Open Appointmentents</option>
+                    <option value = "Tutor Requests" selected>Open Requests</option>
+                {% endif %}
+            </select>
+            <br>
+            <input type="submit" value="View">
+        </div>
+        </form>
+        {% if page %}
+            <h1>{{page}}</h1>
+        {% if page == "Unread" %}
+            {% if unread_received_texts %}
+                {% for text in unread_received_texts %}
                     <fieldset style="text-align:center;">
                                 <div style="text-align:center;">
                                     <table style="margin: 20px auto; border-collapse: collapse; text-align: center;">
@@ -42,6 +66,7 @@
                                                 <button class="btn btn-success" name="Mark as Read" type="submit" value="{{ text.id }}">Mark as Read</button>
                                                 <button class="btn btn-danger" name="Delete" type="submit" value="{{ text.id }}">Delete</button>
                                                 {% if text.sender %}
+                                                <input type="text" class="form-control" name="reply_message" placeholder="Leave a Reply">
                                                 <button class="btn btn-warning" name="Reply" type="submit" value="{{ text.id }}">Reply</button>
                                                 {% endif %}
                                             </form>
@@ -52,9 +77,135 @@
                                 </fieldset>
                 {% endfor %}
             {% else %}
-                    <h3 style="margin-top:20px;">You have no messages</h3>
+                <h3>You have no unread messages</h3>
             {% endif %}
-        {% elif user.user_type == 1 %}
+        {% elif page == "Read" %}
+            {% if read_texts %}
+                {% for text in read_texts %}
+                    <fieldset style="text-align:center;">
+                                <div style="text-align:center;">
+                                    <table style="margin: 20px auto; border-collapse: collapse; text-align: center;">
+                                        <tr>
+                                            <th style="...">Subject</th>
+                                            <th style="padding: 10px; border: 1px solid black;">Content</th>
+                                            <th style="padding: 10px; border: 1px solid black;">Date</th>
+                                            <th style="padding: 10px; border: 1px solid black;">Action</th>
+                                        </tr>
+                                        <tr>
+                                            <td style="padding: 10px; border: 1px solid black;">{{ text }}</td>
+                                            <td style="padding: 10px; border: 1px solid black;">{{ text.content }}</td>
+                                            <td style="padding: 10px; border: 1px solid black;">{{ text.time_stamp }}</td>
+                                            <td style="padding: 10px; border: 1px solid black;">
+                                            <form method="post">
+                                                {% csrf_token %}
+                                                <button class="btn btn-danger" name="Delete" type="submit" value="{{ text.id }}">Delete</button>
+                                                {% if text.sender %}
+                                                <input type="text" class="form-control" name="reply_message" placeholder="Leave a Reply">
+                                                <button class="btn btn-warning" name="Reply" type="submit" value="{{ text.id }}">Reply</button>
+                                                {% endif %}
+                                            </form>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                </fieldset>
+                {% endfor %}
+            {% else %}
+                <h3>You have no read messages</h3>
+            {% endif %}
+        {% elif page == "Sent" %}
+            {% if sent_texts %}
+                {% for text in sent_texts %}
+                    <fieldset style="text-align:center;">
+                                <div style="text-align:center;">
+                                    <table style="margin: 20px auto; border-collapse: collapse; text-align: center;">
+                                        <tr>
+                                            <th style="...">Subject</th>
+                                            <th style="padding: 10px; border: 1px solid black;">Content</th>
+                                            <th style="padding: 10px; border: 1px solid black;">Date</th>
+                                            <th style="padding: 10px; border: 1px solid black;">Action</th>
+                                        </tr>
+                                        <tr>
+                                            <td style="padding: 10px; border: 1px solid black;">{{ text }}</td>
+                                            <td style="padding: 10px; border: 1px solid black;">{{ text.content }}</td>
+                                            <td style="padding: 10px; border: 1px solid black;">{{ text.time_stamp }}</td>
+                                            <td style="padding: 10px; border: 1px solid black;">
+                                            <form method="post">
+                                                {% csrf_token %}
+                                                <button class="btn btn-danger" name="Delete" type="submit" value="{{ text.id }}">Delete</button>
+                                            </form>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                </fieldset>
+                {% endfor %}
+            {% else %}
+                <h3>You have no sent messages</h3>
+            {% endif %}
+        {% elif page == "Upcoming" %}
+            {% if booked %}
+                {% for item in booked %}
+                    <fieldset style="text-align:center;">
+                                <div style="text-align:center;">
+                                    <table style="margin: 20px auto; border-collapse: collapse; text-align: center;">
+                                        <tr>
+                                            <th style="...">Subject</th>
+                                            {%if user.user_type == 2 %}
+                                            <th style="padding: 10px; border: 1px solid black;">Tutor</th>
+                                            {%elif user.user_type == 1 %}
+                                            <th style="padding: 10px; border: 1px solid black;">Student</th>
+                                            {% endif %}
+                                            <th style="padding: 10px; border: 1px solid black;">Action</th>
+                                        </tr>
+                                        <tr>
+                                            <td style="padding: 10px; border: 1px solid black;">{{ item }}</td>
+                                            {%if user.user_type == 2 %}
+                                            <td style="padding: 10px; border: 1px solid black;">{{ item.tutor }}</td>
+                                            {%elif user.user_type == 1 %}
+                                            <td style="padding: 10px; border: 1px solid black;">{{ item.student }}</td>
+                                            {% endif %}
+                                            <td style="padding: 10px; border: 1px solid black;">
+                                            <form method="post">
+                                                {% csrf_token %}
+                                                <button class="btn btn-danger" name="Delete_Event" type="submit" value="{{ item.id }}">Delete</button>
+                                            </form>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                </fieldset>
+                {% endfor %}
+            {% else %}
+                <h3>You have no booked appointments</h3>
+            {% endif %}
+        {% elif page == "Unaccepted" %}
+            {% if unbooked %}
+                {% for item in unbooked %}
+                    <fieldset style="text-align:center;">
+                                <div style="text-align:center;">
+                                    <table style="margin: 20px auto; border-collapse: collapse; text-align: center;">
+                                        <tr>
+                                            <th style="...">Subject</th>
+                                            <th style="padding: 10px; border: 1px solid black;">Action</th>
+                                        </tr>
+                                        <tr>
+                                            <td style="padding: 10px; border: 1px solid black;">{{ item }}</td>
+                                            <td style="padding: 10px; border: 1px solid black;">
+                                            <form method="post">
+                                                {% csrf_token %}
+                                                <button class="btn btn-danger" name="Delete_Event" type="submit" value="{{ item.id }}">Delete</button>
+                                            </form>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                </fieldset>
+                {% endfor %}
+            {% else %}
+                <h3>You have no unbooked appointments</h3>
+            {% endif %}
+        {% elif page == "Tutor Requests" %}
             {% if requests %}
                 <fieldset style="margin-bottom:20px;">
                     {% for month in sorted_calendar %}
@@ -87,7 +238,86 @@
                     {% endfor %}
                     {% endfor %}
                 </fieldset>
+            {% else %}
+                <h3>You have no Requests</h3>
             {% endif %}
+        {% endif %}
+        {% else %}
+            {% if user.user_type == 2 %}
+            <h1>Unread</h1>
+            {% if unread_received_texts %}
+                {% for text in unread_received_texts %}
+                    <fieldset style="text-align:center;">
+                                <div style="text-align:center;">
+                                    <table style="margin: 20px auto; border-collapse: collapse; text-align: center;">
+                                        <tr>
+                                            <th style="...">Subject</th>
+                                            <th style="padding: 10px; border: 1px solid black;">Content</th>
+                                            <th style="padding: 10px; border: 1px solid black;">Date</th>
+                                            <th style="padding: 10px; border: 1px solid black;">Action</th>
+                                        </tr>
+                                        <tr>
+                                            <td style="padding: 10px; border: 1px solid black;">{{ text }}</td>
+                                            <td style="padding: 10px; border: 1px solid black;">{{ text.content }}</td>
+                                            <td style="padding: 10px; border: 1px solid black;">{{ text.time_stamp }}</td>
+                                            <td style="padding: 10px; border: 1px solid black;">
+                                            <form method="post">
+                                                {% csrf_token %}
+                                                <button class="btn btn-success" name="Mark as Read" type="submit" value="{{ text.id }}">Mark as Read</button>
+                                                <button class="btn btn-danger" name="Delete" type="submit" value="{{ text.id }}">Delete</button>
+                                                {% if text.sender %}
+                                                <input type="text" class="form-control" name="reply_message" placeholder="Leave a Reply">
+                                                <button class="btn btn-warning" name="Reply" type="submit" value="{{ text.id }}">Reply</button>
+                                                {% endif %}
+                                            </form>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                </fieldset>
+                {% endfor %}
+            {% else %}
+                    <h3 style="margin-top:20px;">You have no unread messages</h3>
+            {% endif %}
+        {% elif user.user_type == 1 %}
+            <h1>Tutor Requests</h1>
+            {% if requests %}
+                <fieldset style="margin-bottom:20px;">
+                    {% for month in sorted_calendar %}
+                        <legend>{{month}} Requests</legend>
+                            {% for request in requests %}
+                                {% if month == request.event_month %}
+                                <fieldset style="text-align:center;">
+                                <div style="text-align:center;">
+                                    <table style="margin: 20px auto; border-collapse: collapse; text-align: center;">
+                                        <tr>
+                                            <th style="padding: 10px; border: 1px solid black;">Date</th>
+                                            <th style="padding: 10px; border: 1px solid black;">Request</th>
+                                            <th style="padding: 10px; border: 1px solid black;">Action</th>
+                                        </tr>
+                                        <tr>
+                                            <td style="padding: 10px; border: 1px solid black;">{{ request.event_weekday }} {{ request.event_month }} {{ request.event_day }}</td>
+                                            <td style="padding: 10px; border: 1px solid black;">{{ request }}</td>
+                                            <td style="padding: 10px; border: 1px solid black;">
+                                            <form method="post">
+                                                {% csrf_token %}
+                                                <button class="btn btn-success" name="Accept" type="submit" value="{{ request.id }}">Accept</button>
+                                                <button class="btn btn-danger" name="Reject" type="submit" value="{{ request.id }}">Reject</button>
+                                            </form>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                </fieldset>
+                        {% endif %}
+                    {% endfor %}
+                    {% endfor %}
+                </fieldset>
+            {% else %}
+                <h3>You have no Requests</h3>
+            {% endif %}
+        {% endif %}
+
         {% endif %}
     </div>
 

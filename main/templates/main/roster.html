@@ -81,7 +81,7 @@
                                success: function (data) {
                                    calendar.fullCalendar('refetchEvents');
                                    if (year <= start_year && month <= start_month) {
-                                            if (day < start_day ||  (day == start_day && hour <= start_hour)) {
+                                            if (day < start_day ||  (day == start_day && hour <= start_hour) || (start_month>month && start_year>=year)) {
                                                     alert("Added Successfully");
                                             }
                                             else{
@@ -89,7 +89,7 @@
                                             }
                                         }
                                    else{
-                                       alert("Events not created, because the date has already passed");
+                                       alert("Events not created, because the date has already passed.");
                                    }
                                },
                                error: function (data) {
@@ -116,7 +116,7 @@
                                     success: function (data) {
                                         calendar.fullCalendar('refetchEvents');
                                         if (year <= start_year && month <= start_month) {
-                                            if (day < start_day ||  (day == start_day && hour <= start_hour)) {
+                                            if ((day < start_day ||  (day == start_day && hour <= start_hour)) || (start_month>month && start_year>=year)) {
                                                     alert("Added Successfully");
                                             }
                                             else{
@@ -124,7 +124,7 @@
                                             }
                                         }
                                         else{
-                                            alert("Events not created, because the date has already passed");
+                                            alert("Events not created, because the date has already passed.");
                                         }
                                     },
                                     error: function (data) {

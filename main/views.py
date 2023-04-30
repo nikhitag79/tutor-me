@@ -266,6 +266,12 @@ def mnemonic(response):
 
 def messages_and_requests(response):
     user = response.user
+    unplanned_events=[]
+    if user.user_type == 1:
+        unplanned_events = Event.objects.filter(tutor = user, isAval = True)
+        booked_events = Event.objects.filter(tutor = user, isAval = False)
+    if user.user_type == 2:
+        booked_events = Event.objects.filter(student=user)
     if user.id is not None:
         requests = Request.objects.filter(tutor = response.user)
         cal = {}
@@ -278,10 +284,13 @@ def messages_and_requests(response):
         scal = sorted(cal)
         for m in scal:
             sorted_cal[cal[m]] = cal[m]
-
-        received_texts = TextMessages.objects.filter(receiver = response.user)
-        print(received_texts)
-
+        page = ''
+        unread_received_texts = TextMessages.objects.filter(receiver = response.user, viewed = False)
+        read_texts = TextMessages.objects.filter(receiver = response.user, viewed = True)
+        sent_texts = TextMessages.objects.filter(sender = response.user)
+    if response.GET.get:
+        if response.GET:
+            page = response.GET['message_option']
     if response.POST.get('logout'):
         logout(response)
         return redirect("/")
@@ -310,7 +319,50 @@ def messages_and_requests(response):
                                            )                                                        ,
         request.delete()
         requests = Request.objects.filter(tutor=response.user)
-    return render(response, "main/message_request.html", {'name': 'Messages and Requests', 'user': user, 'requests': requests, 'sorted_calendar': sorted_cal, 'received_texts': received_texts})
+    elif response.POST.get("Mark as Read"):
+        message = TextMessages.objects.get(id=response.POST.get("Mark as Read"))
+        message.viewed = True
+        message.save()
+        unread_received_texts = TextMessages.objects.filter(receiver=response.user, viewed=False)
+    elif response.POST.get("Delete"):
+        message = TextMessages.objects.get(id=response.POST.get("Delete"))
+        if message.receiver == user:
+            if message.sender:
+                message.receiver = None
+                message.save()
+            else:
+                message.delete()
+        else:
+            if message.receiver:
+                message.sender = None
+                message.save()
+            else:
+                message.delete()
+        read_texts = TextMessages.objects.filter(receiver=response.user, viewed=True)
+    elif response.POST.get("Delete_Event"):
+        modified_event = Event.objects.get(id=response.POST.get("Delete_Event"))
+        if user.user_type == 1:
+            modified_event.delete()
+            unplanned_events = Event.objects.filter(tutor=user, isAval=True)
+            booked_events = Event.objects.filter(tutor=user, isAval=False)
+        if user.user_type == 2:
+            modified_event.student = None
+            modified_event.isAval = True
+            modified_event.save()
+            booked_events = Event.objects.filter(student=user)
+    elif response.POST.get("Reply"):
+        message = TextMessages.objects.get(id=response.POST.get("Reply"))
+        print(response.POST.get)
+        new_message = TextMessages.objects.create(content=response.POST.get('reply_message'),
+                                                  subject="Reply from " + user.username,
+                                                  time_stamp=datetime.datetime.now(),
+                                                  viewed=False,
+                                                  receiver=message.sender,
+                                                  sender=user
+                                                  )
+        page = "Sent"
+
+    return render(response, "main/message_request.html", {'name': 'Messages and Requests', 'user': user, 'requests': requests, 'sorted_calendar': sorted_cal, 'unread_received_texts': unread_received_texts, 'read_texts': read_texts, 'sent_texts': sent_texts, 'unbooked': unplanned_events, 'booked': booked_events, 'page': page})
 
 
 @login_required
@@ -504,7 +556,7 @@ def database_setup(request):
     user = request.user
     if request.method == "GET":
         if request.GET.get("create_database_json"):
-            major_url = "https://sisuva.admin.virginia.edu/psc/ihprd/UVSS/SA/s/WEBLIB_HCX_CM.H_CLASS_SEARCH.FieldFormula.IScript_ClassSearchOptions?institution=UVA01&term=1228"
+            major_url = "https://sisuva.admin.virginia.edu/psc/ihprd/UVSS/SA/s/WEBLIB_HCX_CM.H_CLASS_SEARCH.FieldFormula.IScript_ClassSearchOptions?institution=UVA01&term=1232"
             major_url_data = View.get_json_data(major_url)
             major_data = {'data': major_url_data}
             json_dict = {}
@@ -515,7 +567,7 @@ def database_setup(request):
                 pages = 100
                 for page_number in range(1, pages):
                     print("pages numbers", page_number)
-                    url = "https://sisuva.admin.virginia.edu/psc/ihprd/UVSS/SA/s/WEBLIB_HCX_CM.H_CLASS_SEARCH.FieldFormula.IScript_ClassSearch?institution=UVA01&term=1228&subject=" + search_mnemonic_json + "&page=" + str(
+                    url = "https://sisuva.admin.virginia.edu/psc/ihprd/UVSS/SA/s/WEBLIB_HCX_CM.H_CLASS_SEARCH.FieldFormula.IScript_ClassSearch?institution=UVA01&term=1232&subject=" + search_mnemonic_json + "&page=" + str(
                         page_number)
                     url_data = View.get_json_data(url)
                     data = {'data': url_data}
