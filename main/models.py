@@ -54,6 +54,25 @@ class ClassDatabase(models.Model):
     def __str__(self):
         return self.class_id + ' ' + self.class_name + ' ' + self.professors
 
+class ClassDescription(models.Model):
+    class_id = models.CharField(max_length=10, default='no class id')
+    class_mnen = models.CharField(max_length=100, default='no class mnemonic')
+    class_name = models.CharField(max_length=100, default='no class name')
+    def __str__(self):
+        return self.class_id
+
+class ClassName(models.Model):
+    class_mnen = models.CharField(max_length=100, default='no class mnemonic')
+    class_name = models.CharField(max_length=100, default='no class name')
+
+    def __str__(self):
+        return self.class_name
+
+class Professors(models.Model):
+    class_mnen = models.CharField(max_length=100, default='no class mnemonic')
+    professors = models.CharField(max_length=100, default='no professor')
+    def __str__(self):
+        return self.professors
 
 class Event(models.Model):
     id = models.AutoField(primary_key=True)
