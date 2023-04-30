@@ -87,7 +87,8 @@ class Event(models.Model):
     isAval = models.BooleanField(default=True)
     tutor = models.ForeignKey(User, on_delete=models.CASCADE,related_name='tutor_events',default=1)
     student= models.ForeignKey(User, on_delete = models.SET_NULL,related_name ='student_events',null=True)
-
+    def __str__(self):
+        return 'Tutoring appointment on ' + self.weekday + " " + self.month + " " + self.day + " " + self.start_hour
 
 class Request(models.Model):
     event_id = models.CharField(max_length=255, default='no event')
@@ -111,7 +112,7 @@ class TextMessages(models.Model):
     subject = models.CharField(max_length=255,null=True,blank=True)
     time_stamp = models.DateTimeField(null=True,blank=True)
     viewed = models.BooleanField(default=False)
-    receiver = models.ForeignKey(User, on_delete=models.CASCADE, related_name='receiver',default=1)
+    receiver = models.ForeignKey(User, on_delete=models.SET_NULL, related_name='receiver',null=True)
     sender = models.ForeignKey(User, on_delete = models.SET_NULL,related_name ='sender',null=True)
     def __str__(self):
         return self.subject
