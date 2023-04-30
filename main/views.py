@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 
-from .models import View, ClassDatabase, Event, Request, TextMessages
+from .models import View, ClassDatabase, Event, Request, TextMessages, ClassDescription, Professors, ClassName
 from django.contrib.auth import logout
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
@@ -12,6 +12,7 @@ import json
 from json import dumps
 import datetime
 import sys
+import re
 
 
 # Create your views here.
@@ -364,14 +365,38 @@ def searchbar_tutee(request):
                                                                               class_name=name,
                                                                               professors=instructor,
                                                                               class_mnen=search_mnemonic, tutors=group)
+                                if not ClassDescription.objects.filter(class_id=search_mnemonic + class_info).exists():
+                                    ClassDescription.objects.create(class_id=search_mnemonic + class_info,
+                                                                    class_name=name, class_mnen=search_mnemonic)
+                                if not Professors.objects.filter(professors=instructor,
+                                                                 class_mnen=search_mnemonic).exists():
+                                    Professors.objects.create(professors=instructor, class_mnen=search_mnemonic)
+                                if not ClassName.objects.filter(class_name=name).exists():
+                                    ClassName.objects.create(class_name=name, class_mnen=search_mnemonic)
                     else:
                         messages.error(request, "Not an existing mnemonic")
                         return redirect('/student_home/', {'name': 'Home'})
-            filters = FilterCourses(request.GET,queryset= existing_classes)
+            filters = FilterCourses(request.GET,queryset= existing_classes, filter_value=search_mnemonic)
             context = {"filters": filters,'name':search_mnemonic}
         else:
-            selection = ClassDatabase.objects.all()
-            filters = FilterCourses(request.GET, queryset=selection)
+            if request.GET['class_id']:
+                full_class_id = request.GET['class_id']
+                selected_description = ClassDescription.objects.get(id=full_class_id)
+                selected_mnem = selected_description.class_mnen
+                selection = ClassDatabase.objects.filter(class_mnen=selected_mnem)
+                filters = FilterCourses(request.GET, queryset=selection, filter_value=selected_mnem)
+            elif request.GET['class_name']:
+                full_class_name = request.GET['class_name']
+                selected_description = ClassName.objects.get(id=full_class_name)
+                selected_mnem = selected_description.class_mnen
+                selection = ClassDatabase.objects.filter(class_mnen=selected_mnem)
+                filters = FilterCourses(request.GET, queryset=selection, filter_value=selected_mnem)
+            else:
+                full_class_name = request.GET['professors']
+                selected_description = Professors.objects.get(id=full_class_name)
+                selected_mnem = selected_description.class_mnen
+                selection = ClassDatabase.objects.filter(class_mnen=selected_mnem)
+                filters = FilterCourses(request.GET, queryset=selection, filter_value=selected_mnem)
             class_name = ""
             for index, item in enumerate(filters.qs):
                 if index == 0 and len(filters.qs) == 1:
@@ -427,15 +452,39 @@ def searchbar_tutor(request):
                                                                               class_name=name,
                                                                               professors=instructor,
                                                                               class_mnen=search_mnemonic, tutors=group)
+                                if not ClassDescription.objects.filter(class_id=search_mnemonic + class_info).exists():
+                                    ClassDescription.objects.create(class_id=search_mnemonic + class_info,
+                                                                    class_name=name, class_mnen=search_mnemonic)
+                                if not Professors.objects.filter(professors=instructor,
+                                                                 class_mnen=search_mnemonic).exists():
+                                    Professors.objects.create(professors=instructor, class_mnen=search_mnemonic)
+                                if not ClassName.objects.filter(class_name=name).exists():
+                                    ClassName.objects.create(class_name=name, class_mnen=search_mnemonic)
                     else:
                         messages.error(request, "Not an existing mnemonic")
                         return redirect('/tutor_home/', {'name': 'Home', "results": tutor_group})
-            filters = FilterCourses(request.GET, queryset=existing_classes)
+            filters = FilterCourses(request.GET, queryset=existing_classes, filter_value=search_mnemonic)
 
             context = {"filters": filters, 'name': search_mnemonic, 'user': user, 'results': tutor_group}
         else:
-            selection = ClassDatabase.objects.all()
-            filters = FilterCourses(request.GET, queryset=selection)
+            if request.GET['class_id']:
+                full_class_id = request.GET['class_id']
+                selected_description = ClassDescription.objects.get(id=full_class_id)
+                selected_mnem = selected_description.class_mnen
+                selection = ClassDatabase.objects.filter(class_mnen=selected_mnem)
+                filters = FilterCourses(request.GET, queryset=selection, filter_value=selected_mnem)
+            elif request.GET['class_name']:
+                full_class_name = request.GET['class_name']
+                selected_description = ClassName.objects.get(id=full_class_name)
+                selected_mnem = selected_description.class_mnen
+                selection = ClassDatabase.objects.filter(class_mnen=selected_mnem)
+                filters = FilterCourses(request.GET, queryset=selection, filter_value=selected_mnem)
+            else:
+                full_class_name = request.GET['professors']
+                selected_description = Professors.objects.get(id=full_class_name)
+                selected_mnem = selected_description.class_mnen
+                selection = ClassDatabase.objects.filter(class_mnen=selected_mnem)
+                filters = FilterCourses(request.GET, queryset=selection, filter_value=selected_mnem)
             class_name = ""
             for index, item in enumerate(filters.qs):
                 if index == 0 and len(filters.qs) == 1:
@@ -510,4 +559,9 @@ def database_setup(request):
                                                                           professors=instructor,
                                                                           class_mnen=acronym, tutors=group)
                             class_instance.save()
+                            if not ClassDescription.objects.filter(class_id=acronym + class_info).exists():
+                                ClassDescription.objects.create(class_id=acronym + class_info,
+                                                                          class_name=name,class_mnen=acronym)
+                            if not Professors.objects.filter(professors=instructor, class_mnen=acronym).exists():
+                                Professors.objects.create(professors=instructor, class_mnen=acronym)
     return render(request, "main/database.html", {'name': 'Database Setup', 'user': user})

@@ -10,12 +10,14 @@
 
 <body>
   {% if user.user_type == 1 %}
-   <h1>Time Availability</h1>
+
     <form method="post">
       {% csrf_token %}
       <br>
       {% if user_in_group == 0 %}
          <button name = "tutor" type="submit" value = "tutor">Tutor for this Class</button>
+        {% else %}
+            <h1>Time Availability</h1>
       {% endif %}
 <!--      <input type="submit" value="Add Availability">-->
       <br>
