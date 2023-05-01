@@ -1,14 +1,14 @@
 {% extends 'main/base.html' %}
 
 {% block title_block %}
-   <h1 style="text-align:center">{{ name }} Search Class Mnemonic</h1>
+   <h1 style="text-align:center; margin-top:3%;">Search Class Mnemonic</h1>
 {% endblock %}
 
 
 
 {% block body_block %}
 
-    <div style="text-align:center; margin-top:50px;">
+    <div style="text-align:center; margin-top:50px; height: 70vh;">
         {% if messages %}
             <ul style="list-style-type:none; margin-bottom:30px;" class="messages">
                 {% for message in messages %}
@@ -20,7 +20,7 @@
         {% if user.user_type == 2 %}
             <h3 style="margin-top:20px;">Find Tutors</h3>
         {% elif user.user_type == 1 %}
-            <h3 style="margin-top:50px;">Find Classes to Tutor</h3>
+            <h3 style="margin-top:20px;">Find Classes to Tutor</h3>
         {% endif %}
             <form action="searchbar/" method="get" style="display:flex; justify-content:center; align-items:center; margin-top:20px;">
                 <div class="input-group" style="max-width:500px;">

@@ -1,7 +1,7 @@
 {% extends 'main/base.html' %}
 
 {% block title_block %}
-   <h1 style="text-align:center">{{ name }}</h1>
+   {% comment %} <h1 style="text-align:center">{{ name }}</h1> {% endcomment %}
 {% endblock %}
 
 
@@ -77,7 +77,7 @@
                                 </fieldset>
                 {% endfor %}
             {% else %}
-                <h3>You have no unread messages</h3>
+                <h3 style>You have no unread messages</h3>
             {% endif %}
         {% elif page == "Read" %}
             {% if read_texts %}
