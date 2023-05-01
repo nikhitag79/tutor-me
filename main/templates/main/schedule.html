@@ -100,40 +100,13 @@ function get_groups() {
                                     }
                                 });
                             }
-                        } else {
-                            if (confirm('Selecting here will add 48 events over the entire day.\n' +
+                        }
+                        else {
+                            alert('Selecting here will add 48 events over the entire day.\n' +
                                 'If that is what you actually want click ok.\n' +
-                                'Otherwise click cancel, and add in the week or day time sections!')) {
-                                var start_year = Number($.fullCalendar.formatDate(start, "Y"));
-                                var start_month = Number($.fullCalendar.formatDate(start, "MM"));
-                                var start_day = Number($.fullCalendar.formatDate(start, "DD"));
-                                var start_hour = Number($.fullCalendar.formatDate(start, "HH"));
-                                var start = $.fullCalendar.formatDate(start, "Y-MM-DD HH:mm:ss");
-                                var end = $.fullCalendar.formatDate(end, "Y-MM-DD HH:mm:ss");
-                                $.ajax({
-                                    type: "GET",
-                                    url: '/add_event',
-                                    data: {'title': title, 'start': start, 'end': end},
-                                    dataType: "json",
-                                    success: function (data) {
-                                        calendar.fullCalendar('refetchEvents');
-                                        if (year <= start_year && month <= start_month) {
-                                            if (day < start_day ||  (day == start_day && hour <= start_hour) || (start_month>month && start_year>=year)) {
-                                                    alert("Added Successfully");
-                                            }
-                                            else{
-                                                alert("Events not created, because the date has already passed");
-                                            }
-                                        }
-                                        else{
-                                            alert("Events not created, because the date has already passed");
-                                        }
-                                    },
-                                    error: function (data) {
-                                        alert('There is a problem!!!');
-                                    }
-                                });
-                            }
+                                'Otherwise click cancel, and add in the week or day time sections!')
+
+
                         }
                     }
                     else {
