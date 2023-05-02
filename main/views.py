@@ -72,6 +72,20 @@ def add_event(request):
     end = datetime.datetime.strptime(end, format)
     while time < end:
         if Event.objects.filter(name=str(title), start=time, end=time+datetime.timedelta(minutes=slot_time), tutor=request.user).exists():
+            TextMessages.objects.create(subject="Appointment Not Created",
+                                        content="The appointment you tried to create already exists!",
+                                        time_stamp=datetime.datetime.now(),
+                                        viewed=False,
+                                        receiver=request.user,
+                                        )
+            return JsonResponse(data)
+        if Event.objects.filter(start=time, end=time+datetime.timedelta(minutes=slot_time), tutor=request.user, isAval = False).exists():
+            TextMessages.objects.create(subject="Appointment Not Created",
+                                        content="The appointment you tried to create conflicts with an existing booked appointment, so it was not created.",
+                                        time_stamp=datetime.datetime.now(),
+                                        viewed=False,
+                                        receiver=request.user,
+                                        )
             return JsonResponse(data)
         event = Event(name=str(title), start=time, end=time + datetime.timedelta(minutes=slot_time), tutor=request.user,
                       month=time.strftime("%B"), weekday=time.strftime("%A"), day=time.strftime("%d"),
@@ -125,16 +139,26 @@ def all_events(request, class_id="", first_professors="", middle="", last_profes
 
 
 def update(request):
+    data = {}
     start = request.GET.get("start", None)
     end = request.GET.get("end", None)
     title = request.GET.get("title", None)
     id = request.GET.get("id", None)
     event = Event.objects.get(id=id)
+    if event.isAval == False:
+        return JsonResponse(data)
     event.start = start
     event.end = end
     event.name = title
+    format = "%Y-%m-%d %H:%M:%S"
+    slot_time = 30
+    time = datetime.datetime.strptime(event.start, format)
+    event.month = time.strftime("%B")
+    event.weekday = time.strftime("%A")
+    event.day = time.strftime("%d"),
+    event.start_hour = time.strftime("%H:%M"),
+    event.end_hour = (time + datetime.timedelta(minutes=slot_time)).strftime("%H:%M")
     event.save()
-    data = {}
     return JsonResponse(data)
 
 
@@ -229,8 +253,6 @@ def classes(response, class_id, first_professors, middle="", last_professors="")
                                             )
             event.delete()
     event_name = Event.objects.all()
-    # This is what we will use, using a different one for testing
-    # event_name = Event.objects.get(name= header)
     users = group_name.user_set.all()
     letters_only = ''.join(filter(str.isalpha, class_id))
 
@@ -369,7 +391,28 @@ def messages_and_requests(response):
                                                receiver=request.student,
                                                sender=request.tutor,
                                                )
+        if Request.objects.filter(event_id = adjusted_event.id).exists():
+            deleting_requests = Request.objects.filter(event_id = adjusted_event.id)
+            for req in deleting_requests:
+                new_text = TextMessages.objects.create(subject="Appointment Rejection",
+                                                       content="Unfortunately, " + req.tutor.username + " was unable to meet with you on " + req.event_weekday + ", " + req.event_month + ", " + req.event_day + "\nPlease try finding another time or available tutor!",
+                                                       time_stamp=datetime.datetime.now(),
+                                                       viewed=False,
+                                                       receiver=req.student
+                                                       ),
+                req.delete()
         requests = Request.objects.filter(tutor=response.user)
+        if Event.objects.filter(tutor=response.user, start=adjusted_event.start, end=adjusted_event.end, isAval = True):
+            deleting_events = Event.objects.filter(tutor=response.user, start=adjusted_event.start, end=adjusted_event.end, isAval = True)
+            for event in deleting_events:
+                new_text = TextMessages.objects.create(subject="Event Deleted",
+                                                       content="Because you allowed an appointment at this time to be booked.\n"
+                                                               " We deleted all of the other events at that time.",
+                                                       time_stamp=datetime.datetime.now(),
+                                                       viewed=False,
+                                                       receiver=req.student
+                                                       ),
+                event.delete()
     elif response.POST.get("Reject"):
         request = Request.objects.get(id=response.POST.get("Reject"))
         new_text = TextMessages.objects.create(subject="Appointment Rejection",
