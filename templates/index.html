@@ -36,7 +36,13 @@
    <div class = "container-fluid" style = "background-image:url('https://www.toptal.com/designers/subtlepatterns/uploads/y-so-serious-white.png'); background-repeat: repeat;">
        <div class = "row">
            <div class = "col-4" id = "leftside">
-               <!--<img src = "{% static 'testproject1/lineart-book-nobg.png' %}"/>-->
+               <img src = "https://logos-world.net/wp-content/uploads/2021/11/UVA-Logo.png"
+               style = "
+                    max-width: 70%;
+                    height: auto;
+                    width: auto\9;
+                    margin-left: 14%;
+                    margin-top: 35vh;"/>
                {% comment %} <p>Put an image here</p> {% endcomment %}
            </div><!--'https://www.toptal.com/designers/subtlepatterns/uploads/y-so-serious-white.png'-->
            <div class = "d-flex align-items-center justify-content-center col-6" id = "rightside" style = " width: 65%;">
@@ -76,12 +82,9 @@
    }
 </style>
 
-<div class="row" id="row-bot">
-   <a href="/tutor_home/">Tutor Home ➜ </a>
+<div class="row" id="row-bot"style = "margin-top: 4%;">
+   <a href="/tutor_home/" >Tutor Home ➜ </a>
 </div>
-
-
-
                    {% elif user.user_type == 2%}
                        <div class="row" id = "row-top">
                            <h1 id = "welcome">Welcome, {{ user.username }} :)</h1>
@@ -110,7 +113,7 @@
        background-color: rgba(241, 129, 23, 1);
    }
 </style>
-                       <div class="row" id = "row-bot">
+                       <div class="row" id = "row-bot"style = "margin-top: 4%;">
                            <a href="/student_home/"> Student Home ➜ </a>
                        </div>
                    {% endif %}
