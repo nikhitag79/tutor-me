@@ -16,7 +16,6 @@
          margin-bottom: 1%;
          margin-left: 10%;
          margin-right: 10%;
-         height: auto;
          flex: 1;
          display: flex;
          flex-direction: column;
@@ -61,7 +60,7 @@
                   {%for group in user.groups.all %}
                     <!-- "https://tutor-me-uva.herokuapp.com/{{group}}" #For Heroku-->
                     <!-- "http://127.0.0.1:8000/{{group}}" #For Heroku-->
-                    <li><a href = "https://tutor-me-uva.herokuapp.com/{{group}}">{{group}}</a></li> <!--  HAVE TO CHANGE THIS HARD CODE-->
+                    <li><a class = "nav-link" style = "white-space: nowrap;"href = "http://127.0.0.1:8000/{{group}}">{{group}}</a></li> <!--  HAVE TO CHANGE THIS HARD CODE-->
                   {% endfor %}
                 </ul>
               </li>
@@ -74,9 +73,9 @@
                     Account
                   </a>
                   <ul class="dropdown-menu dropdown-menu-end dropdown-menu-dark" aria-labelledby="navbarDarkDropdownMenuLink">
-                    <li><a class="dropdown-item" href="/account/">View Profile</a></li>
+                    <li><a class="dropdown-item" href="/account/" style = "text-align: right;">View Profile</a></li>
                     <li><form method = "POST">{% csrf_token %}
-                      <button name = "logout" value="logout" type="submit">Logout</button>
+                      <button class = "dropdown-item" name = "logout" value="logout" type="submit" style = "text-align: right;">Logout</button>
                     </form></li>
                   </ul>
                 </li>

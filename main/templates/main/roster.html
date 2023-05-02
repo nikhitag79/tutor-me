@@ -8,17 +8,28 @@
 
 {% block body_block %}
 
-<body>
+<body >
   {% if user.user_type == 1 %}
-
+<div style="height:80vh;">
     <form method="post">
       {% csrf_token %}
       <br>
-      {% if user_in_group == 0 %}
-         <button name = "tutor" type="submit" value = "tutor">Tutor for this Class</button>
-        {% else %}
-            <h1>Time Availability</h1>
-      {% endif %}
+{% if user_in_group == 0 %}
+  <button name="tutor" type="submit" value="tutor" style="
+    display: block;
+    margin: 0 auto;
+    margin-top: 7%;
+    padding: 10px 15px;
+    color: #fff;
+    background-color: #007bff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  ">Tutor for this Class</button>
+{% else %}
+  <h1>Time Availability</h1>
+{% endif %}
+
 <!--      <input type="submit" value="Add Availability">-->
       <br>
       {% for person in group.user_set.all%}
@@ -226,6 +237,7 @@
       </fieldset>
   {% endif %}
   </form>
+    </div>
   </body>
 
 {% endblock %}
