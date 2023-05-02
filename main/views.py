@@ -153,7 +153,8 @@ def update(request):
     format = "%Y-%m-%d %H:%M:%S"
     slot_time = 30
     time = datetime.datetime.strptime(event.start, format)
-    event.month = time.strftime("%B")
+    event.month = \
+        time.strftime("%B")
     event.weekday = time.strftime("%A")
     event.day = time.strftime("%d"),
     event.start_hour = time.strftime("%H:%M"),

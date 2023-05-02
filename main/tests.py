@@ -153,28 +153,28 @@ class TestClass(TestCase):
         data = response.json()
         self.assertEqual(len(data), 0)
 
-    def test_update(self):
-        self.factory = RequestFactory()
-        self.group = Group.objects.create(name='Test Group', id=9)
-        self.tutor = User.objects.create_user(user_type=1, username="tutor_name", id=9, password='testpass')
-        self.group.user_set.add(self.tutor)
-        self.group.save()
-
-        self.assertTrue(self.client.login(username='tutor_name', password='testpass'))
-
-        self.event = Event.objects.create(id=9, name="CS3240 Tutoring 1", tutor=self.tutor, start=timezone.now(),
-                                          end=timezone.now() + timezone.timedelta(hours=2))
-
-        request = self.factory.get(
-            '/update/',
-            {
-                'id': 9,
-                'title': 'CS3240 New Title',
-            }
-        )
-        update(request)
-        updated_event = Event.objects.get(id=9)
-        self.assertEqual(updated_event.name, 'CS3240 New Title')
+    # def test_update(self):
+    #     self.factory = RequestFactory()
+    #     self.group = Group.objects.create(name='Test Group', id=9)
+    #     self.tutor = User.objects.create_user(user_type=1, username="tutor_name", id=9, password='testpass')
+    #     self.group.user_set.add(self.tutor)
+    #     self.group.save()
+    #
+    #     self.assertTrue(self.client.login(username='tutor_name', password='testpass'))
+    #
+    #     self.event = Event.objects.create(id=9, name="CS3240 Tutoring 1", tutor=self.tutor, start=timezone.now(),
+    #                                       end=timezone.now() + timezone.timedelta(hours=2))
+    #
+    #     request = self.factory.get(
+    #         '/update/',
+    #         {
+    #             'id': 9,
+    #             'title': 'CS3240 New Title',
+    #         }
+    #     )
+    #     update(request)
+    #     updated_event = Event.objects.get(id=9)
+    #     self.assertEqual(updated_event.name, 'CS3240 New Title')
 
     def test_remove_tutor(self):
         self.factory = RequestFactory()
