@@ -47,20 +47,22 @@
         {% if page == "Unread" %}
             {% if unread_received_texts %}
                 {% for text in unread_received_texts %}
-                    <fieldset style="text-align:center;">
+                    <fieldset>
                                 <div style="text-align:center;">
-                                    <table style="margin: 20px auto; border-collapse: collapse; text-align: center;">
-                                        <tr>
+                                    <table style ="..." style="margin: 20px auto; border-collapse: collapse; text-align: center;">
+                                        <thead>
+                                        <tr style = "...">
                                             <th style="...">Subject</th>
-                                            <th style="padding: 10px; border: 1px solid black;">Content</th>
-                                            <th style="padding: 10px; border: 1px solid black;">Date</th>
-                                            <th style="padding: 10px; border: 1px solid black;">Action</th>
+                                            <th style="...">Content</th>
+                                            <th style="...">Date</th>
+                                            <th style="...">Action</th>
                                         </tr>
+                                        </thead>
                                         <tr>
-                                            <td style="padding: 10px; border: 1px solid black;">{{ text }}</td>
-                                            <td style="padding: 10px; border: 1px solid black;">{{ text.content }}</td>
-                                            <td style="padding: 10px; border: 1px solid black;">{{ text.time_stamp }}</td>
-                                            <td style="padding: 10px; border: 1px solid black;">
+                                            <td style="...">{{ text }}</td>
+                                            <td style="...">{{ text.content }}</td>
+                                            <td style="...">{{ text.time_stamp }}</td>
+                                            <td style="...">
                                             <form method="post">
                                                 {% csrf_token %}
                                                 <button class="btn btn-success" name="Mark as Read" type="submit" value="{{ text.id }}">Mark as Read</button>
@@ -82,20 +84,22 @@
         {% elif page == "Read" %}
             {% if read_texts %}
                 {% for text in read_texts %}
-                    <fieldset style="text-align:center;">
+                    <fieldset>
                                 <div style="text-align:center;">
-                                    <table style="margin: 20px auto; border-collapse: collapse; text-align: center;">
-                                        <tr>
+                                    <table style ="..." style="margin: 20px auto; border-collapse: collapse; text-align: center;">
+                                        <thead>
+                                        <tr style = "...">
                                             <th style="...">Subject</th>
-                                            <th style="padding: 10px; border: 1px solid black;">Content</th>
-                                            <th style="padding: 10px; border: 1px solid black;">Date</th>
-                                            <th style="padding: 10px; border: 1px solid black;">Action</th>
+                                            <th style="...">Content</th>
+                                            <th style="...">Date</th>
+                                            <th style="...">Action</th>
                                         </tr>
+                                        </thead>
                                         <tr>
-                                            <td style="padding: 10px; border: 1px solid black;">{{ text }}</td>
-                                            <td style="padding: 10px; border: 1px solid black;">{{ text.content }}</td>
-                                            <td style="padding: 10px; border: 1px solid black;">{{ text.time_stamp }}</td>
-                                            <td style="padding: 10px; border: 1px solid black;">
+                                            <td style="...">{{ text }}</td>
+                                            <td style="...">{{ text.content }}</td>
+                                            <td style="...">{{ text.time_stamp }}</td>
+                                            <td style="...">
                                             <form method="post">
                                                 {% csrf_token %}
                                                 <button class="btn btn-danger" name="Delete" type="submit" value="{{ text.id }}">Delete</button>
@@ -116,20 +120,22 @@
         {% elif page == "Sent" %}
             {% if sent_texts %}
                 {% for text in sent_texts %}
-                    <fieldset style="text-align:center;">
+                    <fieldset>
                                 <div style="text-align:center;">
-                                    <table style="margin: 20px auto; border-collapse: collapse; text-align: center;">
-                                        <tr>
+                                    <table style ="..." style="margin: 20px auto; border-collapse: collapse; text-align: center;">
+                                        <thead>
+                                        <tr style = "...">
                                             <th style="...">Subject</th>
-                                            <th style="padding: 10px; border: 1px solid black;">Content</th>
-                                            <th style="padding: 10px; border: 1px solid black;">Date</th>
-                                            <th style="padding: 10px; border: 1px solid black;">Action</th>
+                                            <th style="...">Content</th>
+                                            <th style="...">Date</th>
+                                            <th style="...">Action</th>
                                         </tr>
+                                        </thead>
                                         <tr>
-                                            <td style="padding: 10px; border: 1px solid black;">{{ text }}</td>
-                                            <td style="padding: 10px; border: 1px solid black;">{{ text.content }}</td>
-                                            <td style="padding: 10px; border: 1px solid black;">{{ text.time_stamp }}</td>
-                                            <td style="padding: 10px; border: 1px solid black;">
+                                            <td style="...">{{ text }}</td>
+                                            <td style="...">{{ text.content }}</td>
+                                            <td style="...">{{ text.time_stamp }}</td>
+                                            <td style="...">
                                             <form method="post">
                                                 {% csrf_token %}
                                                 <button class="btn btn-danger" name="Delete" type="submit" value="{{ text.id }}">Delete</button>
@@ -146,26 +152,28 @@
         {% elif page == "Upcoming" %}
             {% if booked %}
                 {% for item in booked %}
-                    <fieldset style="text-align:center;">
+                    <fieldset>
                                 <div style="text-align:center;">
-                                    <table style="margin: 20px auto; border-collapse: collapse; text-align: center;">
-                                        <tr>
+                                    <table style ="..." style="margin: 20px auto; border-collapse: collapse; text-align: center;">
+                                        <thead>
+                                        <tr style = "...">
                                             <th style="...">Subject</th>
                                             {%if user.user_type == 2 %}
-                                            <th style="padding: 10px; border: 1px solid black;">Tutor</th>
+                                            <th style="...">Tutor</th>
                                             {%elif user.user_type == 1 %}
-                                            <th style="padding: 10px; border: 1px solid black;">Student</th>
+                                            <th style="...">Student</th>
                                             {% endif %}
-                                            <th style="padding: 10px; border: 1px solid black;">Action</th>
+                                            <th style="...">Action</th>
                                         </tr>
+                                        </thead>
                                         <tr>
-                                            <td style="padding: 10px; border: 1px solid black;">{{ item }}</td>
+                                            <td style="...">{{ item }}</td>
                                             {%if user.user_type == 2 %}
-                                            <td style="padding: 10px; border: 1px solid black;">{{ item.tutor }}</td>
+                                            <td style="...">{{ item.tutor }}</td>
                                             {%elif user.user_type == 1 %}
-                                            <td style="padding: 10px; border: 1px solid black;">{{ item.student }}</td>
+                                            <td style="...">{{ item.student }}</td>
                                             {% endif %}
-                                            <td style="padding: 10px; border: 1px solid black;">
+                                            <td style="...">
                                             <form method="post">
                                                 {% csrf_token %}
                                                 <button class="btn btn-danger" name="Delete_Event" type="submit" value="{{ item.id }}">Delete</button>
@@ -182,16 +190,18 @@
         {% elif page == "Unaccepted" %}
             {% if unbooked %}
                 {% for item in unbooked %}
-                    <fieldset style="text-align:center;">
+                    <fieldset>
                                 <div style="text-align:center;">
-                                    <table style="margin: 20px auto; border-collapse: collapse; text-align: center;">
-                                        <tr>
+                                    <table style ="..." style="margin: 20px auto; border-collapse: collapse; text-align: center;">
+                                        <thead>
+                                        <tr style = "...">
                                             <th style="...">Subject</th>
-                                            <th style="padding: 10px; border: 1px solid black;">Action</th>
+                                            <th style="...">Action</th>
                                         </tr>
+                                        </thead>
                                         <tr>
-                                            <td style="padding: 10px; border: 1px solid black;">{{ item }}</td>
-                                            <td style="padding: 10px; border: 1px solid black;">
+                                            <td style="...">{{ item }}</td>
+                                            <td style="...">
                                             <form method="post">
                                                 {% csrf_token %}
                                                 <button class="btn btn-danger" name="Delete_Event" type="submit" value="{{ item.id }}">Delete</button>
@@ -207,23 +217,25 @@
             {% endif %}
         {% elif page == "Tutor Requests" %}
             {% if requests %}
-                <fieldset style="margin-bottom:20px;">
+                <fieldset>
                     {% for month in sorted_calendar %}
                         <legend>{{month}} Requests</legend>
                             {% for request in requests %}
                                 {% if month == request.event_month %}
-                                <fieldset style="text-align:center;">
+                                <fieldset>
                                 <div style="text-align:center;">
-                                    <table style="margin: 20px auto; border-collapse: collapse; text-align: center;">
-                                        <tr>
-                                            <th style="padding: 10px; border: 1px solid black;">Date</th>
-                                            <th style="padding: 10px; border: 1px solid black;">Request</th>
-                                            <th style="padding: 10px; border: 1px solid black;">Action</th>
+                                    <table style ="..." style="margin: 20px auto; border-collapse: collapse; text-align: center;">
+                                        <thead>
+                                        <tr style = "...">
+                                            <th style="...">Date</th>
+                                            <th style="...">Request</th>
+                                            <th style="...">Action</th>
                                         </tr>
+                                        </thead>
                                         <tr>
-                                            <td style="padding: 10px; border: 1px solid black;">{{ request.event_weekday }} {{ request.event_month }} {{ request.event_day }}</td>
-                                            <td style="padding: 10px; border: 1px solid black;">{{ request }}</td>
-                                            <td style="padding: 10px; border: 1px solid black;">
+                                            <td style="...">{{ request.event_weekday }} {{ request.event_month }} {{ request.event_day }}</td>
+                                            <td style="...">{{ request }}</td>
+                                            <td style="...">
                                             <form method="post">
                                                 {% csrf_token %}
                                                 <button class="btn btn-success" name="Accept" type="submit" value="{{ request.id }}">Accept</button>
@@ -247,20 +259,22 @@
             <h1>Unread</h1>
             {% if unread_received_texts %}
                 {% for text in unread_received_texts %}
-                    <fieldset style="text-align:center;">
+                    <fieldset>
                                 <div style="text-align:center;">
-                                    <table style="margin: 20px auto; border-collapse: collapse; text-align: center;">
-                                        <tr>
+                                    <table style ="..." style="margin: 20px auto; border-collapse: collapse; text-align: center;">
+                                        <thead>
+                                        <tr style = "...">
                                             <th style="...">Subject</th>
-                                            <th style="padding: 10px; border: 1px solid black;">Content</th>
-                                            <th style="padding: 10px; border: 1px solid black;">Date</th>
-                                            <th style="padding: 10px; border: 1px solid black;">Action</th>
+                                            <th style="...">Content</th>
+                                            <th style="...">Date</th>
+                                            <th style="...">Action</th>
                                         </tr>
+                                        </thead>
                                         <tr>
-                                            <td style="padding: 10px; border: 1px solid black;">{{ text }}</td>
-                                            <td style="padding: 10px; border: 1px solid black;">{{ text.content }}</td>
-                                            <td style="padding: 10px; border: 1px solid black;">{{ text.time_stamp }}</td>
-                                            <td style="padding: 10px; border: 1px solid black;">
+                                            <td style="...">{{ text }}</td>
+                                            <td style="...">{{ text.content }}</td>
+                                            <td style="...">{{ text.time_stamp }}</td>
+                                            <td style="...">
                                             <form method="post">
                                                 {% csrf_token %}
                                                 <button class="btn btn-success" name="Mark as Read" type="submit" value="{{ text.id }}">Mark as Read</button>
@@ -282,23 +296,25 @@
         {% elif user.user_type == 1 %}
             <h1>Tutor Requests</h1>
             {% if requests %}
-                <fieldset style="margin-bottom:20px;">
+                <fieldset>
                     {% for month in sorted_calendar %}
                         <legend>{{month}} Requests</legend>
                             {% for request in requests %}
                                 {% if month == request.event_month %}
-                                <fieldset style="text-align:center;">
+                                <fieldset>
                                 <div style="text-align:center;">
-                                    <table style="margin: 20px auto; border-collapse: collapse; text-align: center;">
-                                        <tr>
-                                            <th style="padding: 10px; border: 1px solid black;">Date</th>
-                                            <th style="padding: 10px; border: 1px solid black;">Request</th>
-                                            <th style="padding: 10px; border: 1px solid black;">Action</th>
+                                    <table style ="..." style="margin: 20px auto; border-collapse: collapse; text-align: center;">
+                                        <thead>
+                                        <tr style = "...">
+                                            <th style="...">Date</th>
+                                            <th style="...">Request</th>
+                                            <th style="...">Action</th>
                                         </tr>
+                                        </thead>
                                         <tr>
-                                            <td style="padding: 10px; border: 1px solid black;">{{ request.event_weekday }} {{ request.event_month }} {{ request.event_day }}</td>
-                                            <td style="padding: 10px; border: 1px solid black;">{{ request }}</td>
-                                            <td style="padding: 10px; border: 1px solid black;">
+                                            <td style="...">{{ request.event_weekday }} {{ request.event_month }} {{ request.event_day }}</td>
+                                            <td style="...">{{ request }}</td>
+                                            <td style="...">
                                             <form method="post">
                                                 {% csrf_token %}
                                                 <button class="btn btn-success" name="Accept" type="submit" value="{{ request.id }}">Accept</button>

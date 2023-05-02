@@ -97,6 +97,26 @@ def all_events(request, class_id="", first_professors="", middle="", last_profes
     for event in all_events:
         event_end = event.end
         if now.timestamp() > event_end.timestamp():
+            if event.student:
+                TextMessages.objects.create(subject="Appointment Deleted",
+                                        content="The appointment with " + event.student.username + " on " + event.weekday + ", " + event.month + ", " + event.day + " has passed and has been deleted",
+                                        time_stamp=datetime.datetime.now(),
+                                        viewed=False,
+                                        receiver=event.tutor,
+                                        )
+                TextMessages.objects.create(subject="Appointment Deleted",
+                                            content="The appointment with " + event.tutor.username + " on " + event.weekday + ", " + event.month + ", " + event.day + " has passed and has been deleted",
+                                            time_stamp=datetime.datetime.now(),
+                                            viewed=False,
+                                            receiver=event.tutor,
+                                            )
+            else:
+                TextMessages.objects.create(subject="Appointment Deleted",
+                                            content="The appointment with on " + str(event.weekday) + ", " + str(event.month) + ", " + str(event.day) + " was not accepted, has passed, and has been deleted",
+                                            time_stamp=datetime.datetime.now(),
+                                            viewed=False,
+                                            receiver=event.tutor,
+                                            )
             event.delete()
         else:
             out.append({
@@ -129,11 +149,24 @@ def remove(request):
     event = Event.objects.get(id=id)
     data = {}
     if user.user_type == 1:
+        if event.student:
+            TextMessages.objects.create(subject="Appointment Deleted",
+                                        content=request.user.username + " canceled their appointment on " + event.weekday + ", " + event.month + ", " + event.day + ".\nPlease make sure to schedule another tutoring session if it is still required.!",
+                                        time_stamp=datetime.datetime.now(),
+                                        viewed=False,
+                                        receiver=event.student,
+                                        )
         event.delete()
     if user.user_type == 2:
         event.student = None
         event.isAval = True
         event.save()
+        TextMessages.objects.create(subject="Appointment Deleted",
+                                    content=str(user.username) + " canceled their appointment on " + str(event.weekday) + ", " + str(event.month) + ", " + str(event.day) + ".\nThe appointment is once again open!",
+                                    time_stamp=datetime.datetime.now(),
+                                    viewed=False,
+                                    receiver=event.tutor,
+                                    )
     return JsonResponse(data)
 
 
@@ -149,9 +182,12 @@ def account(response):
             if response.user.username == new_username or new_username == '':
                 return render(response, "main/account.html",
                               {'name': 'Account', 'error': 'That is already your username!'})
-            if User.objects.filter(username=new_username).exists():
+            elif User.objects.filter(username=new_username).exists():
                 return render(response, "main/account.html",
                               {'name': 'Account', 'error': 'That user name is already taken. Try again'})
+            elif len(new_username) >= 20:
+                return render(response, "main/account.html",
+                              {'name': 'Account', 'error': 'The user name could not be changed, The username must be shorter than 30 characters!'})
             else:
                 response.user.username = new_username
                 response.user.save()
@@ -181,7 +217,26 @@ def classes(response, class_id, first_professors, middle="", last_professors="")
     for event in event_name:
         event_end = event.end
         if now.timestamp() > event_end.timestamp():
-            print("should not be seen, needs to be deleted, may add notification model")
+            if event.student:
+                TextMessages.objects.create(subject="Appointment Deleted",
+                                        content="The appointment with " + event.student.username + " on " + event.weekday + ", " + event.month + ", " + event.day + " has passed and has been deleted",
+                                        time_stamp=datetime.datetime.now(),
+                                        viewed=False,
+                                        receiver=event.tutor,
+                                        )
+                TextMessages.objects.create(subject="Appointment Deleted",
+                                            content="The appointment with " + event.tutor.username + " on " + event.weekday + ", " + event.month + ", " + event.day + " has passed and has been deleted",
+                                            time_stamp=datetime.datetime.now(),
+                                            viewed=False,
+                                            receiver=event.student,
+                                            )
+            else:
+                TextMessages.objects.create(subject="Appointment Deleted",
+                                            content="The appointment on " + event.weekday + ", " + event.month + ", " + event.day + " was not accepted, has passed, and has been deleted",
+                                            time_stamp=datetime.datetime.now(),
+                                            viewed=False,
+                                            receiver=event.tutor,
+                                            )
             event.delete()
     event_name = Event.objects.all()
     print('event_name', event_name)
@@ -215,7 +270,12 @@ def classes(response, class_id, first_professors, middle="", last_professors="")
                     if group.user_set.all().count() == 0:
                         cleaned_events = Event.objects.filter(tutor=user, name = header)
                         for event in cleaned_events:
-                            print(event)
+                            TextMessages.objects.create(subject="Appointment Deleted",
+                                                        content="The appointment on " + event.weekday + ", " + event.month + ", " +  event.day + " has been deleted.",
+                                                        time_stamp=datetime.datetime.now(),
+                                                        viewed=False,
+                                                        receiver=event.student,
+                                                        )
                             event.delete()
                         my_instance = ClassDatabase.objects.filter(class_id=class_id, professors=professors).first()
                         my_instance.available_tutors = False
@@ -235,7 +295,20 @@ def classes(response, class_id, first_professors, middle="", last_professors="")
                                                  event_start_hour=this_event.start_hour,
                                                  event_end_hour=this_event.end_hour)
                 request.save()
+                TextMessages.objects.create(subject="Requested Appointment",
+                                            content="Sent a request to " + request.tutor.username + " for " + request.event_weekday + ", " + request.event_month + ", " + request.event_day + "\nYou will be notified if they are able attend.",
+                                            time_stamp=datetime.datetime.now(),
+                                            viewed=False,
+                                            receiver=response.user,
+                                            )
                 return redirect("/student_home/searchbar/?mnemonic=" + letters_only)
+
+            TextMessages.objects.create(subject="Requested Appointment",
+                                        content="You already requested this appointment so the request was not made! " + this_event.tutor.username + " will get in touch with you regarding your previous event when they can.",
+                                        time_stamp=datetime.datetime.now(),
+                                        viewed=False,
+                                        receiver=response.user,
+                                        )
             return redirect("/student_home/searchbar/?mnemonic=" + letters_only)
 
     user_in_group = 0
@@ -352,7 +425,8 @@ def messages_and_requests(response):
             booked_events = Event.objects.filter(student=user)
     elif response.POST.get("Reply"):
         message = TextMessages.objects.get(id=response.POST.get("Reply"))
-        print(response.POST.get)
+        message.viewed = True
+        message.save()
         new_message = TextMessages.objects.create(content=response.POST.get('reply_message'),
                                                   subject="Reply from " + user.username,
                                                   time_stamp=datetime.datetime.now(),
@@ -397,7 +471,7 @@ def searchbar_tutee(request):
             search_mnemonic = str(search).upper()
             print("search mnemon", search_mnemonic)
             existing_list = []
-            existing_classes = ClassDatabase.objects.filter(class_mnen=search_mnemonic)
+            existing_classes = ClassDatabase.objects.filter(class_mnen=search_mnemonic).order_by('class_id')
             for i in existing_classes:
                 existing_list.append(str(i))
             if not existing_list:
@@ -431,6 +505,7 @@ def searchbar_tutee(request):
             filters = FilterCourses(request.GET,queryset= existing_classes, filter_value=search_mnemonic)
             context = {"filters": filters,'name':search_mnemonic}
         else:
+            print(request.GET)
             if request.GET['class_id']:
                 full_class_id = request.GET['class_id']
                 selected_description = ClassDescription.objects.get(id=full_class_id)
@@ -443,12 +518,18 @@ def searchbar_tutee(request):
                 selected_mnem = selected_description.class_mnen
                 selection = ClassDatabase.objects.filter(class_mnen=selected_mnem)
                 filters = FilterCourses(request.GET, queryset=selection, filter_value=selected_mnem)
-            else:
+            elif request.GET['professors']:
                 full_class_name = request.GET['professors']
                 selected_description = Professors.objects.get(id=full_class_name)
                 selected_mnem = selected_description.class_mnen
                 selection = ClassDatabase.objects.filter(class_mnen=selected_mnem)
                 filters = FilterCourses(request.GET, queryset=selection, filter_value=selected_mnem)
+            else:
+                messages.error(request, "You must choose a valid parameter before searching!")
+                if request.user.user_type == 1:
+                    return redirect('/tutor_home/')
+                elif request.user.user_type == 2:
+                    return redirect('/student_home/')
             class_name = ""
             for index, item in enumerate(filters.qs):
                 if index == 0 and len(filters.qs) == 1:
@@ -519,6 +600,7 @@ def searchbar_tutor(request):
 
             context = {"filters": filters, 'name': search_mnemonic, 'user': user, 'results': tutor_group}
         else:
+            print(request.GET)
             if request.GET['class_id']:
                 full_class_id = request.GET['class_id']
                 selected_description = ClassDescription.objects.get(id=full_class_id)
@@ -531,12 +613,19 @@ def searchbar_tutor(request):
                 selected_mnem = selected_description.class_mnen
                 selection = ClassDatabase.objects.filter(class_mnen=selected_mnem)
                 filters = FilterCourses(request.GET, queryset=selection, filter_value=selected_mnem)
-            else:
+            elif request.GET['professors']:
                 full_class_name = request.GET['professors']
                 selected_description = Professors.objects.get(id=full_class_name)
                 selected_mnem = selected_description.class_mnen
                 selection = ClassDatabase.objects.filter(class_mnen=selected_mnem)
                 filters = FilterCourses(request.GET, queryset=selection, filter_value=selected_mnem)
+            else:
+                print('user', request.user.user_type)
+                messages.error(request, "You must choose a valid parameter before searching!")
+                if request.user.user_type == 1:
+                    return redirect('/tutor_home/')
+                elif request.user.user_type == 2:
+                    return redirect('/student_home/')
             class_name = ""
             for index, item in enumerate(filters.qs):
                 if index == 0 and len(filters.qs) == 1:
