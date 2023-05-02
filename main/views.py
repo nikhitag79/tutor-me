@@ -471,7 +471,7 @@ def searchbar_tutee(request):
             search_mnemonic = str(search).upper()
             print("search mnemon", search_mnemonic)
             existing_list = []
-            existing_classes = ClassDatabase.objects.filter(class_mnen=search_mnemonic)
+            existing_classes = ClassDatabase.objects.filter(class_mnen=search_mnemonic).order_by('class_id')
             for i in existing_classes:
                 existing_list.append(str(i))
             if not existing_list:
