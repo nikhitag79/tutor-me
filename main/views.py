@@ -487,7 +487,7 @@ def searchbar_tutee(request):
                                 if not ClassName.objects.filter(class_name=name).exists():
                                     ClassName.objects.create(class_name=name, class_mnen=search_mnemonic)
                     else:
-                        messages.error(request, "Not an existing mnemonic")
+                        messages.error(request, "Not an existing mnemonic.")
                         return redirect('/student_home/', {'name': 'Home'})
             filters = FilterCourses(request.GET,queryset= existing_classes, filter_value=search_mnemonic)
             context = {"filters": filters,'name':search_mnemonic}
@@ -580,7 +580,7 @@ def searchbar_tutor(request):
                                 if not ClassName.objects.filter(class_name=name).exists():
                                     ClassName.objects.create(class_name=name, class_mnen=search_mnemonic)
                     else:
-                        messages.error(request, "Not an existing mnemonic")
+                        messages.error(request, "Not an existing mnemonic.")
                         return redirect('/tutor_home/', {'name': 'Home', "results": tutor_group})
             filters = FilterCourses(request.GET, queryset=existing_classes, filter_value=search_mnemonic)
 

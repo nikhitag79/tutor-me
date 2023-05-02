@@ -6,17 +6,17 @@ class FilterCourses(django_filters.FilterSet):
     class_id = django_filters.ModelChoiceFilter(
         queryset=ClassDatabase.objects.none(),
         widget=forms.Select,
-        label="class_id"
+        label="Class ID"
     )
     class_name = django_filters.ModelChoiceFilter(
         queryset=ClassDatabase.objects.none(),
         widget=forms.Select,
-        label="class_name"
+        label="Class Name"
     )
     professors = django_filters.ModelChoiceFilter(
         queryset=ClassDatabase.objects.none(),
         widget=forms.Select,
-        label="professors"
+        label="Professor"
     )
 
     def __init__(self, *args, **kwargs):
