@@ -25,7 +25,7 @@ class FilterCourses(django_filters.FilterSet):
 
         # Filter queryset based on user input value
         if filter_value:
-            self.filters['class_id'].queryset = ClassDescription.objects.filter(class_mnen=filter_value)
+            self.filters['class_id'].queryset = ClassDescription.objects.filter(class_mnen=filter_value).order_by("class_id")
             self.filters['class_name'].queryset = ClassName.objects.filter(class_mnen=filter_value)
             self.filters['professors'].queryset = Professors.objects.filter(class_mnen=filter_value)
         print(self.filters['class_id'].queryset)
