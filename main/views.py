@@ -76,7 +76,7 @@ def add_event(request):
                                         content="The appointment you tried to create already exists!",
                                         time_stamp=datetime.datetime.now(),
                                         viewed=False,
-                                        receiver=event.tutor,
+                                        receiver=request.user,
                                         )
             return JsonResponse(data)
         if Event.objects.filter(start=time, end=time+datetime.timedelta(minutes=slot_time), tutor=request.user, isAval = False).exists():
@@ -84,7 +84,7 @@ def add_event(request):
                                         content="The appointment you tried to create conflicts with an existing booked appointment, so it was not created.",
                                         time_stamp=datetime.datetime.now(),
                                         viewed=False,
-                                        receiver=event.tutor,
+                                        receiver=request.user,
                                         )
             return JsonResponse(data)
         event = Event(name=str(title), start=time, end=time + datetime.timedelta(minutes=slot_time), tutor=request.user,
