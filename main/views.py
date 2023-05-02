@@ -109,20 +109,20 @@ def all_events(request, class_id="", first_professors="", middle="", last_profes
         if now.timestamp() > (event_end.timestamp() + 14400):
             if event.student:
                 TextMessages.objects.create(subject="Appointment Deleted",
-                                        content="The appointment with " + event.student.username + " on " + event.weekday + ", " + event.month + ", " + event.day + " has passed and has been deleted",
+                                        content="The " + event.name + " appointment with " + event.student.username + " on " + event.weekday + ", " + event.month + ", " + event.day + " has passed and has been deleted",
                                         time_stamp=datetime.datetime.now(),
                                         viewed=False,
                                         receiver=event.tutor,
                                         )
                 TextMessages.objects.create(subject="Appointment Deleted",
-                                            content="The appointment with " + event.tutor.username + " on " + event.weekday + ", " + event.month + ", " + event.day + " has passed and has been deleted",
+                                            content="The " + event.name + " appointment with " + event.tutor.username + " on " + event.weekday + ", " + event.month + ", " + event.day + " has passed and has been deleted",
                                             time_stamp=datetime.datetime.now(),
                                             viewed=False,
                                             receiver=event.tutor,
                                             )
             else:
                 TextMessages.objects.create(subject="Appointment Deleted",
-                                            content="The appointment on " + str(event.weekday) + ", " + str(event.month) + ", " + str(event.day) + " was not accepted, has passed, and has been deleted",
+                                            content="The " + event.name + " appointment on " + str(event.weekday) + ", " + str(event.month) + ", " + str(event.day) + " was not accepted, has passed, and has been deleted",
                                             time_stamp=datetime.datetime.now(),
                                             viewed=False,
                                             receiver=event.tutor,
@@ -141,7 +141,6 @@ def all_events(request, class_id="", first_professors="", middle="", last_profes
 def update(request):
     data = {}
     start = request.GET.get("start", None)
-    end = request.GET.get("end", None)
     title = request.GET.get("title", None)
     id = request.GET.get("id", None)
     event = Event.objects.get(id=id)
@@ -172,7 +171,7 @@ def remove(request):
     if user.user_type == 1:
         if event.student:
             TextMessages.objects.create(subject="Appointment Deleted",
-                                        content=request.user.username + " canceled their appointment on " + event.weekday + ", " + event.month + ", " + event.day + ".\nPlease make sure to schedule another tutoring session if it is still required.!",
+                                        content=request.user.username + " canceled their "+ event.name + " appointment on " + event.weekday + ", " + event.month + ", " + event.day + ".\nPlease make sure to schedule another tutoring session if it is still required.!",
                                         time_stamp=datetime.datetime.now(),
                                         viewed=False,
                                         receiver=event.student,
@@ -183,7 +182,7 @@ def remove(request):
         event.isAval = True
         event.save()
         TextMessages.objects.create(subject="Appointment Deleted",
-                                    content=str(user.username) + " canceled their appointment on " + str(event.weekday) + ", " + str(event.month) + ", " + str(event.day) + ".\nThe appointment is once again open!",
+                                    content=str(user.username) + " canceled their "+ event.name + " appointment on " + str(event.weekday) + ", " + str(event.month) + ", " + str(event.day) + ".\nThe appointment is once again open!",
                                     time_stamp=datetime.datetime.now(),
                                     viewed=False,
                                     receiver=event.tutor,
@@ -234,20 +233,20 @@ def classes(response, class_id, first_professors, middle="", last_professors="")
         if now.timestamp() > (event_end.timestamp() + 14400):
             if event.student:
                 TextMessages.objects.create(subject="Appointment Deleted",
-                                        content="The appointment with " + event.student.username + " on " + event.weekday + ", " + event.month + ", " + event.day + " has passed and has been deleted",
+                                        content="The appointment " + event.name + " with " + event.student.username + " on " + event.weekday + ", " + event.month + ", " + event.day + " has passed and has been deleted",
                                         time_stamp=datetime.datetime.now(),
                                         viewed=False,
                                         receiver=event.tutor,
                                         )
                 TextMessages.objects.create(subject="Appointment Deleted",
-                                            content="The appointment with " + event.tutor.username + " on " + event.weekday + ", " + event.month + ", " + event.day + " has passed and has been deleted",
+                                            content="The appointment " + event.name + " with " + event.tutor.username + " on " + event.weekday + ", " + event.month + ", " + event.day + " has passed and has been deleted",
                                             time_stamp=datetime.datetime.now(),
                                             viewed=False,
                                             receiver=event.student,
                                             )
             else:
                 TextMessages.objects.create(subject="Appointment Deleted",
-                                            content="The appointment on " + event.weekday + ", " + event.month + ", " + event.day + " was not accepted, has passed, and has been deleted",
+                                            content="The appointment " + event.name + " on " + event.weekday + ", " + event.month + ", " + event.day + " was not accepted, has passed, and has been deleted",
                                             time_stamp=datetime.datetime.now(),
                                             viewed=False,
                                             receiver=event.tutor,
@@ -282,7 +281,7 @@ def classes(response, class_id, first_professors, middle="", last_professors="")
                         cleaned_events = Event.objects.filter(tutor=user, name = header)
                         for event in cleaned_events:
                             TextMessages.objects.create(subject="Appointment Deleted",
-                                                        content="The appointment on " + event.weekday + ", " + event.month + ", " +  event.day + " has been deleted.",
+                                                        content="The appointment " + event.name + " on " + event.weekday + ", " + event.month + ", " +  event.day + " has been deleted.",
                                                         time_stamp=datetime.datetime.now(),
                                                         viewed=False,
                                                         receiver=event.student,
@@ -307,7 +306,7 @@ def classes(response, class_id, first_professors, middle="", last_professors="")
                                                  event_end_hour=this_event.end_hour)
                 request.save()
                 TextMessages.objects.create(subject="Requested Appointment",
-                                            content="Sent a request to " + request.tutor.username + " for " + request.event_weekday + ", " + request.event_month + ", " + request.event_day + "\nYou will be notified if they are able attend.",
+                                            content="Sent a request to " + request.tutor.username + " for the event " + event.name + " on " + request.event_weekday + ", " + request.event_month + ", " + request.event_day + "\nYou will be notified if they are able attend.",
                                             time_stamp=datetime.datetime.now(),
                                             viewed=False,
                                             receiver=response.user,
@@ -315,7 +314,7 @@ def classes(response, class_id, first_professors, middle="", last_professors="")
                 return redirect("/student_home/searchbar/?mnemonic=" + letters_only)
 
             TextMessages.objects.create(subject="Requested Appointment",
-                                        content="You already requested this appointment so the request was not made! " + this_event.tutor.username + " will get in touch with you regarding your previous event when they can.",
+                                        content="You already requested a " + this_event.name + " appointment at this time, so the request was not made! " + this_event.tutor.username + " will get in touch with you regarding your previous event when they can.",
                                         time_stamp=datetime.datetime.now(),
                                         viewed=False,
                                         receiver=response.user,
@@ -369,9 +368,9 @@ def messages_and_requests(response):
         for m in scal:
             sorted_cal[cal[m]] = cal[m]
         page = ''
-        unread_received_texts = TextMessages.objects.filter(receiver = response.user, viewed = False)
-        read_texts = TextMessages.objects.filter(receiver = response.user, viewed = True)
-        sent_texts = TextMessages.objects.filter(sender = response.user)
+        unread_received_texts = TextMessages.objects.filter(receiver = response.user, viewed = False).order_by('-time_stamp')
+        read_texts = TextMessages.objects.filter(receiver = response.user, viewed = True).order_by('-time_stamp')
+        sent_texts = TextMessages.objects.filter(sender = response.user).order_by('-time_stamp')
     if response.GET.get:
         if response.GET:
             page = response.GET['message_option']
@@ -384,19 +383,20 @@ def messages_and_requests(response):
         adjusted_event.student = request.student
         adjusted_event.isAval = False
         adjusted_event.save()
-        request.delete()
         new_text = TextMessages.objects.create(subject="Appointment Accepted",
-                                               content=request.tutor.username + " has accepted an appointment with you on " + request.event_weekday + ", " + request.event_month + ", " + request.event_day + "\nSee you there, and message me if you need too!",
+                                               content=request.tutor.username + " has accepted an appointment with you on " + request.event_weekday + ", " + request.event_month + ", " + request.event_day + " for " + adjusted_event.name + "\nSee you there, and message me if you need too!",
                                                time_stamp=datetime.datetime.now(),
                                                viewed=False,
                                                receiver=request.student,
                                                sender=request.tutor,
                                                )
+        new_text.save()
+        request.delete()
         if Request.objects.filter(event_id = adjusted_event.id).exists():
             deleting_requests = Request.objects.filter(event_id = adjusted_event.id)
             for req in deleting_requests:
                 new_text = TextMessages.objects.create(subject="Appointment Rejection",
-                                                       content="Unfortunately, " + req.tutor.username + " was unable to meet with you on " + req.event_weekday + ", " + req.event_month + ", " + req.event_day + "\nPlease try finding another time or available tutor!",
+                                                       content="Unfortunately, " + req.tutor.username + " was unable to meet with you on " + req.event_weekday + ", " + req.event_month + ", " + req.event_day + " for " + adjusted_event.name + "\nPlease try finding another time or available tutor!",
                                                        time_stamp=datetime.datetime.now(),
                                                        viewed=False,
                                                        receiver=req.student
@@ -416,12 +416,14 @@ def messages_and_requests(response):
                 event.delete()
     elif response.POST.get("Reject"):
         request = Request.objects.get(id=response.POST.get("Reject"))
+        this_event = Event.objects.get(id=request.event_id)
         new_text = TextMessages.objects.create(subject="Appointment Rejection",
-                                           content = "Unfortunately, " + request.tutor.username + " was unable to meet with you on " + request.event_weekday + ", " + request.event_month + ", " + request.event_day + "\nPlease try finding another time or available tutor!",
+                                           content = "Unfortunately, " + request.tutor.username + " was unable to meet with you on " + request.event_weekday + ", " + request.event_month + ", " + request.event_day + " for " + this_event.name + "\nPlease try finding another time or available tutor!",
                                            time_stamp = datetime.datetime.now(),
                                            viewed = False,
                                            receiver = request.student
-                                           )                                                        ,
+                                           )
+        new_text.save()
         request.delete()
         requests = Request.objects.filter(tutor=response.user)
     elif response.POST.get("Mark as Read"):

@@ -60,7 +60,7 @@ CRISPY_TEMPLATE_PACK = "bootstrap5"
 if 'DATABASE_URL' in os.environ:
     SITE_ID = 13
 else:
-    SITE_ID = 11
+    SITE_ID = 10
 
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
