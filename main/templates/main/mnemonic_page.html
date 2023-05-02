@@ -9,13 +9,7 @@
 {% block body_block %}
 
     <div style="text-align:center; margin-top:50px; height: 70vh;">
-        {% if messages %}
-            <ul style="list-style-type:none; margin-bottom:30px;" class="messages">
-                {% for message in messages %}
-                    <li {% if message.tags %} class="{{ message.tags }}" {% endif %}>{{ message }}</li>
-                {% endfor %}
-            </ul>
-        {% endif %}
+        
 
         {% if user.user_type == 2 %}
             <h3 style="margin-top:20px;">Find Tutors</h3>
@@ -30,6 +24,13 @@
                     </div>
                 </div>
             </form>
+        {% if messages %}
+            <ul style="list-style-type:none; margin-bottom:30px;" class="messages">
+                {% for message in messages %}
+                    <li {% if message.tags %} class="{{ message.tags }}" {% endif %}><h4 style = "color: red">{{ message }}</h4></li>
+                {% endfor %}
+            </ul>
+        {% endif %}
     </div>
 
 {% endblock body_block %}
