@@ -62,10 +62,8 @@ def schedule(response):
 
 def add_event(request):
     group = Group.objects.get(name=request.GET.get("title"))
-    print(group.name)
     start = request.GET.get("start", None)
     end = request.GET.get("end", None)
-    print(end)
     title = request.GET.get("title", None)
     data = {"group": group.name}
     format = "%Y-%m-%d %H:%M:%S"
@@ -73,8 +71,6 @@ def add_event(request):
     time = datetime.datetime.strptime(start, format)
     end = datetime.datetime.strptime(end, format)
     while time < end:
-        print('event start', time)
-        print('event end', time + datetime.timedelta(minutes=slot_time))
         if Event.objects.filter(name=str(title), start=time, end=time+datetime.timedelta(minutes=slot_time), tutor=request.user).exists():
             return JsonResponse(data)
         event = Event(name=str(title), start=time, end=time + datetime.timedelta(minutes=slot_time), tutor=request.user,
@@ -96,7 +92,7 @@ def all_events(request, class_id="", first_professors="", middle="", last_profes
     now = datetime.datetime.now()
     for event in all_events:
         event_end = event.end
-        if now.timestamp() > event_end.timestamp():
+        if now.timestamp() > (event_end.timestamp() + 14400):
             if event.student:
                 TextMessages.objects.create(subject="Appointment Deleted",
                                         content="The appointment with " + event.student.username + " on " + event.weekday + ", " + event.month + ", " + event.day + " has passed and has been deleted",
@@ -112,7 +108,7 @@ def all_events(request, class_id="", first_professors="", middle="", last_profes
                                             )
             else:
                 TextMessages.objects.create(subject="Appointment Deleted",
-                                            content="The appointment with on " + str(event.weekday) + ", " + str(event.month) + ", " + str(event.day) + " was not accepted, has passed, and has been deleted",
+                                            content="The appointment on " + str(event.weekday) + ", " + str(event.month) + ", " + str(event.day) + " was not accepted, has passed, and has been deleted",
                                             time_stamp=datetime.datetime.now(),
                                             viewed=False,
                                             receiver=event.tutor,
@@ -171,8 +167,6 @@ def remove(request):
 
 
 def account(response):
-    # user_id = response.GET.get("username")
-    # print(user_id)
     if response.method == "POST":
         if response.POST.get('logout'):
             logout(response)
@@ -200,14 +194,10 @@ def account(response):
 
 def classes(response, class_id, first_professors, middle="", last_professors=""):
     user = response.user
-    print(user.user_type)
     if (middle == ""):
-        print("single")
         professors = first_professors + " " + last_professors
     else:
-        print("double")
         professors = first_professors + " " + middle + " " + last_professors
-    print("professors", professors)
     my_instance = ClassDatabase.objects.filter(class_id=class_id, professors=professors)
     header = class_id + " " + professors
     dict = {}
@@ -216,7 +206,7 @@ def classes(response, class_id, first_professors, middle="", last_professors="")
     event_name = Event.objects.all()
     for event in event_name:
         event_end = event.end
-        if now.timestamp() > event_end.timestamp():
+        if now.timestamp() > (event_end.timestamp() + 14400):
             if event.student:
                 TextMessages.objects.create(subject="Appointment Deleted",
                                         content="The appointment with " + event.student.username + " on " + event.weekday + ", " + event.month + ", " + event.day + " has passed and has been deleted",
@@ -239,11 +229,9 @@ def classes(response, class_id, first_professors, middle="", last_professors="")
                                             )
             event.delete()
     event_name = Event.objects.all()
-    print('event_name', event_name)
     # This is what we will use, using a different one for testing
     # event_name = Event.objects.get(name= header)
     users = group_name.user_set.all()
-    print("users", type(users), users)
     letters_only = ''.join(filter(str.isalpha, class_id))
 
 
@@ -469,7 +457,6 @@ def searchbar_tutee(request):
         search = request.GET.get('mnemonic')
         if not search is None:
             search_mnemonic = str(search).upper()
-            print("search mnemon", search_mnemonic)
             existing_list = []
             existing_classes = ClassDatabase.objects.filter(class_mnen=search_mnemonic).order_by('class_id')
             for i in existing_classes:
@@ -505,7 +492,6 @@ def searchbar_tutee(request):
             filters = FilterCourses(request.GET,queryset= existing_classes, filter_value=search_mnemonic)
             context = {"filters": filters,'name':search_mnemonic}
         else:
-            print(request.GET)
             if request.GET['class_id']:
                 full_class_id = request.GET['class_id']
                 selected_description = ClassDescription.objects.get(id=full_class_id)
@@ -600,7 +586,6 @@ def searchbar_tutor(request):
 
             context = {"filters": filters, 'name': search_mnemonic, 'user': user, 'results': tutor_group}
         else:
-            print(request.GET)
             if request.GET['class_id']:
                 full_class_id = request.GET['class_id']
                 selected_description = ClassDescription.objects.get(id=full_class_id)
@@ -620,7 +605,6 @@ def searchbar_tutor(request):
                 selection = ClassDatabase.objects.filter(class_mnen=selected_mnem)
                 filters = FilterCourses(request.GET, queryset=selection, filter_value=selected_mnem)
             else:
-                print('user', request.user.user_type)
                 messages.error(request, "You must choose a valid parameter before searching!")
                 if request.user.user_type == 1:
                     return redirect('/tutor_home/')
@@ -650,18 +634,15 @@ def database_setup(request):
             major_data = {'data': major_url_data}
             json_dict = {}
             for j in range(len(major_data["data"]['subjects'])):
-                print('major_data', major_data['data']['subjects'][j]['subject'])
                 search_mnemonic_json = major_data['data']['subjects'][j]['subject']
                 class_list = []
                 pages = 100
                 for page_number in range(1, pages):
-                    print("pages numbers", page_number)
                     url = "https://sisuva.admin.virginia.edu/psc/ihprd/UVSS/SA/s/WEBLIB_HCX_CM.H_CLASS_SEARCH.FieldFormula.IScript_ClassSearch?institution=UVA01&term=1232&subject=" + search_mnemonic_json + "&page=" + str(
                         page_number)
                     url_data = View.get_json_data(url)
                     data = {'data': url_data}
                     if (data["data"] == []):
-                        print("breaking")
                         break
                     for j in range(len(data["data"])):
                         class_info = data['data'][j]['catalog_nbr']
@@ -684,13 +665,11 @@ def database_setup(request):
                 for i in existing_classes:
                     existing_list.append(str(i))
                 for acronym in database_file:
-                    print('acronym', acronym)
                     for item in database_file[acronym]:
                         class_info = item[0]['class_info']
                         instructor = item[1]['instructors'][0]['name']
                         name = item[2]['descr']
                         database_object = acronym + class_info + " " + name + " " + instructor
-                        print('database object', database_object)
                         if not database_object in existing_list:
                             existing_list.append(database_object)
                             group = Group.objects.create(name= acronym + class_info + " " + instructor)
