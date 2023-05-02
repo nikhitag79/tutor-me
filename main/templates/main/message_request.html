@@ -21,7 +21,8 @@
         {% endif %}
         <form method="get">
             {% csrf_token %}
-<div class="col-md-3" style="float:right; margin-top: 75px;">
+            
+<div class="col-md-3" style="float:right;"> <!-- margin-top: 75px;-->
   <div class="input-group">
     <select name="message_option" class="form-control">
       {% if user.user_type == 2 %}
@@ -44,11 +45,13 @@
   </div>
 </div>
         </form>
-<!--        tutor unread -->
         {% if page %}
-            <h1> 1 {{page}}</h1>
+        <h1>{{page}}</h1>
+<!--        tutor unread -->
         {% if page == "Unread" %}
         {% if unread_received_texts %}
+        <br>
+        <br>
                 {% for text in unread_received_texts %}
         <style>
     fieldset {
@@ -158,8 +161,13 @@
         {% elif page == "Read" %}
             {% if read_texts %}
                 <fieldset>
-  <div style="text-align: center;">
-    <table style="border-collapse: collapse; margin: 50px auto; width: 90%;">
+  <div class="container mt-4">
+   <div class="row justify-content-center">
+       <div class="col-lg-10">
+           <div class="card">
+               <div class="card-body">
+                   <div class="table-responsive">
+    <table > <!--style="border-collapse: collapse; margin: 50px auto; width: 90%;"-->
       <thead>
         <tr style="background-color: #f8f9fa; border-bottom: 1px solid #dee2e6; color: #6c757d; font-size: 0.9rem;">
           <th style="padding: 0.75rem; text-align: left;">Subject</th>
@@ -190,7 +198,7 @@
         {% endfor %}
       </tbody>
     </table>
-  </div>
+  </div></div></div></div></div></div>
 </fieldset>
 
             {% else %}
@@ -445,6 +453,9 @@
 <!--        studnet unread>-->
             <h1>Unread</h1>
             {% if unread_received_texts %}
+            <br>
+            <br>
+            <br>
                 {% for text in unread_received_texts %}
         <style>
     fieldset {
@@ -512,10 +523,15 @@
         width: auto;
         margin-right: 5px;
     }
-</style>
+</style> <!--STUDENT Unread-->
                     <fieldset>
-                                <div style="text-align:center;">
-                                    <table style ="..." style="margin: 20px auto; border-collapse: collapse; text-align: center;">
+                      <div class="container mt-4">
+                      <div class="row justify-content-center">
+                          <div class="col-lg-10">
+                              <div class="card">
+                                  <div class="card-body">
+                                      <div class="table-responsive">
+                                    <table style ="..." ><!--style="margin: 20px auto; border-collapse: collapse; text-align: center;"-->
                                         <thead>
                                         <tr style = "...">
                                             <th style="...">Subject</th>
@@ -542,6 +558,11 @@
                                         </tr>
                                     </table>
                                 </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
                                 </fieldset>
                 {% endfor %}
             {% else %}
