@@ -73,9 +73,9 @@
                     Account
                   </a>
                   <ul class="dropdown-menu dropdown-menu-end dropdown-menu-dark" aria-labelledby="navbarDarkDropdownMenuLink">
-                    <li><a class="dropdown-item" href="/account/">View Profile</a></li>
-                    <li><form class = "nav-link justify-content-end" method = "POST">{% csrf_token %}
-                      <button name = "logout" value="logout" type="submit">Logout</button>
+                    <li><a class="dropdown-item" href="/account/" style = "text-align: right;">View Profile</a></li>
+                    <li><form method = "POST">{% csrf_token %}
+                      <button class = "dropdown-item" name = "logout" value="logout" type="submit" style = "text-align: right;">Logout</button>
                     </form></li>
                   </ul>
                 </li>
