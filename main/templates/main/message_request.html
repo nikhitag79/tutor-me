@@ -3,14 +3,7 @@
 {% block title_block %}
    {% comment %} <h1 style="text-align:center">{{ name }}</h1> {% endcomment %}
 {% endblock %}
-
-
-
 {% block body_block %}
-
-
-
-
     <div style="text-align:center; margin-top:50px;">
         {% if messages %}
             <ul style="list-style-type:none; margin-bottom:30px;" class="messages">
@@ -21,32 +14,104 @@
         {% endif %}
         <form method="get">
             {% csrf_token %}
-        <div class="col-md-3">
-            <label>Options</label>
-            <select name="message_option" class="form-control">
-                {% if user.user_type == 2 %}
-                    <option value = "Unread" selected>Unread Messages</option>
-                    <option value = "Read">Read Messages</option>
-                    <option value = "Sent">Sent Messages</option>
-                    <option value = "Upcoming">Upcoming Appointments</option>
-                {% elif user.user_type == 1 %}
-                    <option value = "Unread">Unread Messages</option>
-                    <option value = "Read">Read Messages</option>
-                    <option value = "Sent">Sent Messages</option>
-                    <option value = "Upcoming">Booked Appointments</option>
-                    <option value = "Unaccepted">Open Appointmentents</option>
-                    <option value = "Tutor Requests" selected>Open Requests</option>
-                {% endif %}
-            </select>
-            <br>
-            <input type="submit" value="View">
-        </div>
+            
+<div class="col-md-3" style="float:right;"> <!-- margin-top: 75px;-->
+  <div class="input-group">
+    <select name="message_option" class="form-select">
+      {% if user.user_type == 2 %}
+        <option value="Unread" selected>Unread Messages</option>
+        <option value="Read">Read Messages</option>
+        <option value="Sent">Sent Messages</option>
+        <option value="Upcoming">Upcoming Appointments</option>
+      {% elif user.user_type == 1 %}
+        <option value="Unread">Unread Messages</option>
+        <option value="Read">Read Messages</option>
+        <option value="Sent">Sent Messages</option>
+        <option value="Upcoming">Booked Appointments</option>
+        <option value="Unaccepted">Open Appointments</option>
+        <option value="Tutor Requests" selected>Open Requests</option>
+      {% endif %}
+    </select>
+    <div class="input-group-append">
+      <button class="btn btn-outline-secondary" type="submit">View</button>
+    </div>
+  </div>
+</div>
         </form>
         {% if page %}
-            <h1>{{page}}</h1>
+        <h1>{{page}}</h1>
+<!--        tutor unread -->
         {% if page == "Unread" %}
-            {% if unread_received_texts %}
+        {% if unread_received_texts %}
+        <br>
+        <br>
                 {% for text in unread_received_texts %}
+        <style>
+    fieldset {
+        border: 1px solid #ccc;
+        margin: 10px;
+        padding: 10px;
+        border-radius: 5px;
+    }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        text-align: center;
+    }
+
+    th, td {
+        padding: 10px;
+        border: 1px solid #ccc;
+    }
+
+    th {
+        background-color: #f2f2f2;
+    }
+
+    td:last-child {
+        white-space: nowrap;
+    }
+
+    button {
+        margin: 5px;
+    }
+
+    .btn-success {
+        background-color: #28a745;
+        border-color: #28a745;
+    }
+
+    .btn-success:hover {
+        background-color: #218838;
+        border-color: #1e7e34;
+    }
+
+    .btn-danger {
+        background-color: #dc3545;
+        border-color: #dc3545;
+    }
+
+    .btn-danger:hover {
+        background-color: #c82333;
+        border-color: #bd2130;
+    }
+
+    .btn-warning {
+        background-color: #ffc107;
+        border-color: #ffc107;
+    }
+
+    .btn-warning:hover {
+        background-color: #e0a800;
+        border-color: #d39e00;
+    }
+
+    .form-control {
+        display: inline-block;
+        width: auto;
+        margin-right: 5px;
+    }
+</style>
                     <fieldset>
                                 <div style="text-align:center;">
                                     <table style ="..." style="margin: 20px auto; border-collapse: collapse; text-align: center;">
@@ -78,145 +143,295 @@
                                 </div>
                                 </fieldset>
                 {% endfor %}
+
+
+
             {% else %}
                 <h3 style>You have no unread messages</h3>
             {% endif %}
+<!--        first-->
         {% elif page == "Read" %}
             {% if read_texts %}
-                {% for text in read_texts %}
-                    <fieldset>
-                                <div style="text-align:center;">
-                                    <table style ="..." style="margin: 20px auto; border-collapse: collapse; text-align: center;">
-                                        <thead>
-                                        <tr style = "...">
-                                            <th style="...">Subject</th>
-                                            <th style="...">Content</th>
-                                            <th style="...">Date</th>
-                                            <th style="...">Action</th>
-                                        </tr>
-                                        </thead>
-                                        <tr>
-                                            <td style="...">{{ text }}</td>
-                                            <td style="...">{{ text.content }}</td>
-                                            <td style="...">{{ text.time_stamp }}</td>
-                                            <td style="...">
-                                            <form method="post">
-                                                {% csrf_token %}
-                                                <button class="btn btn-danger" name="Delete" type="submit" value="{{ text.id }}">Delete</button>
-                                                {% if text.sender %}
-                                                <input type="text" class="form-control" name="reply_message" placeholder="Leave a Reply">
-                                                <button class="btn btn-warning" name="Reply" type="submit" value="{{ text.id }}">Reply</button>
-                                                {% endif %}
-                                            </form>
-                                            </td>
-                                        </tr>
-                                    </table>
-                                </div>
-                                </fieldset>
-                {% endfor %}
+                <fieldset>
+  <div class="container mt-4">
+   <div class="row justify-content-center">
+       <div class="col-lg-10">
+           <div class="card">
+               <div class="card-body">
+                   <div class="table-responsive">
+    <table > <!--style="border-collapse: collapse; margin: 50px auto; width: 90%;"-->
+      <thead>
+        <tr style="background-color: #f8f9fa; border-bottom: 1px solid #dee2e6; color: #6c757d; font-size: 0.9rem;">
+          <th style="padding: 0.75rem; text-align: left;">Subject</th>
+          <th style="padding: 0.75rem; text-align: left;">Content</th>
+          <th style="padding: 0.75rem; text-align: left;">Date</th>
+          <th style="padding: 0.75rem; text-align: center;">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for text in read_texts %}
+        <tr style="border-bottom: 1px solid #dee2e6;">
+          <td style="padding: 0.75rem;">{{ text.subject }}</td>
+          <td style="padding: 0.75rem;">{{ text.content }}</td>
+          <td style="padding: 0.75rem;">{{ text.time_stamp }}</td>
+          <td style="padding: 0.75rem; text-align: center;">
+            <form method="post">
+              {% csrf_token %}
+              <button class="btn btn-danger" name="Delete" type="submit" value="{{ text.id }}"><i class="fas fa-trash"></i> Delete</button>
+              {% if text.sender %}
+              <div style="margin-top: 10px;">
+                <input type="text" class="form-control" name="reply_message" placeholder="Leave a Reply">
+                <button class="btn btn-warning" name="Reply" type="submit" value="{{ text.id }}"><i class="fas fa-reply"></i> Reply</button>
+              </div>
+              {% endif %}
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div></div></div></div></div></div>
+</fieldset>
+
             {% else %}
                 <h3>You have no read messages</h3>
             {% endif %}
         {% elif page == "Sent" %}
             {% if sent_texts %}
-                {% for text in sent_texts %}
-                    <fieldset>
-                                <div style="text-align:center;">
-                                    <table style ="..." style="margin: 20px auto; border-collapse: collapse; text-align: center;">
-                                        <thead>
-                                        <tr style = "...">
-                                            <th style="...">Subject</th>
-                                            <th style="...">Content</th>
-                                            <th style="...">Date</th>
-                                            <th style="...">Action</th>
-                                        </tr>
-                                        </thead>
-                                        <tr>
-                                            <td style="...">{{ text }}</td>
-                                            <td style="...">{{ text.content }}</td>
-                                            <td style="...">{{ text.time_stamp }}</td>
-                                            <td style="...">
-                                            <form method="post">
-                                                {% csrf_token %}
-                                                <button class="btn btn-danger" name="Delete" type="submit" value="{{ text.id }}">Delete</button>
-                                            </form>
-                                            </td>
-                                        </tr>
-                                    </table>
-                                </div>
-                                </fieldset>
-                {% endfor %}
+<style>
+  table {
+    border-collapse: collapse;
+    width: 100%;
+  }
+
+  th, td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+  }
+
+  th {
+    background-color: #f2f2f2;
+    font-weight: bold;
+    text-transform: uppercase;
+  }
+
+  td.actions {
+    text-align: center;
+  }
+
+  button {
+    background-color: #dc3545;
+    border: none;
+    color: white;
+    padding: 6px 12px;
+  }
+
+  button:hover {
+    background-color: #c82333;
+  }
+</style>
+
+{% for text in sent_texts %}
+<div class="container mt-4">
+ <div class="row justify-content-center">
+     <div class="col-lg-10">
+         <div class="card">
+             <div class="card-body">
+                 <div class="table-responsive">
+  <table>
+    <thead>
+      <tr>
+        <th>Subject</th>
+        <th>Date</th>
+        <th class="actions">Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>{{ text.subject }}</td>
+        <td>{{ text.time_stamp }}</td>
+        <td class="actions">
+          <form method="post">
+            {% csrf_token %}
+            <button name="Delete" type="submit" value="{{ text.id }}">Delete</button>
+          </form>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="3">{{ text.content }}</td>
+      </tr>
+    </tbody>
+  </table>
+</div></div></div></div></div></div>
+{% endfor %}
+
             {% else %}
                 <h3>You have no sent messages</h3>
             {% endif %}
         {% elif page == "Upcoming" %}
+               <br>       <br>
             {% if booked %}
+
                 {% for item in booked %}
-                    <fieldset>
-                                <div style="text-align:center;">
-                                    <table style ="..." style="margin: 20px auto; border-collapse: collapse; text-align: center;">
-                                        <thead>
-                                        <tr style = "...">
-                                            <th style="...">Subject</th>
-                                            {%if user.user_type == 2 %}
-                                            <th style="...">Tutor</th>
-                                            {%elif user.user_type == 1 %}
-                                            <th style="...">Student</th>
-                                            {% endif %}
-                                            <th style="...">Action</th>
-                                        </tr>
-                                        </thead>
-                                        <tr>
-                                            <td style="...">{{ item }}</td>
-                                            {%if user.user_type == 2 %}
-                                            <td style="...">{{ item.tutor }}</td>
-                                            {%elif user.user_type == 1 %}
-                                            <td style="...">{{ item.student }}</td>
-                                            {% endif %}
-                                            <td style="...">
-                                            <form method="post">
-                                                {% csrf_token %}
-                                                <button class="btn btn-danger" name="Delete_Event" type="submit" value="{{ item.id }}">Delete</button>
-                                            </form>
-                                            </td>
-                                        </tr>
-                                    </table>
-                                </div>
-                                </fieldset>
-                {% endfor %}
+
+  <fieldset>
+    <div class="container mt-4">
+     <div class="row justify-content-center">
+         <div class="col-lg-10">
+             <div class="card">
+                 <div class="card-body">
+                     <div class="table-responsive">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Subject</th>
+            {% if user.user_type == 2 %}
+              <th>Tutor</th>
+            {% elif user.user_type == 1 %}
+              <th>Student</th>
+            {% endif %}
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>{{ item }}</td>
+            {% if user.user_type == 2 %}
+              <td>{{ item.tutor }}</td>
+            {% elif user.user_type == 1 %}
+              <td>{{ item.student }}</td>
+            {% endif %}
+            <td>
+              <form method="post">
+                {% csrf_token %}
+                <button class="btn btn-danger" name="Delete_Event" type="submit" value="{{ item.id }}">Delete</button>
+              </form>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+</div>
+</div>
+</div>
+  </fieldset>
+{% endfor %}
+
             {% else %}
                 <h3>You have no booked appointments</h3>
             {% endif %}
         {% elif page == "Unaccepted" %}
             {% if unbooked %}
-                {% for item in unbooked %}
-                    <fieldset>
-                                <div style="text-align:center;">
-                                    <table style ="..." style="margin: 20px auto; border-collapse: collapse; text-align: center;">
-                                        <thead>
-                                        <tr style = "...">
-                                            <th style="...">Subject</th>
-                                            <th style="...">Action</th>
-                                        </tr>
-                                        </thead>
-                                        <tr>
-                                            <td style="...">{{ item }}</td>
-                                            <td style="...">
-                                            <form method="post">
-                                                {% csrf_token %}
-                                                <button class="btn btn-danger" name="Delete_Event" type="submit" value="{{ item.id }}">Delete</button>
-                                            </form>
-                                            </td>
-                                        </tr>
-                                    </table>
-                                </div>
-                                </fieldset>
-                {% endfor %}
+<fieldset>
+  <div class="container mt-4">
+   <div class="row justify-content-center">
+       <div class="col-lg-10">
+           <div class="card">
+               <div class="card-body">
+                   <div class="table-responsive">
+  <table style="width: 100%; margin: 50px auto; border-collapse: collapse; text-align: center;">
+    <thead>
+      <tr style="background-color: #f2f2f2;">
+        <th style="padding: 10px;">Subject</th>
+        <th style="padding: 10px;">Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in unbooked %}
+        <tr>
+          <td style="border: 1px solid #ddd; padding: 10px;">{{ item }}</td>
+          <td style="border: 1px solid #ddd; padding: 10px;">
+            <form method="post">
+              {% csrf_token %}
+              <button class="btn btn-danger" name="Delete_Event" type="submit" value="{{ item.id }}">Delete</button>
+            </form>
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</fieldset>
+
             {% else %}
                 <h3>You have no unbooked appointments</h3>
             {% endif %}
         {% elif page == "Tutor Requests" %}
             {% if requests %}
+
+        <style>
+    fieldset {
+        margin: 70px;
+        padding: 20px;
+        border: 2px solid #ccc;
+        border-radius: 5px;
+    }
+    legend {
+        font-size: 24px;
+        font-weight: bold;
+        padding: 10px;
+        background-color: #eee;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
+    table {
+        margin: 20px auto;
+        width: 90%;
+        border-collapse: collapse;
+    }
+    th, td {
+        padding: 12px 15px;
+        text-align: left;
+    }
+    th {
+        background-color: #f2f2f2;
+        font-weight: bold;
+    }
+    td:first-child {
+        font-weight: bold;
+    }
+    .btn {
+        display: inline-block;
+        padding: 6px 12px;
+        margin-bottom: 0;
+        font-size: 14px;
+        font-weight: 400;
+        line-height: 1.42857143;
+        text-align: center;
+        white-space: nowrap;
+        vertical-align: middle;
+        cursor: pointer;
+        background-image: none;
+        border: 1px solid transparent;
+        border-radius: 4px;
+    }
+    .btn-success {
+        color: #fff;
+        background-color: #5cb85c;
+        border-color: #4cae4c;
+    }
+    .btn-success:hover {
+        background-color: #449d44;
+        border-color: #398439;
+    }
+    .btn-danger {
+        color: #fff;
+        background-color: #d9534f;
+        border-color: #d43f3a;
+    }
+    .btn-danger:hover {
+        background-color: #c9302c;
+        border-color: #ac2925;
+    }
+</style>
                 <fieldset>
                     {% for month in sorted_calendar %}
                         <legend>{{month}} Requests</legend>
@@ -224,12 +439,12 @@
                                 {% if month == request.event_month %}
                                 <fieldset>
                                 <div style="text-align:center;">
-                                    <table style ="..." style="margin: 20px auto; border-collapse: collapse; text-align: center;">
+                                    <table style="margin: auto; width: 90%; border-collapse: collapse;">
                                         <thead>
-                                        <tr style = "...">
-                                            <th style="...">Date</th>
-                                            <th style="...">Request</th>
-                                            <th style="...">Action</th>
+                                        <tr style="background-color: #f2f2f2;">
+                                            <th style="padding: 12px 15px; text-align: left;">Date</th>
+                                            <th style="padding: 12px 15px; text-align: left;">Request</th>
+                                            <th style="padding: 12px 15px; text-align: left;">Action</th>
                                         </tr>
                                         </thead>
                                         <tr>
@@ -256,12 +471,88 @@
         {% endif %}
         {% else %}
             {% if user.user_type == 2 %}
+<!--        studnet unread>-->
             <h1>Unread</h1>
             {% if unread_received_texts %}
+            <br>
+            <br>
+            <br>
                 {% for text in unread_received_texts %}
+        <style>
+    fieldset {
+        border: 1px solid #ccc;
+        margin: 10px;
+        padding: 10px;
+        border-radius: 5px;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        text-align: center;
+    }
+
+    th, td {
+        padding: 10px;
+        border: 1px solid #ccc;
+    }
+
+    th {
+        background-color: #f2f2f2;
+    }
+
+    td:last-child {
+        white-space: nowrap;
+    }
+
+    button {
+        margin: 5px;
+    }
+
+    .btn-success {
+        background-color: #28a745;
+        border-color: #28a745;
+    }
+
+    .btn-success:hover {
+        background-color: #218838;
+        border-color: #1e7e34;
+    }
+
+    .btn-danger {
+        background-color: #dc3545;
+        border-color: #dc3545;
+    }
+
+    .btn-danger:hover {
+        background-color: #c82333;
+        border-color: #bd2130;
+    }
+
+    .btn-warning {
+        background-color: #ffc107;
+        border-color: #ffc107;
+    }
+
+    .btn-warning:hover {
+        background-color: #e0a800;
+        border-color: #d39e00;
+    }
+
+    .form-control {
+        display: inline-block;
+        width: auto;
+        margin-right: 5px;
+    }
+</style> <!--STUDENT Unread-->
                     <fieldset>
-                                <div style="text-align:center;">
-                                    <table style ="..." style="margin: 20px auto; border-collapse: collapse; text-align: center;">
+                      <div class="container mt-4">
+                      <div class="row justify-content-center">
+                          <div class="col-lg-10">
+                              <div class="card">
+                                  <div class="card-body">
+                                      <div class="table-responsive">
+                                    <table style ="..." ><!--style="margin: 20px auto; border-collapse: collapse; text-align: center;"-->
                                         <thead>
                                         <tr style = "...">
                                             <th style="...">Subject</th>
@@ -288,6 +579,11 @@
                                         </tr>
                                     </table>
                                 </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
                                 </fieldset>
                 {% endfor %}
             {% else %}
@@ -296,6 +592,72 @@
         {% elif user.user_type == 1 %}
             <h1>Tutor Requests</h1>
             {% if requests %}
+        <style>
+    fieldset {
+        margin: 75px;
+        padding: 20px;
+        border: 2px solid #ccc;
+        border-radius: 5px;
+    }
+    legend {
+        font-size: 24px;
+        font-weight: bold;
+        padding: 10px;
+        background-color: #eee;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
+    table {
+        margin: 20px auto;
+        width: 90%;
+        border-collapse: collapse;
+    }
+    th, td {
+        padding: 12px 15px;
+        text-align: left;
+    }
+    th {
+        background-color: #f2f2f2;
+        font-weight: bold;
+    }
+    td:first-child {
+        font-weight: bold;
+    }
+    .btn {
+        display: inline-block;
+        padding: 6px 12px;
+        margin-bottom: 0;
+        font-size: 14px;
+        font-weight: 400;
+        line-height: 1.42857143;
+        text-align: center;
+        white-space: nowrap;
+        vertical-align: middle;
+        cursor: pointer;
+        background-image: none;
+        border: 1px solid transparent;
+        border-radius: 4px;
+    }
+    .btn-success {
+        color: #fff;
+        background-color: #5cb85c;
+        border-color: #4cae4c;
+    }
+    .btn-success:hover {
+        background-color: #449d44;
+        border-color: #398439;
+    }
+    .btn-danger {
+        color: #fff;
+        background-color: #d9534f;
+        border-color: #d43f3a;
+    }
+    .btn-danger:hover {
+        background-color: #c9302c;
+        border-color: #ac2925;
+    }
+</style>
+
                 <fieldset>
                     {% for month in sorted_calendar %}
                         <legend>{{month}} Requests</legend>
@@ -303,12 +665,12 @@
                                 {% if month == request.event_month %}
                                 <fieldset>
                                 <div style="text-align:center;">
-                                    <table style ="..." style="margin: 20px auto; border-collapse: collapse; text-align: center;">
+                                    <table style="margin: auto; width: 90%; border-collapse: collapse;">
                                         <thead>
-                                        <tr style = "...">
-                                            <th style="...">Date</th>
-                                            <th style="...">Request</th>
-                                            <th style="...">Action</th>
+                                            <tr style="background-color: #f2f2f2;">
+                                             <th style="padding: 12px 15px; text-align: left;">Date</th>
+                                             <th style="padding: 12px 15px; text-align: left;">Request</th>
+                                             <th style="padding: 12px 15px; text-align: left;">Action</th>
                                         </tr>
                                         </thead>
                                         <tr>

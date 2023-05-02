@@ -175,7 +175,6 @@ class TestClass(TestCase):
     #     update(request)
     #     updated_event = Event.objects.get(id=9)
     #     self.assertEqual(updated_event.name, 'CS3240 New Title')
-
     def test_remove_tutor(self):
         self.factory = RequestFactory()
         self.group = Group.objects.create(name='Test Group', id=9)
@@ -489,7 +488,7 @@ class TestClass(TestCase):
         # error_messages = list(response.context.get('messages'))[0]
         #
         # self.assertEqual(len(error_messages), 1)
-        # self.assertEqual(str(error_messages[0]), 'Not an existing mnemonic')
+        # self.assertEqual(str(error_messages[0]), 'Not an existing mnemonic.')
 
     # def test_user(self):
     #     self.tutor = User.objects.create(user_type=1)
