@@ -147,17 +147,17 @@ def update(request):
     event = Event.objects.get(id=id)
     if event.isAval == False:
         return JsonResponse(data)
-    event.start = start
-    event.end = end
-    event.name = title
     format = "%Y-%m-%d %H:%M:%S"
     slot_time = 30
-    time = datetime.datetime.strptime(event.start, format)
-    event.month = \
-        time.strftime("%B")
+    time = datetime.datetime.strptime(start, format)
+    event.start = time
+    event.end = time+datetime.timedelta(minutes=slot_time)
+    event.name = title
+    slot_time = 30
+    event.month = time.strftime("%B")
     event.weekday = time.strftime("%A")
-    event.day = time.strftime("%d"),
-    event.start_hour = time.strftime("%H:%M"),
+    event.day = time.strftime("%d")
+    event.start_hour = time.strftime("%H:%M")
     event.end_hour = (time + datetime.timedelta(minutes=slot_time)).strftime("%H:%M")
     event.save()
     return JsonResponse(data)
