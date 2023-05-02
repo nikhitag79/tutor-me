@@ -15,7 +15,7 @@ import sys
 import re
 
 
-# Create your views here.
+
 
 def home(response):
     if response.POST.get('logout'):
