@@ -175,7 +175,6 @@ class TestClass(TestCase):
     #     update(request)
     #     updated_event = Event.objects.get(id=9)
     #     self.assertEqual(updated_event.name, 'CS3240 New Title')
-
     def test_remove_tutor(self):
         self.factory = RequestFactory()
         self.group = Group.objects.create(name='Test Group', id=9)
