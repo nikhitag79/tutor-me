@@ -46,55 +46,109 @@
         </form>
 <!--        tutor unread -->
         {% if page %}
-            <h1> {{page}}</h1>
+            <h1> 1 {{page}}</h1>
         {% if page == "Unread" %}
-            {% if unread_received_texts %}
-<div class="container mt-4">
-    <div class="row justify-content-center">
-        <div class="col-lg-10">
-            <div class="card">
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-hover">
-                            <thead>
-                                <tr>
-                                    <th>Subject</th>
-                                    <th>Content</th>
-                                    <th>Date</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for text in unread_received_texts %}
-                                <tr>
-                                    <td>{{ text.subject }}</td>
-                                    <td>{{ text.content }}</td>
-                                    <td>{{ text.time_stamp }}</td>
-                                    <td>
-                                        <form method="post">
-                                            {% csrf_token %}
-                                            <button class="btn btn-success btn-sm" name="mark_as_read" type="submit" value="{{ text.id }}">Mark as Read</button>
-                                            <button class="btn btn-danger btn-sm" name="delete" type="submit" value="{{ text.id }}">Delete</button>
-                                            {% if text.sender %}
-                                            <div class="input-group input-group-sm mt-2">
+        {% if unread_received_texts %}
+                {% for text in unread_received_texts %}
+        <style>
+    fieldset {
+        border: 1px solid #ccc;
+        margin: 10px;
+        padding: 10px;
+        border-radius: 5px;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        text-align: center;
+    }
+
+    th, td {
+        padding: 10px;
+        border: 1px solid #ccc;
+    }
+
+    th {
+        background-color: #f2f2f2;
+    }
+
+    td:last-child {
+        white-space: nowrap;
+    }
+
+    button {
+        margin: 5px;
+    }
+
+    .btn-success {
+        background-color: #28a745;
+        border-color: #28a745;
+    }
+
+    .btn-success:hover {
+        background-color: #218838;
+        border-color: #1e7e34;
+    }
+
+    .btn-danger {
+        background-color: #dc3545;
+        border-color: #dc3545;
+    }
+
+    .btn-danger:hover {
+        background-color: #c82333;
+        border-color: #bd2130;
+    }
+
+    .btn-warning {
+        background-color: #ffc107;
+        border-color: #ffc107;
+    }
+
+    .btn-warning:hover {
+        background-color: #e0a800;
+        border-color: #d39e00;
+    }
+
+    .form-control {
+        display: inline-block;
+        width: auto;
+        margin-right: 5px;
+    }
+</style>
+                    <fieldset>
+                                <div style="text-align:center;">
+                                    <table style ="..." style="margin: 20px auto; border-collapse: collapse; text-align: center;">
+                                        <thead>
+                                        <tr style = "...">
+                                            <th style="...">Subject</th>
+                                            <th style="...">Content</th>
+                                            <th style="...">Date</th>
+                                            <th style="...">Action</th>
+                                        </tr>
+                                        </thead>
+                                        <tr>
+                                            <td style="...">{{ text }}</td>
+                                            <td style="...">{{ text.content }}</td>
+                                            <td style="...">{{ text.time_stamp }}</td>
+                                            <td style="...">
+                                            <form method="post">
+                                                {% csrf_token %}
+                                                <button class="btn btn-success" name="Mark as Read" type="submit" value="{{ text.id }}">Mark as Read</button>
+                                                <button class="btn btn-danger" name="Delete" type="submit" value="{{ text.id }}">Delete</button>
+                                                {% if text.sender %}
                                                 <input type="text" class="form-control" name="reply_message" placeholder="Leave a Reply">
-                                                <div class="input-group-append">
-                                                    <button class="btn btn-warning" name="reply" type="submit" value="{{ text.id }}">Reply</button>
-                                                </div>
-                                            </div>
-                                            {% endif %}
-                                        </form>
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+                                                <button class="btn btn-warning" name="Reply" type="submit" value="{{ text.id }}">Reply</button>
+                                                {% endif %}
+                                            </form>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                </fieldset>
+                {% endfor %}
+
 
 
             {% else %}
@@ -147,7 +201,6 @@
 <style>
   table {
     border-collapse: collapse;
-    margin: 50px auto;
     width: 100%;
   }
 
@@ -179,42 +232,32 @@
   }
 </style>
 
-<fieldset>
-  <div class="table-container">
-    <table class="table">
-      <thead>
-        <tr class="table-header">
-          <th>Subject</th>
-          <th>Content</th>
-          <th>Date</th>
-          <th>Action</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for text in read_texts %}
-        <tr>
-          <td>{{ text.subject }}</td>
-          <td>{{ text.content }}</td>
-          <td>{{ text.time_stamp }}</td>
-          <td>
-            <form method="post">
-              {% csrf_token %}
-              <button class="btn btn-danger" name="Delete" type="submit" value="{{ text.id }}">Delete</button>
-              {% if text.sender %}
-              <div class="reply-section">
-                <input type="text" class="form-control" name="reply_message" placeholder="Leave a Reply">
-                <button class="btn btn-warning" name="Reply" type="submit" value="{{ text.id }}">Reply</button>
-              </div>
-              {% endif %}
-            </form>
-          </td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </div>
-</fieldset>
-
+{% for text in sent_texts %}
+  <table>
+    <thead>
+      <tr>
+        <th>Subject</th>
+        <th>Date</th>
+        <th class="actions">Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>{{ text.subject }}</td>
+        <td>{{ text.time_stamp }}</td>
+        <td class="actions">
+          <form method="post">
+            {% csrf_token %}
+            <button name="Delete" type="submit" value="{{ text.id }}">Delete</button>
+          </form>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="3">{{ text.content }}</td>
+      </tr>
+    </tbody>
+  </table>
+{% endfor %}
 
             {% else %}
                 <h3>You have no sent messages</h3>
@@ -402,54 +445,105 @@
 <!--        studnet unread>-->
             <h1>Unread</h1>
             {% if unread_received_texts %}
-                <div class="container mt-4">
-    <div class="row justify-content-center">
-        <div class="col-lg-10">
-            <div class="card">
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-hover">
-                            <thead>
-                                <tr>
-                                    <th>Subject</th>
-                                    <th>Content</th>
-                                    <th>Date</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for text in unread_received_texts %}
-                                <tr>
-                                    <td>{{ text.subject }}</td>
-                                    <td>{{ text.content }}</td>
-                                    <td>{{ text.time_stamp }}</td>
-                                    <td>
-                                        <form method="post">
-                                            {% csrf_token %}
-                                            <button class="btn btn-success btn-sm" name="mark_as_read" type="submit" value="{{ text.id }}">Mark as Read</button>
-                                            <button class="btn btn-danger btn-sm" name="delete" type="submit" value="{{ text.id }}">Delete</button>
-                                            {% if text.sender %}
-                                            <div class="input-group input-group-sm mt-2">
+                {% for text in unread_received_texts %}
+        <style>
+    fieldset {
+        border: 1px solid #ccc;
+        margin: 10px;
+        padding: 10px;
+        border-radius: 5px;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        text-align: center;
+    }
+
+    th, td {
+        padding: 10px;
+        border: 1px solid #ccc;
+    }
+
+    th {
+        background-color: #f2f2f2;
+    }
+
+    td:last-child {
+        white-space: nowrap;
+    }
+
+    button {
+        margin: 5px;
+    }
+
+    .btn-success {
+        background-color: #28a745;
+        border-color: #28a745;
+    }
+
+    .btn-success:hover {
+        background-color: #218838;
+        border-color: #1e7e34;
+    }
+
+    .btn-danger {
+        background-color: #dc3545;
+        border-color: #dc3545;
+    }
+
+    .btn-danger:hover {
+        background-color: #c82333;
+        border-color: #bd2130;
+    }
+
+    .btn-warning {
+        background-color: #ffc107;
+        border-color: #ffc107;
+    }
+
+    .btn-warning:hover {
+        background-color: #e0a800;
+        border-color: #d39e00;
+    }
+
+    .form-control {
+        display: inline-block;
+        width: auto;
+        margin-right: 5px;
+    }
+</style>
+                    <fieldset>
+                                <div style="text-align:center;">
+                                    <table style ="..." style="margin: 20px auto; border-collapse: collapse; text-align: center;">
+                                        <thead>
+                                        <tr style = "...">
+                                            <th style="...">Subject</th>
+                                            <th style="...">Content</th>
+                                            <th style="...">Date</th>
+                                            <th style="...">Action</th>
+                                        </tr>
+                                        </thead>
+                                        <tr>
+                                            <td style="...">{{ text }}</td>
+                                            <td style="...">{{ text.content }}</td>
+                                            <td style="...">{{ text.time_stamp }}</td>
+                                            <td style="...">
+                                            <form method="post">
+                                                {% csrf_token %}
+                                                <button class="btn btn-success" name="Mark as Read" type="submit" value="{{ text.id }}">Mark as Read</button>
+                                                <button class="btn btn-danger" name="Delete" type="submit" value="{{ text.id }}">Delete</button>
+                                                {% if text.sender %}
                                                 <input type="text" class="form-control" name="reply_message" placeholder="Leave a Reply">
-                                                <div class="input-group-append">
-                                                    <button class="btn btn-warning" name="reply" type="submit" value="{{ text.id }}">Reply</button>
-                                                </div>
-                                            </div>
-                                            {% endif %}
-                                        </form>
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-
+                                                <button class="btn btn-warning" name="Reply" type="submit" value="{{ text.id }}">Reply</button>
+                                                {% endif %}
+                                            </form>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                </fieldset>
+                {% endfor %}
             {% else %}
                     <h3 style="margin-top:20px;">You have no unread messages</h3>
             {% endif %}
